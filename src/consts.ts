@@ -6,7 +6,7 @@
 export const SITE_METADATA = {
     title: 'Jpasholk\' Blog',
     headerTitle: 'My Blog',
-    description: 'A blog created with Astro and Tailwind.css',
+    description: 'My new blog created with Astro and Tailwind.css',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
     siteUrl: 'https://astro-starter-blog.yon.fun/',
