@@ -4,7 +4,7 @@
  * A few of these are not used yet, and are subject to change, example of this is Author.
  */
 export const SITE_METADATA = {
-    title: 'Jpasholk',
+    title: 'Jpasholk\' Blog',
     headerTitle: 'My Blog',
     description: 'A blog created with Astro and Tailwind.css',
     language: 'en-us',
