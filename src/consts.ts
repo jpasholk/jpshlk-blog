@@ -9,7 +9,7 @@ export const SITE_METADATA = {
     description: 'My new blog created with Astro and Tailwind.css',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
-    siteUrl: 'https://astro-starter-blog.yon.fun/',
+    siteUrl: 'https://jpasholk-blog-test.netlify.app',
     siteRepo: 'https://github.com/wanoo21/tailwind-astro-starting-blog',
     siteLogo: '/static/images/logo.png',
     socialBanner: '/static/images/twitter-card.png',
@@ -20,11 +20,11 @@ export const SITE_METADATA = {
     author: 'Josh Pasholk',
     mastodon: 'https://mastodon.social/@mastodonuser',
     email: 'address@yoursite.com',
-    github: 'https://github.com',
+    github: 'https://github.com/jpasholk',
     twitter: 'https://twitter.com/Twitter',
     facebook: 'https://facebook.com',
     youtube: 'https://youtube.com',
-    linkedin: 'https://www.linkedin.com',
+    linkedin: 'https://www.linkedin.com/in/joshpasholk',
 
     // These are not supported yet
     // analytics: {
