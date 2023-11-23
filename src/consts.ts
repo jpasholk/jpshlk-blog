@@ -4,12 +4,12 @@
  * A few of these are not used yet, and are subject to change, example of this is Author.
  */
 export const SITE_METADATA = {
-    title: 'Astro Starter Blog',
-    headerTitle: 'Astro Starter Blog',
-    description: 'A blog created with Astro and Tailwind.css',
+    title: 'Jpasholk's Blog',
+    headerTitle: 'Jpasholk's Blog',
+    description: 'A collection of my thoughts and experiences, sprinkled with some memes.',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
-    siteUrl: 'https://astro-starter-blog.yon.fun/',
+    siteUrl: 'https://jpasholk-blog-test.netlify.app',
     siteRepo: 'https://github.com/wanoo21/tailwind-astro-starting-blog',
     siteLogo: '/static/images/logo.png',
     socialBanner: '/static/images/twitter-card.png',
