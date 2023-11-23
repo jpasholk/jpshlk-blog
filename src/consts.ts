@@ -21,7 +21,7 @@ export const SITE_METADATA = {
     mastodon: 'https://mastodon.social/@mastodonuser',
     email: 'address@yoursite.com',
     github: 'https://github.com/jpasholk',
-    twitter: 'https://twitter.com/Twitter',
+    twitter: 'https://twitter.com/jpasholk',
     facebook: 'https://facebook.com',
     youtube: 'https://youtube.com',
     linkedin: 'https://www.linkedin.com/in/joshpasholk',
