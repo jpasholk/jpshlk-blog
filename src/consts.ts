@@ -4,13 +4,13 @@
  * A few of these are not used yet, and are subject to change, example of this is Author.
  */
 export const SITE_METADATA = {
-    title: 'Jpasholk\' Blog',
-    headerTitle: 'My Blog',
+    title: 'Hi, I\'m Josh!',
+    headerTitle: 'Jpshlk',
     description: 'My new blog created with Astro and Tailwind.css',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
     siteUrl: 'https://jpasholk-blog-test.netlify.app',
-    siteRepo: 'https://github.com/wanoo21/tailwind-astro-starting-blog',
+    siteRepo: 'https://github.com/jpasholk/jpshlk-blog',
     siteLogo: '/static/images/logo.png',
     socialBanner: '/static/images/twitter-card.png',
     locale: 'en-US',
@@ -18,12 +18,12 @@ export const SITE_METADATA = {
     // The following are subject to change. They are placeholders for now.
     // This project provide a default author content see src/content/authors/default.mdx, so these details are better to be inserted there.
     author: 'Josh Pasholk',
-    mastodon: 'https://mastodon.social/@mastodonuser',
-    email: 'address@yoursite.com',
+    // mastodon: 'https://mastodon.social/@mastodonuser',
+    // email: 'address@yoursite.com',
     github: 'https://github.com/jpasholk',
     twitter: 'https://twitter.com/jpasholk',
-    facebook: 'https://facebook.com',
-    youtube: 'https://youtube.com',
+    // facebook: 'https://facebook.com',
+    // youtube: 'https://youtube.com',
     linkedin: 'https://www.linkedin.com/in/joshpasholk',
 
     // These are not supported yet
