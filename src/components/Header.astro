@@ -10,9 +10,9 @@ import ThemeSwitcher from "./ThemeSwitcher.astro";
     <div>
         <a href="/" aria-label={SITE_METADATA.headerTitle}>
             <div class="flex items-center justify-between">
-                <!-- <div class="mr-3">
-                    <Logo/>
-                </div> -->
+                <div class="mr-3">
+                    <img src="/josh-logo.svg" alt="My site logo" width="50" height="50">
+                </div>
                 {typeof SITE_METADATA.headerTitle === 'string' ? (
                         <div class="h-6 text-2xl font-semibold sm:block">
                             {SITE_METADATA.headerTitle}
