@@ -6,7 +6,7 @@
 export const SITE_METADATA = {
     title: 'Hi, I\'m Josh!',
     headerTitle: 'Jpshlk',
-    description: 'My new blog created with Astro and Tailwind.css',
+    description: 'Welcome to my new blog created with Astro and Tailwind.css',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
     siteUrl: 'https://jpasholk-blog-test.netlify.app',
