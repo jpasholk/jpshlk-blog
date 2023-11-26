@@ -1,0 +1,32 @@
+---
+title: Odd Behavior With Transitions After Forking The Theme 
+date: '2023-11-24'
+draft: false
+summary: "After forking the theme and adding my own content, there's super glitchy transitions when the site is live."
+tags: ['astro', 'markdown', 'ai', 'bugs']
+---
+
+![Black Glitch Image](/black-glitch.jpeg)
+
+## What's with the glitchy transitions?
+
+After forking [this](https://github.com/wanoo21/tailwind-astro-starting-blog) awesome theme, and throwing it at Netlify to build I noticed some odd issues with the animation for page transitions.
+
+I posted about it in the [Astro Discord](https://discord.com/channels/830184174198718474/1178031437216235571), and someone mentioned that there isn't a `<ViewTransitions />` tag in the `<head>` of the site, as per [Astro's Docs](https://docs.astro.build/en/guides/view-transitions/#adding-view-transitions-to-a-page).
+
+That seemed to make sense, so I started looking through the repo code and noticed that there actually isn't a `<head>` tag anywhere to be found. This is incredibly odd because the generated `HTML` definetly contains a `<head>`. 🤨
+
+I know that I am super new to Astro and a complete noon with it comes to web development, but I know that the `<head>` tag is something from _somewhere_...
+
+## Looks like images may be the problem.
+
+Wait... How come this post didn't do that then?
+
+I put that image in the `public` folder instead of the `src/assets`.
+
+My guess is it's something to do with `<ViewTransitions />`, and how Astro imports the image in `src`.
+
+## Here is the bug in action
+
+![Video showing the glitch in action](/trasition-glitch.gif)
+
