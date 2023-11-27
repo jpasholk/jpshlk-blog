@@ -11,7 +11,7 @@ export const SITE_METADATA = {
     theme: 'system', // Options: system, light, dark, Does not work yet
     siteUrl: 'https://jpasholk-blog-test.netlify.app',
     siteRepo: 'https://github.com/jpasholk/jpshlk-blog',
-    siteLogo: '/static/images/logo.png',
+    siteLogo: '/josh-logo.png',
     socialBanner: '/static/images/twitter-card.png',
     locale: 'en-US',
 
