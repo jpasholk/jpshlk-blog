@@ -6,7 +6,7 @@
 export const SITE_METADATA = {
     title: 'Hi, I\'m Josh!',
     headerTitle: 'Jpshlk',
-    description: 'Chief Operating Officer For A Top Amazon Seller In The Home And Garden Categoy.',
+    description: 'Thanks for stopping by!',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
     siteUrl: 'https://jpasholk-blog-test.netlify.app',
