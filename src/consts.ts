@@ -6,7 +6,7 @@
 export const SITE_METADATA = {
     title: 'Hi, I\'m Josh!',
     headerTitle: 'Jpshlk',
-    description: 'Welcome to my new blog created with Astro and Tailwind.css',
+    description: 'Chief Operating Officer For A Top Amazon Seller In The Home And Garden Categoy.',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
     siteUrl: 'https://jpasholk-blog-test.netlify.app',

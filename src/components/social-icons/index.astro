@@ -6,6 +6,7 @@ import Youtube from './icons/Youtube.astro'
 import Linkedin from './icons/Linkedin.astro'
 import Twitter from './icons/Twitter.astro'
 import Mastodon from './icons/Mastodon.astro'
+import Link from './icons/Link-icon.astro'
 
 const components = {
     mail: Mail,
@@ -15,20 +16,22 @@ const components = {
     linkedin: Linkedin,
     twitter: Twitter,
     mastodon: Mastodon,
+    link: Link,
 }
 
 type Props = {
     kind: keyof typeof components
     href: string | undefined
     size?: number
+    target: string | undefined
 }
 
-const {kind, href, size = 8} = Astro.props
+const {kind, href, size = 8, target} = Astro.props
 const SocialSvg = components[kind]
 ---
 
 
-<a class="text-sm text-gray-500 transition hover:text-gray-600" target="_blank" rel="noopener noreferrer" href={href}>
+<a class="text-sm text-gray-500 transition hover:text-gray-600" target={target} rel="noopener noreferrer" href={href}>
     <span class="sr-only">{kind}</span>
     <SocialSvg
             class={`fill-current text-gray-700 hover:text-primary-500 dark:text-gray-200 dark:hover:text-primary-400 h-${size} w-${size}`}/>
