@@ -4,6 +4,7 @@
 import '@/styles/global.css';
 import {SITE_METADATA} from "@/consts";
 import {ViewTransitions} from 'astro:transitions';
+import ExternalScripts from './ExternalScripts.astro';
 
 interface Props {
     title: string;
@@ -67,6 +68,7 @@ const {title, description, image = '/blog-placeholder-1.jpg'} = Astro.props;
     <link rel="alternate" type="application/rss+xml" href="/rss.xml"/>
 
     <!-- Other Stuff -->
+    <ExternalScripts />
 
     <ViewTransitions/>
 <head/>

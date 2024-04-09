@@ -5,6 +5,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SectionContainer from "../components/SectionContainer.astro";
+import ExternalScripts from '@/components/ExternalScripts.astro';
 
 import {SITE_METADATA} from "../consts";
 
@@ -28,6 +29,6 @@ const {title, description} = Astro.props;
         <Footer/>
     </div>
 </SectionContainer>
-<script async defer src="https://buttons.github.io/buttons.js"></script>
+<ExternalScripts />
 </body>
 </html>
