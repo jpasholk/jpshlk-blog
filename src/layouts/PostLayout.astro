@@ -116,7 +116,7 @@ const {Content, headings, remarkPluginFrontmatter} = await post.render();
                             {(next || prev) && (
                                     <div class="flex justify-between py-4 xl:block xl:space-y-8 xl:py-8">
                                         {prev && (
-                                                <div>
+                                                <div class="px-1">
                                                     <h2 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                                                         Previous Article
                                                     </h2>
@@ -126,7 +126,7 @@ const {Content, headings, remarkPluginFrontmatter} = await post.render();
                                                 </div>
                                         )}
                                         {next && (
-                                                <div>
+                                                <div class="px-1">
                                                     <h2 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                                                         Next Article
                                                     </h2>

@@ -14,19 +14,20 @@ module.exports = {
                 14: '3.5rem',
             },
             fontFamily: {
-                sans: ['Space Grotesk', ...fontFamily.sans],
+                // sans: ['Space Grotesk', ...fontFamily.sans],
+                sans: ['Inter var', ...fontFamily.sans],
             },
             colors: {
-                primary: colors.pink,
+                primary: colors.sky,
                 gray: colors.gray,
             },
             typography: ({theme}) => ({
                 DEFAULT: {
                     css: {
                         a: {
-                            color: theme('colors.primary.500'),
+                            color: theme('colors.primary.700'),
                             '&:hover': {
-                                color: `${theme('colors.primary.600')}`,
+                                color: `${theme('colors.primary.200')}`,
                             },
                             code: {color: theme('colors.primary.400')},
                         },
@@ -38,21 +39,24 @@ module.exports = {
                             fontWeight: '600',
                         },
                         code: {
-                            color: theme('colors.indigo.500'),
+                            color: theme('colors.rose.500'),
                         },
                     },
                 },
                 invert: {
                     css: {
                         a: {
-                            color: theme('colors.primary.500'),
+                            color: theme('colors.primary.400'),
                             '&:hover': {
-                                color: `${theme('colors.primary.400')}`,
+                                color: `${theme('colors.primary.300')}`,
                             },
                             code: {color: theme('colors.primary.400')},
                         },
                         'h1,h2,h3,h4,h5,h6': {
                             color: theme('colors.gray.100'),
+                        },
+                        code: {
+                            color: theme('colors.rose.400'),
                         },
                     },
                 },
