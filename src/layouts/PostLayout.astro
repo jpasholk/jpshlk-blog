@@ -8,6 +8,7 @@ import {type CollectionEntry, getEntries} from "astro:content";
 import FormattedDate from "../components/FormattedDate.astro";
 import Tag from "../components/Tag.astro";
 import ScrollTopAndComments from "../components/ScrollTopAndComments.astro";
+import PostComments from "@/components/PostComments.astro";
 
 interface Props {
     post: CollectionEntry<'blog'>;
@@ -82,6 +83,7 @@ const {Content, headings, remarkPluginFrontmatter} = await post.render();
                         <div class="prose max-w-none pb-8 pt-10 dark:prose-invert">
                             <slot/>
                             <Content/>
+                            <PostComments />
                         </div>
                         <!--    <div class="pb-6 pt-6 text-sm text-gray-700 dark:text-gray-300">-->
                         <!--        <Link href={discussUrl(path)} rel="nofollow">-->
@@ -160,6 +162,7 @@ const {Content, headings, remarkPluginFrontmatter} = await post.render();
                             >
                                 &larr; Back to the blog
                             </Link>
+                            
                         </div>
                     </footer>
                 </div>
