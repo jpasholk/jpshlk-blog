@@ -18,7 +18,7 @@ module.exports = {
                 sans: ['Inter var', ...fontFamily.sans],
             },
             colors: {
-                primary: colors.sky,
+                primary: colors.blue,
                 gray: colors.gray,
                 white: colors.blue,
             },
@@ -26,7 +26,7 @@ module.exports = {
                 DEFAULT: {
                     css: {
                         a: {
-                            color: theme('colors.blue.600'),
+                            color: theme('colors.primary.600'),
                             '&:hover': {
                                 color: `${theme('colors.primary.200')}`,
                             },
