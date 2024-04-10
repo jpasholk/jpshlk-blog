@@ -1,0 +1,22 @@
+<script type="module">
+    async function loadRandomQuote() {
+      try {
+        const response = await fetch('/quotes.json'); // Ensure the file is in the public directory
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        const randomIndex = Math.floor(Math.random() * data.quotes.length);
+        const quote = data.quotes[randomIndex];
+        
+        document.getElementById('quote').textContent = `"${quote.text}"`;
+        document.getElementById('author').textContent = `~ ${quote.author}`;
+      } catch (error) {
+        console.error('Fetch error:', error);
+        document.getElementById('quote').textContent = "Failed to load quote.";
+        document.getElementById('author').textContent = "";
+      }
+    }
+  
+    loadRandomQuote();
+  </script>
