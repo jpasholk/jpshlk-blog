@@ -4,4 +4,4 @@
 
 I'm currently slowly but surely learning Astro.
 
-<!-- ![Screenshots of my Blog on an iPhone 13 Pro Max](../../assets/jpshlk-blog-iPhone-screenshots.png) -->
+![Screenshots of my Blog on an iPhone 13 Pro Max](https://raw.githubusercontent.com/jpasholk/jpshlk-blog/main/src/assets/jpshlk-blog-iPhone-screenshots.png)
