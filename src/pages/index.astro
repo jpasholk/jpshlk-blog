@@ -28,14 +28,14 @@ const posts = await getCollection('blog', excludeDrafts).then(sortBlogPosts)
                 Building some fun things with iOS Shortcuts, some of which you can find on my
                 <Link href={`https://routinehub.co/user/jpasholk`} class="text-primary-500 hover:text-sky-600 dark:hover:text-primary-400">RoutineHub Page</Link>.
                 <hr class="h-px w-48 !mt-2 mx-auto my-8 bg-gray-200 border-0 dark:bg-gray-700">
-                <div transition:animate="slide" id="quotes" class="!mt-8 !min-h-min">
-                    <p transition:animate={fade({ duration: '1s' })} class="text-lg leading-7 text-gray-500 dark:text-gray-400 text-center" id=quote></p>
-                    <p transition:animate={fade({ duration: '1.6s' })} class="text-base leading-7 text-gray-400 dark:text-gray-400 text-center" id="author"></p>
+                <div  id="quotes" class="!mt-8 !min-h-min">
+                    <p class="text-lg leading-7 text-gray-500 dark:text-gray-400 text-center" id=quote></p>
+                    <p class="text-base leading-7 text-gray-400 dark:text-gray-400 text-center" id="author"></p>
                 </div>
                 <RandomQuote />
             </p>
         </div>
-        <ul transition:animate={fade({ duration: '1s' })} class="divide-y divide-gray-200 dark:divide-gray-700">
+        <ul transition:animate={fade({ duration: '0.3s' })} class="divide-y divide-gray-200 dark:divide-gray-700">
             {!posts.length && 'No posts found.'}
             {posts.slice(0, ITEMS_PER_PAGE).map((post) => {
                 const {date, title, summary, tags} = post.data;
@@ -45,14 +45,14 @@ const posts = await getCollection('blog', excludeDrafts).then(sortBlogPosts)
                                 <div class="space-y-2 xl:grid xl:grid-cols-4 xl:items-baseline xl:space-y-0">
                                     <dl>
                                         <dt class="sr-only">Published on</dt>
-                                        <dd transition:animate={fade({ duration: '1.2s' })} class="text-base font-medium leading-6 text-gray-500 dark:text-gray-400">
+                                        <dd class="text-base font-medium leading-6 text-gray-500 dark:text-gray-400">
                                             <FormattedDate date={date}/>
                                         </dd>
                                     </dl>
                                     <div class="space-y-5 xl:col-span-3">
                                         <div class="space-y-6">
                                             <div>
-                                                <h2 transition:animate={fade({ duration: '1.6s' })} class="text-2xl font-bold leading-8 tracking-tight">
+                                                <h2 class="text-2xl font-bold leading-8 tracking-tight">
                                                     <Link 
                                                         href={`/blog/${post.slug}`}
                                                         class="text-gray-900 dark:text-gray-100"   
@@ -60,17 +60,17 @@ const posts = await getCollection('blog', excludeDrafts).then(sortBlogPosts)
                                                         {title}
                                                     </Link>
                                                 </h2>
-                                                <div transition:animate={fade({ duration: '1.8s' })} class="flex flex-wrap">
+                                                <div class="flex flex-wrap">
                                                     {tags.map(({slug}) => (
                                                             <Tag slug={slug}/>
                                                     ))}
                                                 </div>
                                             </div>
-                                            <div transition:animate={fade({ duration: '1.9s' })} class="prose max-w-none text-gray-500 dark:text-gray-400">
+                                            <div class="prose max-w-none text-gray-500 dark:text-gray-400">
                                                 {summary}
                                             </div>
                                         </div>
-                                        <div transition:animate={fade({ duration: '2.1s' })} class="text-base font-medium leading-6">
+                                        <div class="text-base font-medium leading-6">
                                             <Link
                                                     href={`/blog/${post.slug}`}
                                                     class="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
