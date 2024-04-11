@@ -1,6 +1,7 @@
 ---
 import Card from "@/components/Card.astro";
 import RootLayout from "@/layouts/RootLayout.astro";
+import { fade } from "astro:transitions";
 
 const projectsData = [
     {
@@ -31,7 +32,7 @@ const projectsData = [
             </p>
         </div>
         <div class="container py-12">
-            <div class="-m-4 flex flex-wrap">
+            <div transition:animate={fade({ duration: '0.3s' })} class="-m-4 flex flex-wrap">
                 {projectsData.map((d) => (
                         <Card title={d.title} description={d.description} imgSrc={d.imgSrc} href={d.href}/>
                 ))}

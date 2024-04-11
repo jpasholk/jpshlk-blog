@@ -9,6 +9,7 @@ import FormattedDate from "../components/FormattedDate.astro";
 import Tag from "../components/Tag.astro";
 import ScrollTopAndComments from "../components/ScrollTopAndComments.astro";
 import PostComments from "@/components/PostComments.astro";
+import { fade } from "astro:transitions";
 
 interface Props {
     post: CollectionEntry<'blog'>;
@@ -80,7 +81,7 @@ const {Content, headings, remarkPluginFrontmatter} = await post.render();
                         </dd>
                     </dl>
                     <div class="divide-y divide-gray-200 dark:divide-gray-700 xl:col-span-3 xl:row-span-2 xl:pb-0">
-                        <div class="prose max-w-none pb-8 pt-10 dark:prose-invert">
+                        <div transition:animate={fade({ duration: '0.3s' })} class="prose max-w-none pb-8 pt-10 dark:prose-invert">
                             <slot/>
                             <Content/>
                             <PostComments />
