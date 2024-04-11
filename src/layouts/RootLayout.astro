@@ -23,7 +23,7 @@ const {title, description} = Astro.props;
 <SectionContainer>
     <div class="flex h-screen flex-col justify-between font-sans">
         <Header/>
-        <main class="mb-auto">
+        <main transition:animate="fade" class="mb-auto">
             <slot/>
         </main>
         <Footer/>
