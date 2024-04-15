@@ -15,7 +15,7 @@ const {page: {currentPage, lastPage, url: {prev, next}}} = Astro.props;
         {prev && (
                 <Link class="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400" href={prev} rel="prev">← Previous</Link>
         )}
-        <span>
+        <span class="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400">
           {currentPage} of {lastPage}
         </span>
         {!next && (
