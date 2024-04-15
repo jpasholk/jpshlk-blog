@@ -11,18 +11,18 @@ const {page: {currentPage, lastPage, url: {prev, next}}} = Astro.props;
 <div class="space-y-2 pb-8 pt-6 md:space-y-5">
     <nav class="flex justify-between">
         {!prev && (
-                <button class="cursor-auto disabled:opacity-50" disabled>Previous</button>)}
+                <button class="cursor-auto disabled:opacity-50 text-primary-500 hover:text-primary-600 dark:hover:text-primary-400" disabled>← Previous</button>)}
         {prev && (
-                <Link href={prev} rel="prev">Previous</Link>
+                <Link class="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400" href={prev} rel="prev">← Previous</Link>
         )}
         <span>
           {currentPage} of {lastPage}
         </span>
         {!next && (
-                <button class="cursor-auto disabled:opacity-50" disabled>Next</button>
+                <button class="cursor-auto disabled:opacity-50 text-primary-500 hover:text-primary-600 dark:hover:text-primary-400" disabled>Next →</button>
         )}
         {next && (
-                <Link href={next} rel="next">Next</Link>
+                <Link class="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400" href={next} rel="next">Next →</Link>
         )}
     </nav>
 </div>
