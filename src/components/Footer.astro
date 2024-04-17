@@ -1,7 +1,6 @@
 ---
 import SocialIcon from '@/components/social-icons/index.astro'
 import {SITE_METADATA} from '@/consts'
-
 import Link from "./Link.astro";
 ---
 
@@ -15,6 +14,8 @@ import Link from "./Link.astro";
             <SocialIcon kind="linkedin" href={SITE_METADATA.linkedin} size={6} target="_blank"/>
             <SocialIcon kind="twitter" href={SITE_METADATA.twitter} size={6} target="_blank"/>
             <!-- <SocialIcon kind="link" href="/links" size={10} /> -->
+            <SocialIcon kind="buymeacoffee" href={SITE_METADATA.buymeacoffee} size={6} target="_blank"/>
+
         </div>
         <div class="mb-2 flex space-x-2 text-sm text-gray-500 dark:text-gray-400">
             <Link href="/about">{SITE_METADATA.author}</Link>
@@ -34,6 +35,7 @@ import Link from "./Link.astro";
                 <span class="underline">give it a star</span>
                 {` if you like it.`}
             </Link>
+            </>
         </div>
     </div>
 </footer>

@@ -9,7 +9,7 @@ export const SITE_METADATA = {
     description: 'Thanks for stopping by!',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
-    siteUrl: 'https://jpasholk-blog-test.netlify.app',
+    siteUrl: 'https://jshlk.com',
     siteRepo: 'https://github.com/jpasholk/jpshlk-blog',
     siteLogo: '/josh-logo.png',
     socialBanner: '/static/images/twitter-card.png',
@@ -25,6 +25,7 @@ export const SITE_METADATA = {
     // facebook: 'https://facebook.com',
     // youtube: 'https://youtube.com',
     linkedin: 'https://www.linkedin.com/in/joshpasholk',
+    buymeacoffee: 'https://buymeacoffee.com/jpasholk',
 
     // These are not supported yet
     // analytics: {
