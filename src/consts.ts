@@ -4,9 +4,9 @@
  * A few of these are not used yet, and are subject to change, example of this is Author.
  */
 export const SITE_METADATA = {
-    title: 'Hi, I\'m Josh!',
+    title: 'jpshlk.com',
     headerTitle: 'Jpshlk',
-    description: 'Thanks for stopping by!',
+    description: 'A blog about things I find useful, and want to remember.',
     language: 'en-us',
     theme: 'system', // Options: system, light, dark, Does not work yet
     siteUrl: 'https://jshlk.com',
