@@ -26,6 +26,7 @@ export const SITE_METADATA = {
     // youtube: 'https://youtube.com',
     linkedin: 'https://www.linkedin.com/in/joshpasholk',
     buymeacoffee: 'https://buymeacoffee.com/jpasholk',
+    instagram: 'https://www.instagram.com/joshpasholk/',
 
     // These are not supported yet
     // analytics: {
