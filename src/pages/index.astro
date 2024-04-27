@@ -23,17 +23,18 @@ const posts = await getCollection('blog', excludeDrafts).then(sortBlogPosts)
                 Thanks for stopping by!
             </h2>
             <p class="text-lg leading-7 text-gray-500 dark:text-gray-400">
-                I enjoy good friends, bad jokes, hot coffee, and cold beer. 
-                For fun I like to play disc golf in good weather, and play pool at my favorite bar in bad.
-                Building some fun things with iOS Shortcuts, some of which you can find on my
-                <Link href={`https://routinehub.co/user/jpasholk`} class="text-primary-500 hover:text-sky-600 dark:hover:text-primary-400">RoutineHub Page</Link>.
-                <hr class="h-px w-48 !mt-2 mx-auto my-8 bg-gray-200 border-0 dark:bg-gray-700">
-                <div  id="quotes" class="!mt-8 !min-h-min">
-                    <p class="text-lg leading-7 text-gray-500 dark:text-gray-400 text-center" id=quote></p>
-                    <p class="text-base leading-7 text-gray-400 dark:text-gray-400 text-center" id="author"></p>
-                </div>
-                <RandomQuote />
+                Here you will find posts about iPhone and macOS apps, marketing, eCommerce, and a smidge of web development, among other things I find interesting. I'm currently learning Astro and loving it.
+                I like building fun things with iOS Shortcuts, some of which you can find on my
+                <Link href={`https://routinehub.co/user/jpasholk`} class="text-primary-500 hover:text-sky-600 dark:hover:text-primary-400">
+                    RoutineHub Page
+                </Link>.
             </p>
+                <hr class="h-px w-48 !mt-4 mx-auto my-8 bg-gray-200 border-0 dark:bg-gray-700">
+            <div  id="quotes" class="!mt-8 !min-h-min">
+                <p class="text-lg leading-7 text-gray-500 dark:text-gray-400 text-center" id=quote></p>
+                <p class="text-base leading-7 text-gray-400 dark:text-gray-400 text-center" id="author"></p>
+            </div>
+            <RandomQuote />
         </div>
         <ul transition:animate={fade({ duration: '0.3s' })} class="divide-y divide-gray-200 dark:divide-gray-700">
             {!posts.length && 'No posts found.'}

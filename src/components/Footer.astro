@@ -26,12 +26,16 @@ import Link from "./Link.astro";
             <Link href="/">{SITE_METADATA.title}</Link>
         </div>
         <div class="mb-8 text-sm text-gray-500 dark:text-gray-400">
-            <p>My blog is built with Astro and open source. View
-            <Link href={SITE_METADATA.siteRepo}>
-                <span class="underline">the source code</span>
-            </Link>
-            on GitHub and give it a star, if you like!
+            <p class="text-center">
+                My blog is  open source, built with Astro, and is typeset in Inter.
             </p>
+                <p class="text-center">
+                    View
+                        <Link href={SITE_METADATA.siteRepo}>
+                            <span class="underline">the source code</span>
+                        </Link>
+                    on GitHub.
+                </p>
         </div>
     </div>
 </footer>
