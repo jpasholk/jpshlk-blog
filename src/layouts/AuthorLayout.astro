@@ -8,7 +8,7 @@ interface Props {
     content: CollectionEntry<'authors'>;
 }
 
-const {name, avatar, occupation, company, buymeacoffee, github, linkedin, instagram} = Astro.props.content;
+const {name, avatar, occupation, company, buymeacoffee, github, linkedin, instagram, mastodon} = Astro.props.content;
 ---
 
 <RootLayout title={name}>
@@ -34,8 +34,9 @@ const {name, avatar, occupation, company, buymeacoffee, github, linkedin, instag
                 <div class="text-gray-500 dark:text-gray-400">{company}</div>
                 <div class="flex space-x-3 pt-6">
                     <SocialIcon kind="github" href={github} target="_blank"/>
-                    <SocialIcon kind="linkedin" href={linkedin} target="_blank"/>
+                    <SocialIcon kind="mastodon" href={mastodon} target="_blank"/>
                     <SocialIcon kind="instagram" href={instagram} target="_blank"/>
+                    <SocialIcon kind="linkedin" href={linkedin} target="_blank"/>
                     <SocialIcon kind="buymeacoffee" href={buymeacoffee} target="_blank"/>
                 </div>
             </div>

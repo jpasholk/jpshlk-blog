@@ -18,7 +18,7 @@ export const SITE_METADATA = {
     // The following are subject to change. They are placeholders for now.
     // This project provide a default author content see src/content/authors/default.mdx, so these details are better to be inserted there.
     author: 'Josh Pasholk',
-    // mastodon: 'https://mastodon.social/@mastodonuser',
+    mastodon: 'https://mastodon.social/@jpasholk',
     // email: 'address@yoursite.com',
     github: 'https://github.com/jpasholk',
     twitter: 'https://twitter.com/jpasholk',
