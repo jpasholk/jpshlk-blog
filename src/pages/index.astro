@@ -1,17 +1,11 @@
 ---
+import BaseLayout from '@/layouts/BaseLayout.astro';
 import { SITE } from '@/config';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{SITE.title}</title>
-    <meta name="description" content={SITE.description} />
-  </head>
-  <body>
-    <h1>{SITE.title}</h1>
-    <p>Rebuild in progress.</p>
-  </body>
-</html>
+<BaseLayout title={SITE.title}>
+  <h1 class="mt-8 text-4xl font-bold tracking-tight">👋 I'm Josh</h1>
+  <p class="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+    Landing page coming in Phase 2.
+  </p>
+</BaseLayout>

@@ -1,0 +1,120 @@
+---
+/**
+ * Internal design-system preview. Noindexed and excluded from the
+ * sitemap; kept in production builds so the design can be reviewed
+ * on deploy previews.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+import Card from '@/components/Card.astro';
+import Prose from '@/components/Prose.astro';
+import TagPill from '@/components/TagPill.astro';
+import SocialIcon from '@/components/social-icons/index.astro';
+
+// Static class names: Tailwind only generates utilities it can see,
+// and `@theme inline` doesn't emit --color-primary-* custom properties.
+const primaryShades = [
+  { shade: 50, class: 'bg-primary-50' },
+  { shade: 100, class: 'bg-primary-100' },
+  { shade: 200, class: 'bg-primary-200' },
+  { shade: 300, class: 'bg-primary-300' },
+  { shade: 400, class: 'bg-primary-400' },
+  { shade: 500, class: 'bg-primary-500' },
+  { shade: 600, class: 'bg-primary-600' },
+  { shade: 700, class: 'bg-primary-700' },
+  { shade: 800, class: 'bg-primary-800' },
+  { shade: 900, class: 'bg-primary-900' },
+  { shade: 950, class: 'bg-primary-950' },
+];
+---
+
+<BaseLayout title="Styleguide" description="Design system preview" noindex>
+  <h1 class="mt-8 text-4xl font-bold tracking-tight">Styleguide</h1>
+
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold">Primary color</h2>
+    <div class="mt-4 flex flex-wrap gap-2">
+      {
+        primaryShades.map(({ shade, class: bgClass }) => (
+          <div
+            class:list={[
+              'flex size-16 items-end justify-center rounded-md p-1 text-xs ring-1 ring-zinc-200 dark:ring-zinc-800',
+              bgClass,
+            ]}
+          >
+            <span class="rounded bg-white/70 px-1 text-zinc-900">{shade}</span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold">Type scale</h2>
+    <div class="mt-4 space-y-2">
+      <p class="text-5xl font-bold tracking-tight">Heading 5xl</p>
+      <p class="text-4xl font-bold tracking-tight">Heading 4xl</p>
+      <p class="text-2xl font-bold">Heading 2xl</p>
+      <p class="text-lg">Body large — Space Grotesk Variable</p>
+      <p class="text-base text-zinc-600 dark:text-zinc-400">Body muted</p>
+      <p class="text-sm text-zinc-500">Caption</p>
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold">Buttons</h2>
+    <div class="mt-4 flex gap-4">
+      <Button href="#">Primary action</Button>
+      <Button href="#" variant="ghost">Ghost action</Button>
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold">Tag pills</h2>
+    <div class="mt-4">
+      <TagPill slug="ios-shortcuts" />
+      <TagPill slug="macos" />
+      <TagPill slug="e-commerce" name="eCommerce" />
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold">Card</h2>
+    <Card class="mt-4">
+      <h3 class="text-lg font-semibold">Card title</h3>
+      <p class="mt-2 text-zinc-600 dark:text-zinc-400">
+        Card body copy sits on a subtle surface in both themes.
+      </p>
+    </Card>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold">Social icons</h2>
+    <div class="mt-4 flex items-center gap-4">
+      <SocialIcon kind="mastodon" href="#" size={6} />
+      <SocialIcon kind="github" href="#" size={6} />
+      <SocialIcon kind="linkedin" href="#" size={6} />
+      <SocialIcon kind="instagram" href="#" size={6} />
+      <SocialIcon kind="buymeacoffee" href="#" size={6} />
+    </div>
+  </section>
+
+  <section class="mt-10 mb-16">
+    <h2 class="text-2xl font-bold">Prose</h2>
+    <div class="mt-4">
+      <Prose>
+        <h2>Rendered content heading</h2>
+        <p>
+          Paragraph with a <a href="#">link</a>, <strong>bold text</strong>, and
+          <code>inline code</code>.
+        </p>
+        <blockquote>A blockquote for pull-quotes in posts.</blockquote>
+        <pre><code>const theme = localStorage.getItem('theme');</code></pre>
+        <ul>
+          <li>List item one</li>
+          <li>List item two</li>
+        </ul>
+      </Prose>
+    </div>
+  </section>
+</BaseLayout>
