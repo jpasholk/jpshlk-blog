@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths, Page } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Pagination from '@/components/Pagination.astro';
+import PostCard from '@/components/PostCard.astro';
+import { POSTS_PER_PAGE } from '@/config';
+import { getPublishedPosts, type Post } from '@/lib/posts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const [tags, posts] = await Promise.all([getCollection('tags'), getPublishedPosts()]);
+  return tags.flatMap((tag) => {
+    const tagged = posts.filter((post) => post.data.tags.some((t) => t.id === tag.id));
+    if (tagged.length === 0) return [];
+    return paginate(tagged, {
+      params: { tag: tag.id },
+      props: { tagName: tag.data.name, tagDescription: tag.data.description },
+      pageSize: POSTS_PER_PAGE,
+    });
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<Post>;
+  tagName: string;
+  tagDescription?: string;
+}
+
+const { page, tagName, tagDescription } = Astro.props;
+---
+
+<BaseLayout title={`${tagName} posts`} description={tagDescription ?? `Posts tagged ${tagName}.`}>
+  <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">{tagName}</h1>
+  {
+    tagDescription && (
+      <p class="mt-3 text-lg text-zinc-600 dark:text-zinc-400">{tagDescription}</p>
+    )
+  }
+  <div class="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800">
+    {page.data.map((post) => <PostCard post={post} />)}
+  </div>
+  <Pagination page={page} />
+</BaseLayout>

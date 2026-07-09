@@ -1,28 +1,21 @@
 ---
 import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
 import Card from '@/components/Card.astro';
 import Link from '@/components/Link.astro';
 
-const projects = (await getCollection('projects', ({ data }) => data.featured)).sort(
+const projects = (await getCollection('projects')).sort(
   (a, b) => a.data.order - b.data.order,
 );
 ---
 
-<section id="work" class="mt-16 scroll-mt-8">
-  <div class="flex items-baseline justify-between">
-    <h2 class="text-2xl font-bold tracking-tight">My work</h2>
-    <a
-      href="/projects"
-      class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
-    >
-      All projects &rarr;
-    </a>
-  </div>
-  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+<BaseLayout title="Projects" description="Things I've built and work I do.">
+  <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Projects</h1>
+  <div class="mt-8 grid gap-4 sm:grid-cols-2">
     {
       projects.map(({ data }) => (
         <Card class="flex flex-col">
-          <h3 class="text-lg font-semibold">{data.title}</h3>
+          <h2 class="text-lg font-semibold">{data.title}</h2>
           <p class="mt-2 grow text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
             {data.description}
           </p>
@@ -38,4 +31,4 @@ const projects = (await getCollection('projects', ({ data }) => data.featured)).
       ))
     }
   </div>
-</section>
+</BaseLayout>
