@@ -6,8 +6,10 @@ import { defineConfig } from 'astro/config';
 
 const SITE_URL = 'https://jpshlk.com';
 
-// Deploy-platform branch var (Cloudflare Pages / Workers Builds).
-const branch = process.env.CF_PAGES_BRANCH ?? process.env.WORKERS_CI_BRANCH ?? '';
+// Deploy-platform branch var (Netlify, or Cloudflare Pages / Workers
+// Builds if the site moves there later).
+const branch =
+  process.env.BRANCH ?? process.env.CF_PAGES_BRANCH ?? process.env.WORKERS_CI_BRANCH ?? '';
 
 // IndexNow bricks its key if URLs are submitted before /<key>.txt is
 // live (403), so submission requires an explicit second opt-in:

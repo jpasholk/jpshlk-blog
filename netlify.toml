@@ -1,0 +1,9 @@
+# Applies to any branch that contains this file — so branch deploys of
+# the rewrite build correctly while old `main` (no netlify.toml) keeps
+# its existing settings until the rewrite is merged.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

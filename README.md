@@ -25,9 +25,9 @@ Personal site and blog of Josh Pasholk — a custom-built [Astro](https://astro.
 | `npm run preview` | Preview the production build |
 | `npm run check`   | Type-check                   |
 
-## Deploying (Cloudflare)
+## Deploying
 
-Static output deploys via Cloudflare Workers static assets (`wrangler.jsonc`) or Cloudflare Pages. Redirects live in `public/_redirects`.
+Fully static output — currently deployed on **Netlify** (`netlify.toml`; Node 22 required). Redirects live in `public/_redirects`, which Netlify and Cloudflare both understand. A `wrangler.jsonc` is included for a possible future move to Cloudflare Workers/Pages.
 
 IndexNow (two-step, in this order):
 
