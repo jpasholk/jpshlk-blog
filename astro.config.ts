@@ -61,9 +61,10 @@ export default defineConfig({
           return (
             !/^\/(?:blog|tags\/[^/]+)\/\d+\/$/.test(path) &&
             !path.startsWith('/styleguide') &&
-            // Redirect stubs, not content.
+            // Redirect stubs and the 404 page, not content.
             path !== '/about/' &&
-            path !== '/aboutme/'
+            path !== '/aboutme/' &&
+            path !== '/404'
           );
         },
       },
