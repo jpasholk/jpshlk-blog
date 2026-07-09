@@ -1,0 +1,30 @@
+---
+/**
+ * Shows a random quote on every visit, including ClientRouter
+ * navigations. Quotes are inlined at build time as JSON so no
+ * client fetch is needed.
+ */
+import quotesData from '@/data/quotes.json';
+---
+
+<figure class="mx-auto mt-16 max-w-xl text-center" data-random-quote>
+  <blockquote class="text-lg text-zinc-600 italic dark:text-zinc-400" data-quote-text></blockquote>
+  <figcaption class="mt-2 text-sm text-zinc-500" data-quote-author></figcaption>
+</figure>
+
+<script type="application/json" data-quotes set:html={JSON.stringify(quotesData.quotes)} />
+
+<script>
+  function showRandomQuote() {
+    const container = document.querySelector('[data-random-quote]');
+    const data = document.querySelector('[data-quotes]');
+    if (!container || !data?.textContent) return;
+    const quotes: Array<{ text: string; author: string }> = JSON.parse(data.textContent);
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    if (!quote) return;
+    container.querySelector('[data-quote-text]')!.textContent = `“${quote.text}”`;
+    container.querySelector('[data-quote-author]')!.textContent = `— ${quote.author}`;
+  }
+
+  document.addEventListener('astro:page-load', showRandomQuote);
+</script>

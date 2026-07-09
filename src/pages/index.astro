@@ -1,11 +1,19 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import About from '@/components/home/About.astro';
+import Hero from '@/components/home/Hero.astro';
+import HobbiesSection from '@/components/home/HobbiesSection.astro';
+import LatestPosts from '@/components/home/LatestPosts.astro';
+import RandomQuote from '@/components/home/RandomQuote.astro';
+import WorkSection from '@/components/home/WorkSection.astro';
 import { SITE } from '@/config';
 ---
 
-<BaseLayout title={SITE.title}>
-  <h1 class="mt-8 text-4xl font-bold tracking-tight">👋 I'm Josh</h1>
-  <p class="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-    Landing page coming in Phase 2.
-  </p>
+<BaseLayout title={SITE.title} description={SITE.description}>
+  <Hero />
+  <About />
+  <WorkSection />
+  <HobbiesSection />
+  <LatestPosts />
+  <RandomQuote />
 </BaseLayout>
