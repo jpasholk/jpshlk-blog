@@ -2,18 +2,42 @@
 import '@/styles/global.css';
 import '@fontsource-variable/space-grotesk';
 import { ClientRouter } from 'astro:transitions';
+import Seo from '@jdevalk/astro-seo-graph/Seo.astro';
 import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.astro';
-import { SITE } from '@/config';
+import { SITE, SOCIALS } from '@/config';
 
 interface Props {
   title: string;
   description?: string;
   noindex?: boolean;
+  canonical?: string;
+  ogType?: 'website' | 'article' | 'profile' | 'book';
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  article?: {
+    publishedTime?: Date;
+    modifiedTime?: Date;
+    tags?: string[];
+  };
+  graph?: Record<string, unknown> | null;
 }
 
-const { title, description = SITE.description, noindex = false } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const {
+  title,
+  description = SITE.description,
+  noindex = false,
+  canonical,
+  ogType = 'website',
+  ogImage = new URL('/og-default.png', SITE.url).href,
+  ogImageAlt = SITE.title,
+  ogImageWidth = 1200,
+  ogImageHeight = 630,
+  article,
+  graph,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -21,9 +45,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-touch-icon.png" />
     <meta name="generator" content={Astro.generator} />
 
     <script is:inline>
@@ -42,12 +63,34 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       })();
     </script>
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#09090b" />
+    <Seo
+      title={title}
+      titleTemplate={title === SITE.title ? '%s' : `%s | ${SITE.title}`}
+      description={description}
+      canonical={canonical}
+      ogType={ogType}
+      ogImage={ogImage}
+      ogImageAlt={ogImageAlt}
+      ogImageWidth={ogImageWidth}
+      ogImageHeight={ogImageHeight}
+      siteName={SITE.title}
+      locale="en_US"
+      noindex={noindex}
+      article={article}
+      graph={graph}
+      extraLinks={[
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/static/favicons/apple-touch-icon.png' },
+        { rel: 'sitemap', href: '/sitemap-index.xml' },
+        { rel: 'alternate', type: 'application/rss+xml', title: SITE.title, href: '/rss.xml' },
+        { rel: 'me', href: SOCIALS.mastodon },
+      ]}
+      extraMeta={[
+        { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#ffffff' },
+        { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#09090b' },
+      ]}
+    />
 
     <ClientRouter />
   </head>

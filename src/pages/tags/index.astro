@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getPublishedPosts } from '@/lib/posts';
+import { pageGraph } from '@/lib/schema';
 
 const [tags, posts] = await Promise.all([getCollection('tags'), getPublishedPosts()]);
 
@@ -18,14 +19,18 @@ const sorted = tags
   .sort((a, b) => b.count - a.count);
 ---
 
-<BaseLayout title="Tags" description="Browse posts by topic.">
+<BaseLayout
+  title="Tags"
+  description="Browse every topic on the blog — from iOS Shortcuts and Mac apps to e-commerce and web development."
+  graph={pageGraph('Tags', '/tags/', 'Browse every topic on the blog — from iOS Shortcuts and Mac apps to e-commerce and web development.')}
+>
   <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Tags</h1>
   <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-4">
     {
       sorted.map(({ id, data, count }) => (
         <li>
           <a
-            href={`/tags/${id}`}
+            href={`/tags/${id}/`}
             class="text-lg font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
           >
             {data.name}

@@ -28,9 +28,9 @@ export const SOCIALS = {
 
 export const NAVIGATION = [
   { href: '/', title: 'Home' },
-  { href: '/blog', title: 'Blog' },
-  { href: '/projects', title: 'Projects' },
-  { href: '/tags', title: 'Tags' },
+  { href: '/blog/', title: 'Blog' },
+  { href: '/projects/', title: 'Projects' },
+  { href: '/tags/', title: 'Tags' },
 ] as const;
 
 export const POSTS_PER_PAGE = 5;

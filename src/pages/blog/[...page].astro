@@ -5,6 +5,7 @@ import Pagination from '@/components/Pagination.astro';
 import PostCard from '@/components/PostCard.astro';
 import { POSTS_PER_PAGE } from '@/config';
 import { getPublishedPosts, type Post } from '@/lib/posts';
+import { pageGraph } from '@/lib/schema';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const posts = await getPublishedPosts();
@@ -16,9 +17,19 @@ interface Props {
 }
 
 const { page } = Astro.props;
+
+const pagePath = page.currentPage === 1 ? '/blog/' : `/blog/${page.currentPage}/`;
+const title = page.currentPage === 1 ? 'Blog' : `Blog — page ${page.currentPage}`;
+const pageSuffix =
+  page.lastPage > 1 ? ` Page ${page.currentPage} of ${page.lastPage}.` : '';
+const description = `All ${page.total} posts about iPhone and Mac apps, iOS Shortcuts, e-commerce, and web development — newest first.${pageSuffix}`;
 ---
 
-<BaseLayout title="Blog" description="All posts, newest first.">
+<BaseLayout
+  title={title}
+  description={description}
+  graph={pageGraph(title, pagePath, description)}
+>
   <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Blog</h1>
   <div class="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800">
     {page.data.map((post) => <PostCard post={post} />)}

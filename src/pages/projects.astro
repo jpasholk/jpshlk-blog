@@ -3,13 +3,18 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Card from '@/components/Card.astro';
 import Link from '@/components/Link.astro';
+import { pageGraph } from '@/lib/schema';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) => a.data.order - b.data.order,
 );
 ---
 
-<BaseLayout title="Projects" description="Things I've built and work I do.">
+<BaseLayout
+  title="Projects"
+  description="Things I've built and work I do — from e-commerce at Plantonix to Jekyll themes and iOS Shortcuts."
+  graph={pageGraph('Projects', '/projects/', "Things I've built and work I do — from e-commerce at Plantonix to Jekyll themes and iOS Shortcuts.")}
+>
   <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Projects</h1>
   <div class="mt-8 grid gap-4 sm:grid-cols-2">
     {

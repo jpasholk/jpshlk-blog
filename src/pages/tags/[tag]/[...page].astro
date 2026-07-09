@@ -6,6 +6,7 @@ import Pagination from '@/components/Pagination.astro';
 import PostCard from '@/components/PostCard.astro';
 import { POSTS_PER_PAGE } from '@/config';
 import { getPublishedPosts, type Post } from '@/lib/posts';
+import { pageGraph } from '@/lib/schema';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const [tags, posts] = await Promise.all([getCollection('tags'), getPublishedPosts()]);
@@ -27,9 +28,25 @@ interface Props {
 }
 
 const { page, tagName, tagDescription } = Astro.props;
+
+const pageSuffix = page.lastPage > 1 ? ` — page ${page.currentPage}` : '';
+const title = `Posts tagged ${tagName}${pageSuffix}`;
+const description = `${tagDescription ?? `Posts tagged ${tagName}.`} ${page.total} ${
+  page.total === 1 ? 'post' : 'posts'
+} tagged ${tagName} on jpshlk.com.${
+  page.lastPage > 1 ? ` Page ${page.currentPage} of ${page.lastPage}.` : ''
+}`;
+const pagePath =
+  page.currentPage === 1
+    ? `/tags/${Astro.params.tag}/`
+    : `/tags/${Astro.params.tag}/${page.currentPage}/`;
 ---
 
-<BaseLayout title={`${tagName} posts`} description={tagDescription ?? `Posts tagged ${tagName}.`}>
+<BaseLayout
+  title={title}
+  description={description}
+  graph={pageGraph(title, pagePath, description)}
+>
   <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">{tagName}</h1>
   {
     tagDescription && (

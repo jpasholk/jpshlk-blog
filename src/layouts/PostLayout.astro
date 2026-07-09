@@ -3,7 +3,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import Prose from '@/components/Prose.astro';
 import TagPill from '@/components/TagPill.astro';
+import { SITE } from '@/config';
 import type { Post } from '@/lib/posts';
+import { postDateModified, postGraph } from '@/lib/schema';
 
 interface Props {
   post: Post;
@@ -12,10 +14,27 @@ interface Props {
 }
 
 const { post, prev, next } = Astro.props;
-const { title, date, lastmod, summary, tags } = post.data;
+const { title, date, lastmod, summary, tags, seo, featureImage, canonicalUrl } = post.data;
+
+const ogImage = seo?.image?.src ?? featureImage?.src;
 ---
 
-<BaseLayout title={title} description={summary}>
+<BaseLayout
+  title={seo?.title ?? title}
+  description={seo?.description ?? summary}
+  canonical={canonicalUrl}
+  ogType="article"
+  ogImage={ogImage ? new URL(ogImage.src, SITE.url).href : undefined}
+  ogImageAlt={ogImage ? (seo?.image?.alt ?? featureImage?.alt ?? title) : undefined}
+  ogImageWidth={ogImage?.width}
+  ogImageHeight={ogImage?.height}
+  article={{
+    publishedTime: date,
+    modifiedTime: postDateModified(post),
+    tags: tags.map((tag) => tag.id),
+  }}
+  graph={postGraph(post)}
+>
   <article class="pt-10">
     <header class="border-b border-zinc-200 pb-8 text-center dark:border-zinc-800">
       <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
@@ -61,7 +80,7 @@ const { title, date, lastmod, summary, tags } = post.data;
       >
         {prev ? (
           <a
-            href={`/blog/${prev.id}`}
+            href={`/blog/${prev.id}/`}
             class="max-w-xs text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
           >
             &larr; {prev.data.title}
@@ -71,7 +90,7 @@ const { title, date, lastmod, summary, tags } = post.data;
         )}
         {next && (
           <a
-            href={`/blog/${next.id}`}
+            href={`/blog/${next.id}/`}
             class="max-w-xs text-sm font-medium text-primary-600 hover:text-primary-500 sm:text-right dark:text-primary-400"
           >
             {next.data.title} &rarr;
