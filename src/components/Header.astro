@@ -1,0 +1,93 @@
+---
+import { NAVIGATION, SITE } from '@/config';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+
+const currentPath = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+---
+
+<header class="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-6 sm:px-6">
+  <a href="/" class="text-xl font-bold tracking-tight hover:text-primary-500">
+    {SITE.headerTitle}<span class="text-primary-500">.</span>
+  </a>
+
+  <div class="flex items-center gap-1 sm:gap-2">
+    <nav aria-label="Main" class="hidden items-center gap-1 sm:flex">
+      {
+        NAVIGATION.map(({ href, title }) => (
+          <a
+            href={href}
+            aria-current={isActive(href) ? 'page' : undefined}
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              isActive(href)
+                ? 'text-primary-600 dark:text-primary-400'
+                : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
+            ]}
+          >
+            {title}
+          </a>
+        ))
+      }
+    </nav>
+
+    <ThemeToggle />
+
+    <button
+      type="button"
+      data-mobile-menu-toggle
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      aria-label="Open menu"
+      class="rounded-md p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 sm:hidden dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="size-5">
+        <path
+          fill-rule="evenodd"
+          d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </button>
+  </div>
+</header>
+
+<nav id="mobile-menu" aria-label="Main mobile" hidden class="mx-auto w-full max-w-3xl px-4 pb-4 sm:hidden">
+  <ul class="flex flex-col gap-1 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+    {
+      NAVIGATION.map(({ href, title }) => (
+        <li>
+          <a
+            href={href}
+            aria-current={isActive(href) ? 'page' : undefined}
+            class:list={[
+              'block rounded-md px-3 py-2 text-base font-medium',
+              isActive(href)
+                ? 'text-primary-600 dark:text-primary-400'
+                : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
+            ]}
+          >
+            {title}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  function bindMobileMenu() {
+    const toggle = document.querySelector<HTMLButtonElement>('[data-mobile-menu-toggle]');
+    const menu = document.getElementById('mobile-menu');
+    if (!toggle || !menu) return;
+    toggle.addEventListener('click', () => {
+      const open = menu.hidden;
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+  }
+
+  document.addEventListener('astro:page-load', bindMobileMenu);
+</script>
