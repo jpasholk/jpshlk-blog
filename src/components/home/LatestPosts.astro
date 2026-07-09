@@ -1,13 +1,9 @@
 ---
-/**
- * Latest posts teaser. Placeholder cards until the blog collection
- * lands in Phase 3, when this switches to getCollection('blog').
- */
-import Card from '@/components/Card.astro';
+import PostCard from '@/components/PostCard.astro';
+import { POSTS_PER_PAGE } from '@/config';
+import { getPublishedPosts } from '@/lib/posts';
 
-const placeholders = [
-  { title: 'Blog posts arrive in Phase 3', summary: 'The existing 24 posts migrate here.' },
-];
+const posts = (await getPublishedPosts()).slice(0, POSTS_PER_PAGE);
 ---
 
 <section id="posts" class="mt-16 scroll-mt-8">
@@ -20,14 +16,7 @@ const placeholders = [
       All posts &rarr;
     </a>
   </div>
-  <div class="mt-6 space-y-4">
-    {
-      placeholders.map(({ title, summary }) => (
-        <Card>
-          <h3 class="text-lg font-semibold">{title}</h3>
-          <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{summary}</p>
-        </Card>
-      ))
-    }
+  <div class="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+    {posts.map((post) => <PostCard post={post} />)}
   </div>
 </section>

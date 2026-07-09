@@ -1,0 +1,27 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Pagination from '@/components/Pagination.astro';
+import PostCard from '@/components/PostCard.astro';
+import { POSTS_PER_PAGE } from '@/config';
+import { getPublishedPosts, type Post } from '@/lib/posts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPublishedPosts();
+  return paginate(posts, { pageSize: POSTS_PER_PAGE });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<Post>;
+}
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title="Blog" description="All posts, newest first.">
+  <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Blog</h1>
+  <div class="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800">
+    {page.data.map((post) => <PostCard post={post} />)}
+  </div>
+  <Pagination page={page} />
+</BaseLayout>
