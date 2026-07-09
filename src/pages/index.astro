@@ -6,10 +6,15 @@ import HobbiesSection from '@/components/home/HobbiesSection.astro';
 import LatestPosts from '@/components/home/LatestPosts.astro';
 import RandomQuote from '@/components/home/RandomQuote.astro';
 import WorkSection from '@/components/home/WorkSection.astro';
-import { SITE } from '@/config';
+import { AUTHOR, SITE } from '@/config';
+import { pageGraph } from '@/lib/schema';
 ---
 
-<BaseLayout title={SITE.title} description={SITE.description}>
+<BaseLayout
+  title={AUTHOR.name}
+  description={SITE.description}
+  graph={pageGraph(SITE.title, '/', SITE.description)}
+>
   <Hero />
   <About />
   <WorkSection />
