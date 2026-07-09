@@ -1,0 +1,37 @@
+---
+import Link from '@/components/Link.astro';
+import { SOCIALS } from '@/config';
+---
+
+<section class="mt-16">
+  <h2 class="text-2xl font-bold tracking-tight">About me</h2>
+  <div class="mt-4 space-y-4 leading-relaxed text-zinc-600 dark:text-zinc-400">
+    <p>
+      I like to spend my time with family and friends, and enjoy good times,
+      bad jokes, hot coffee, and cold beer. When I'm not working or hanging
+      out with my lovely girlfriend, I can be found playing pool or disc golf.
+    </p>
+    <p>
+      At work I manage all of the web and marketing operations for our Amazon
+      and Shopify based business. Sometimes I'm creating marketing strategies,
+      others I'm helping develop new products. Then there's the times that
+      I'll have to put out a fire because some online service doesn't want to
+      work (I don't blame them, I really don't either). 😜
+    </p>
+    <p>
+      In the free-ish time that I can find I like to blog about iPhone and Mac
+      apps, among other topics that interest me, and build cool things with
+      the <Link
+        href="https://apps.apple.com/us/app/shortcuts/id915249334"
+        class="text-primary-600 hover:text-primary-500 dark:text-primary-400"
+      >iOS Shortcuts app</Link>, some of which you can find on my <Link
+        href={SOCIALS.routinehub}
+        class="text-primary-600 hover:text-primary-500 dark:text-primary-400"
+      >RoutineHub page</Link>.
+    </p>
+    <p>
+      I love chatting about e-commerce, marketing, Shopify, and anything tech
+      related really. So hit me up if you'd like! 🤙
+    </p>
+  </div>
+</section>

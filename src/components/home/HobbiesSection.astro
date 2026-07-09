@@ -1,0 +1,51 @@
+---
+import Card from '@/components/Card.astro';
+
+const hobbies = [
+  {
+    emoji: '🥏',
+    title: 'Disc golf',
+    blurb: 'Chasing chains whenever the weather (or the girlfriend) allows.',
+  },
+  {
+    emoji: '🎱',
+    title: 'Pool',
+    blurb: 'Rack ’em up — always down for a game of eight-ball.',
+  },
+  {
+    emoji: '☕️🍺',
+    title: 'Coffee & beer',
+    blurb: 'Hot coffee in the morning, cold beer with friends.',
+  },
+  {
+    emoji: '🎮',
+    title: 'Nintendo Switch',
+    blurb: 'Skyrim, Tears of the Kingdom, Witcher 3, and Mario RPG.',
+  },
+  {
+    emoji: '🥾',
+    title: 'Hiking',
+    blurb: 'Trails, lakes, and the occasional glacier photo op.',
+  },
+  {
+    emoji: '📱',
+    title: 'iOS Shortcuts',
+    blurb: 'Building automations that make the iPhone do the busywork.',
+  },
+];
+---
+
+<section id="hobbies" class="mt-16 scroll-mt-8">
+  <h2 class="text-2xl font-bold tracking-tight">Hobbies</h2>
+  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      hobbies.map(({ emoji, title, blurb }) => (
+        <Card>
+          <span class="text-2xl" aria-hidden="true">{emoji}</span>
+          <h3 class="mt-2 text-lg font-semibold">{title}</h3>
+          <p class="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{blurb}</p>
+        </Card>
+      ))
+    }
+  </div>
+</section>
