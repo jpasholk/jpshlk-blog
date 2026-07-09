@@ -1,14 +1,14 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "jpshlk.com",
+  "short_name": "jpshlk",
   "icons": [
     {
-      "src": "/android-chrome-96x96.png",
-      "sizes": "96x96",
+      "src": "/static/favicons/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png"
     }
   ],
-  "theme_color": "#000000",
-  "background_color": "#000000",
+  "theme_color": "#09090b",
+  "background_color": "#09090b",
   "display": "standalone"
 }
