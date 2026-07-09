@@ -1,0 +1,98 @@
+---
+title: Starting Clean With Astro 7 and Tailwind 4
+date: '2026-07-09'
+draft: true
+summary: 'What a from-scratch Astro project looks like in 2026: the dependencies I actually needed, why Astro 7 was safe to bet on, and Tailwind with no config file.'
+tags: ['rebuild', 'astro']
+---
+
+*This is part 3 of my [rebuild series](/tags/rebuild/). In [part 2](/blog/back-up-your-site-with-a-git-branch/) I backed up the old site to a git branch.*
+
+With the backup in place, it was demolition day: everything in `src/` got deleted except two folders — `src/content/` (my actual posts) and `src/assets/` (my images). Content is cargo; code is the ship. We were only replacing the ship. 🚢
+
+## The entire dependency list
+
+One thing I love about this rebuild: I can explain every single package. Here's the new `package.json`, dependencies only:
+
+```json
+{
+  "dependencies": {
+    "@astrojs/mdx": "^7.0.2",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/space-grotesk": "^5.2.10",
+    "@jdevalk/astro-seo-graph": "^2.2.0",
+    "@jdevalk/seo-graph-core": "^0.7.0",
+    "astro": "^7.0.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@tailwindcss/typography": "^0.5.20",
+    "@tailwindcss/vite": "^4.3.2",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^5.8.0"
+  }
+}
+```
+
+Line by line: **mdx** lets my posts mix components into markdown. **rss** and **sitemap** generate the feed and sitemap. **fontsource** self-hosts my font (no more Google Fonts slowing down first paint). The two **@jdevalk** packages are the SEO suite from Yoast's founder (that's part 7). **astro** is the framework. Dev side: type checking, Tailwind, and its typography plugin for styling post content.
+
+No React. No UI framework at all. A blog is mostly HTML — Astro renders it at build time, and the few interactive bits (theme toggle, mobile menu) are small vanilla JavaScript.
+
+## Why Astro 7 was the right risk
+
+Astro 7 was about three weeks old when we started, and my first instinct was to play it safe with 6. Here's what changed my mind.
+
+Astro 7's headline change is a new Rust compiler that's *stricter*: unclosed HTML tags are now build errors instead of silently accepted. That's a real migration hazard — **for existing codebases**. Old code full of sloppy markup breaks. But we were writing every file from scratch, so we'd just... write valid HTML from day one. The strictness only ever helped us.
+
+The lesson generalizes: a "risky" upgrade is often only risky for code you already have. A clean slate is the cheapest possible time to be on the newest major version — it means no forced migration six months later.
+
+One real requirement to know about: Astro 7 needs **Node 22.12 or newer**. This matters again at deploy time (part 8).
+
+## The config, in TypeScript
+
+Astro configs can be TypeScript files, which means typo-checking and autocomplete on your own config:
+
+```ts
+// astro.config.ts
+import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  site: 'https://jpshlk.com',
+  prefetch: true,
+  integrations: [mdx(), sitemap()],
+  vite: {
+    plugins: [tailwindcss()],
+  },
+});
+```
+
+Two things worth noticing. The `site` value is my canonical domain — and setting it forced me to fix a typo (`jshlk.com`) that had been quietly poisoning my old sitemap and canonical URLs. And Tailwind is now a **Vite plugin**, not an Astro integration — which brings me to the fun part.
+
+## Tailwind 4: the config file is gone
+
+If you learned Tailwind before v4, you knew `tailwind.config.js` — a JavaScript file describing your colors, fonts, and plugins. Tailwind 4 deleted the whole concept. Configuration now lives *in your CSS*:
+
+```css
+/* src/styles/global.css */
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme inline {
+  --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary-500: var(--color-sky-500);
+  /* ...the full 50–950 primary scale... */
+}
+```
+
+The `@theme` block replaces the old config: define a CSS variable, get utility classes for free. Declare `--color-primary-500` and `text-primary-500` just exists. It sounds like a small change, but it makes the design system feel like *CSS* instead of a JavaScript puzzle — which is exactly where part 4 picks up.
+
+At this point the site built successfully and rendered one nearly-empty page. Felt amazing anyway. Every rebuild needs its "hello world" moment.
+
+Next up: [a tiny design system, and a dark mode toggle that finally works](/blog/a-tiny-design-system-and-dark-mode-that-works/).
+
+Thanks for reading and have a good one! 🤙

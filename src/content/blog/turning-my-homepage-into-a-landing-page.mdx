@@ -1,0 +1,85 @@
+---
+title: Turning My Homepage Into a Landing Page
+date: '2026-07-09'
+draft: true
+summary: 'The homepage used to be a wall of blog posts. Now it introduces me — my work, my hobbies — with the blog one click away. Here''s how it''s put together.'
+tags: ['rebuild', 'astro']
+---
+
+*This is part 5 of my [rebuild series](/tags/rebuild/). In [part 4](/blog/a-tiny-design-system-and-dark-mode-that-works/) I built the design system these pieces are made of.*
+
+The single biggest reason for this rebuild wasn't technical. It was that my homepage said nothing about *me*. You landed on a list of posts and had to click "About" to learn whose site you were on. Most personal sites work like that because most blog themes work like that.
+
+The new homepage flips it: **who I am first, blog second.**
+
+## The anatomy
+
+The page is six sections, each its own component in `src/components/home/`:
+
+```astro
+// src/pages/index.astro (the important part)
+<BaseLayout title={AUTHOR.name} description={SITE.description}>
+  <Hero />
+  <About />
+  <WorkSection />
+  <HobbiesSection />
+  <LatestPosts />
+  <RandomQuote />
+</BaseLayout>
+```
+
+- **Hero** — photo, name, "Digital Duct Tape @ Plantonix," a two-line intro, and two buttons (read the blog / see my work).
+- **About** — the bio that used to hide on the `/about` page: family, coffee & beer, pool, disc golf, what I actually do at work.
+- **WorkSection** — cards for Plantonix, my Jekyll UiKit theme, and my iOS Shortcuts on RoutineHub. These come from a tiny *projects* content collection (part 6), so adding a project is a new markdown file, not code.
+- **HobbiesSection** — emoji cards. 🥏🎱☕️🍺🎮🥾 No icon library needed; emoji are free and on-brand for me.
+- **LatestPosts** — the five newest posts, reusing the same `PostCard` component the blog page uses.
+- **RandomQuote** — the random quote widget from the old site, rebuilt (story below).
+
+Sections have anchor IDs (`#work`, `#hobbies`), so the old `/projects` audience and the hero's "See my work" button can jump straight to a section.
+
+## Killing the About page (politely)
+
+Since the landing page *is* the about page now, `/about` shouldn't 404 — old links to it exist in the wild. It redirects to the homepage instead. Astro handles this in config:
+
+```ts
+// astro.config.ts
+redirects: {
+  '/about': '/',
+  '/aboutme': '/',
+},
+```
+
+That `/aboutme` one is fun: an SEO validation tool (part 7) scanned every link in every built page and found one of my *old posts* linking to `/aboutme` — a page that hadn't existed for years. A dead link I'd never have noticed, caught by a robot. 🤖
+
+## The random quote bug (part 4's rule, striking again)
+
+The old homepage had a widget that showed a random quote on each visit. Porting it uncovered the exact bug class from part 4: the old script ran once, as a module, on initial page load. With view transitions, navigating *back* to the homepage doesn't re-run module scripts — so the widget silently died and showed nothing.
+
+The rebuilt version does two things differently. The quotes are bundled into the page at build time (no fetch at all — they're just data in the HTML). And the picking logic runs on `astro:page-load`, which fires on every navigation, full or client-side:
+
+```astro
+<!-- src/components/home/RandomQuote.astro -->
+<script>
+  function showRandomQuote() {
+    const container = document.querySelector('[data-random-quote]');
+    const data = document.querySelector('[data-quotes]');
+    if (!container || !data?.textContent) return;
+    const quotes = JSON.parse(data.textContent);
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+    container.querySelector('[data-quote-text]').textContent = `“${quote.text}”`;
+    container.querySelector('[data-quote-author]').textContent = `— ${quote.author}`;
+  }
+
+  document.addEventListener('astro:page-load', showRandomQuote);
+</script>
+```
+
+Bonus: you now get a *new* quote every time you come back to the homepage, which is honestly how a random quote widget should have worked all along.
+
+## One small SEO note
+
+The homepage `<title>` used to be just `jpshlk.com`. It's now my name — because the title is what shows up in a Google result, and "Josh Pasholk" tells a searcher more than my domain repeated back at them. Little stuff like this comes from the SEO tooling nagging me, which is part 7's whole story.
+
+Next up: [migrating 22 posts without editing a single one](/blog/migrating-22-posts-without-editing-a-single-one/).
+
+Thanks for reading and have a good one! 🤙

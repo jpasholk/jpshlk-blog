@@ -1,0 +1,87 @@
+---
+title: A Tiny Design System and a Dark Mode That Works
+date: '2026-07-09'
+draft: true
+summary: 'My old theme toggle was broken in two educational ways. Building a small design system — and a dark mode that survives page transitions — fixed both.'
+tags: ['rebuild', 'astro', 'web-development']
+---
+
+*This is part 4 of my [rebuild series](/tags/rebuild/). In [part 3](/blog/starting-clean-with-astro-7-and-tailwind-4/) I scaffolded the empty Astro 7 project.*
+
+Before building any real pages, we built the *pieces* pages are made of. And in the process, finally fixed the dark mode toggle that had been quietly broken on the old site for as long as I can remember. The old config literally had a comment next to the theme setting that said "Does not work yet." 😅
+
+## What "design system" means for a blog
+
+Forget the enterprise version of that phrase. At personal-site scale, a design system is three things:
+
+1. **Tokens** — the named values everything uses: a `primary` color scale, one font (Space Grotesk), consistent grays. They live in the `@theme` block from part 3.
+2. **A handful of components** — mine has eight: `Link`, `Button`, `Card`, `TagPill`, `Prose` (styles post content), `Header`, `Footer`, `ThemeToggle`.
+3. **A styleguide page** — a private `/styleguide` route that renders every token and component in both light and dark mode. When I tweak the design, I look at one page instead of clicking through the whole site. It's marked `noindex` and left out of the sitemap, so it's for my eyes only.
+
+The point of building this *before* the homepage: every later page is just arranging pieces that already look right.
+
+## Why dark mode toggles break
+
+Here's what I learned about why my old toggle failed — two separate bugs, both classics.
+
+### Bug 1: the flash (FOUC)
+
+The theme choice lives in `localStorage`, which only JavaScript can read. If that JavaScript runs *after* the page paints, dark-mode users get a blinding white flash on every load. That's called FOUC — flash of unstyled content.
+
+The fix: a tiny script in the `<head>` marked `is:inline`, which tells Astro "don't optimize or move this — run it right here, before anything renders":
+
+```astro
+<!-- src/layouts/BaseLayout.astro -->
+<script is:inline>
+  (() => {
+    const apply = () => {
+      const stored = localStorage.getItem('theme');
+      const dark = stored
+        ? stored === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', dark);
+    };
+    apply();
+    document.addEventListener('astro:after-swap', apply);
+  })();
+</script>
+```
+
+In plain words: check for a saved choice; if there isn't one, follow the system setting; apply the `dark` class before the first pixel paints.
+
+### Bug 2: view transitions eat your JavaScript
+
+This site uses Astro's view transitions (the `<ClientRouter />` component) for those smooth animated page changes. Under the hood, clicking a link doesn't do a full page load — Astro fetches the next page and *swaps the document*.
+
+That swap is where naive theme code dies twice over: the fresh document arrives without your `dark` class (instant un-theming), and your click handlers were attached to elements that just got thrown away (the toggle goes dead after one navigation). **That was my old site's bug.** The toggle worked until you clicked a link. Then, nothing.
+
+Astro provides events for exactly this. `astro:after-swap` fires right after the new document lands — that's the `apply` listener in the snippet above, re-applying the theme mid-swap. And `astro:page-load` fires after every navigation, which is where the button wires itself up:
+
+```astro
+<!-- src/components/ThemeToggle.astro -->
+<script>
+  function bindThemeToggles() {
+    for (const button of document.querySelectorAll('[data-theme-toggle]')) {
+      button.addEventListener('click', () => {
+        const dark = !document.documentElement.classList.contains('dark');
+        document.documentElement.classList.toggle('dark', dark);
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', bindThemeToggles);
+</script>
+```
+
+The rule of thumb I took away: **on a view-transitions site, any JavaScript that touches the page must run on `astro:page-load`, not just once at startup.** This one rule explains the theme toggle, the mobile menu, and a random-quote widget bug coming up in part 5.
+
+## Did it actually work?
+
+We tested it with an automated browser: load the site with dark system settings (no flash), toggle to light, navigate through five pages (stays light), toggle again (still responds). All green. The styleguide got screenshotted in both themes for a visual once-over.
+
+Testing dark mode by *navigating around*, not just toggling once, is the test my old site never got. Now I know why.
+
+Next up: [turning the homepage into an actual landing page](/blog/turning-my-homepage-into-a-landing-page/).
+
+Thanks for reading and have a good one! 🤙
