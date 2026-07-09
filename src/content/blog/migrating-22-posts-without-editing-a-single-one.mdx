@@ -2,13 +2,13 @@
 title: Migrating 22 Posts Without Editing One
 date: '2026-07-09'
 draft: true
-summary: 'Every post on this site survived a complete rewrite with zero edits — same URLs, same content. The tricks: a forgiving schema and two carefully-placed components.'
+summary: 'Every post on this site survived a complete rewrite with zero edits: same URLs, same content. The tricks: a forgiving schema and two carefully-placed components.'
 tags: ['rebuild', 'astro', 'markdown']
 ---
 
 *This is part 6 of my [rebuild series](/tags/rebuild/). In [part 5](/blog/turning-my-homepage-into-a-landing-page/) I built the new landing page.*
 
-Here's the constraint that shaped this whole phase: I have 22 published posts, and I did not want to touch any of them. Not the text, not the metadata at the top, not the URLs. A rebuild that breaks old links or forces you to hand-edit every post isn't a rebuild — it's a punishment.
+Here's the constraint that shaped this whole phase: I have 22 published posts, and I did not want to touch any of them. Not the text, not the metadata at the top, not the URLs. A rebuild that breaks old links or forces you to hand-edit every post isn't a rebuild. It's a punishment.
 
 Mission accomplished: **zero post edits, byte-identical URLs.** Here's how.
 
@@ -36,11 +36,11 @@ The schema is a contract: if a post's frontmatter doesn't match, the build fails
 
 ## Trick 1: only validate what you use
 
-My old posts carry frontmatter fields the old theme needed — `authors`, `layout`, `bibliography` — that the new site doesn't care about. Fun fact: a schema like the one above **ignores unknown fields** instead of rejecting them. So the new schema describes only the fields the new site actually reads, and all the legacy fields just... pass through harmlessly. That single property saved 22 rounds of frontmatter surgery.
+My old posts carry frontmatter fields the old theme needed (`authors`, `layout`, `bibliography`) that the new site doesn't care about. Fun fact: a schema like the one above **ignores unknown fields** instead of rejecting them. So the new schema describes only the fields the new site actually reads, and all the legacy fields just... pass through harmlessly. That single property saved 22 rounds of frontmatter surgery.
 
-One real bug surfaced here: the old schema gave every untagged post a default tag called `default` — and there was no `default` tag file. A dangling reference that had always been there. The new default is an empty list. 🐛
+One real bug surfaced here: the old schema gave every untagged post a default tag called `default`, and there was no `default` tag file. A dangling reference that had always been there. The new default is an empty list. 🐛
 
-## Trick 2: posts can import components — so keep the paths alive
+## Trick 2: posts can import components, so keep the paths alive
 
 This is the sneaky one. MDX posts can import components, and eleven of my posts do, right in their bodies:
 
@@ -51,24 +51,24 @@ import SocialIcon from '@/components/social-icons/index.astro';
 
 Those are *file paths inside my posts*. If the rebuild had put its link component anywhere other than exactly `src/components/Link.astro`, eleven posts would crash at build time.
 
-The solution wasn't a hack: the new design system simply *places its own* `Link` and `SocialIcon` components at those exact paths, accepting the same props. New internals, new styling — same address. The posts import them and never know anything changed underneath.
+The solution wasn't a hack: the new design system simply *places its own* `Link` and `SocialIcon` components at those exact paths, accepting the same props. New internals, new styling, same address. The posts import them and never know anything changed underneath.
 
-Same idea for styling: post bodies use Tailwind classes like `text-primary-500` directly, so the new theme keeps a `primary` color scale (part 3's `@theme` block). Rename that scale and every one of those classes silently stops working — no error, just unstyled links.
+Same idea for styling: post bodies use Tailwind classes like `text-primary-500` directly, so the new theme keeps a `primary` color scale (part 3's `@theme` block). Rename that scale and every one of those classes silently stops working. No error, just unstyled links.
 
-**The takeaway: your content can have a hidden API.** Imports, class names, image paths — anything your posts reference is a contract the new code has to honor (or you're editing every post after all).
+**The takeaway: your content can have a hidden API.** Imports, class names, image paths: anything your posts reference is a contract the new code has to honor (or you're editing every post after all).
 
 ## Trick 3: prove the URLs didn't change
 
 Old Astro used `post.slug` for URLs; the new content layer uses `post.id`. Both derive from the filename, so they *should* match... but "should" isn't a migration plan, because every changed URL is a broken link somewhere and lost search ranking.
 
-So we diffed it: list every page the old site generated, list every page the new build generates, compare. Result: all 22 published posts and all 15 tag pages, identical paths — including a subtle one, where `ice-macOS-menu-bar-manager.mdx` (capital letters in the filename!) still becomes lowercase `/blog/ice-macos-menu-bar-manager/` in both systems.
+So we diffed it: list every page the old site generated, list every page the new build generates, compare. Result: all 22 published posts and all 15 tag pages, identical paths, including a subtle one, where `ice-macOS-menu-bar-manager.mdx` (capital letters in the filename!) still becomes lowercase `/blog/ice-macos-menu-bar-manager/` in both systems.
 
-The one post that "disappeared" from the build was my one `draft: true` post — excluded on purpose, exactly like the old site did.
+The one post that "disappeared" from the build was my one `draft: true` post, excluded on purpose, exactly like the old site did.
 
 ## What the blog pages look like now
 
-With the collection defined, the actual pages are short: a paginated `/blog/` list, a post page, tag pages, and an RSS feed, all pulling from one shared `getPublishedPosts()` helper. The post titles even morph smoothly from the list into the post header using view transitions — one `transition:name` attribute on each side, and Astro animates between them.
+With the collection defined, the actual pages are short: a paginated `/blog/` list, a post page, tag pages, and an RSS feed, all pulling from one shared `getPublishedPosts()` helper. The post titles even morph smoothly from the list into the post header using view transitions: one `transition:name` attribute on each side, and Astro animates between them.
 
-Next up: [the SEO layer from the founder of Yoast](/blog/agent-ready-seo-with-the-yoast-founders-tools/) — where robots audit my site and find *my* bugs.
+Next up: [the SEO layer from the founder of Yoast](/blog/agent-ready-seo-with-the-yoast-founders-tools/), where robots audit my site and find *my* bugs.
 
 Thanks for reading and have a good one! 🤙

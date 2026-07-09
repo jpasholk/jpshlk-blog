@@ -6,9 +6,9 @@ summary: 'AI coding tools are only as good as what they can see. MCP servers giv
 tags: ['rebuild', 'ai']
 ---
 
-*This is part 9 — the finale — of my [rebuild series](/tags/rebuild/). In [part 8](/blog/moving-from-netlify-to-cloudflare/) I moved the site to Cloudflare.*
+*This is part 9, the finale, of my [rebuild series](/tags/rebuild/). In [part 8](/blog/moving-from-netlify-to-cloudflare/) I moved the site to Cloudflare.*
 
-{/* TODO: revisit after you've actually used these for a while — swap in your own impressions. */}
+{/* TODO: revisit after you've actually used these for a while. Swap in your own impressions. */}
 
 The whole rebuild was AI-assisted, so let me close the series with the plumbing that makes AI assistance actually good: **MCP servers**.
 
@@ -18,15 +18,15 @@ MCP (Model Context Protocol) is like a USB port for AI tools. An AI coding assis
 
 ## Why docs servers matter more than you'd think
 
-Here's the concrete problem. Astro 7 came out **three weeks** before this rebuild. Every AI model's training data predates it — so out of the box, models confidently give you Astro 4-or-5-era answers.
+Here's the concrete problem. Astro 7 came out **three weeks** before this rebuild. Every AI model's training data predates it, so out of the box, models confidently give you Astro 4-or-5-era answers.
 
-Real example from this project: the view-transitions component used to be called `<ViewTransitions />`. In current Astro it's `<ClientRouter />` — the old name is *gone*. An AI working from memory will hand you the old one and the build fails. Multiply that by content collections moving files, config formats changing, Tailwind 4 deleting its config file... a fast-moving framework quietly breaks an AI's memorized knowledge everywhere.
+Real example from this project: the view-transitions component used to be called `<ViewTransitions />`. In current Astro it's `<ClientRouter />`, and the old name is *gone*. An AI working from memory will hand you the old one and the build fails. Multiply that by content collections moving files, config formats changing, Tailwind 4 deleting its config file... a fast-moving framework quietly breaks an AI's memorized knowledge everywhere.
 
 A docs MCP server fixes this at the root: instead of remembering, the AI *looks it up* in documentation that's current today.
 
 ## My shortlist
 
-### 1. Astro Docs (official) — the essential one
+### 1. Astro Docs (official): the essential one
 
 Free, remote (nothing to install), run by the Astro team, always current. If you add exactly one server for Astro work, it's this:
 
@@ -36,19 +36,19 @@ claude mcp add --transport http astro-docs https://mcp.docs.astro.build/mcp
 
 Details at [mcp.docs.astro.build](https://mcp.docs.astro.build/) and Astro's [Build with AI guide](https://docs.astro.build/en/guides/build-with-ai/).
 
-### 2. Playwright — let the AI look at your site
+### 2. Playwright: let the AI look at your site
 
 [Playwright's MCP server](https://github.com/microsoft/playwright-mcp) gives the AI a real browser: open pages, click buttons, take screenshots.
 
-This one earned its spot during the rebuild. The dark mode fix in part 4 wasn't declared done because the code looked right — the AI opened a browser with dark system settings, verified no flash, clicked the toggle, navigated five pages, and screenshotted the styleguide in both themes. The fuzzy 404 from part 7 was proven by literally visiting a typo'd URL and watching it redirect. "Does it look right?" is half of web dev, and this makes it something the AI can answer itself:
+This one earned its spot during the rebuild. The dark mode fix in part 4 wasn't declared done because the code looked right. The AI opened a browser with dark system settings, verified no flash, clicked the toggle, navigated five pages, and screenshotted the styleguide in both themes. The fuzzy 404 from part 7 was proven by literally visiting a typo'd URL and watching it redirect. "Does it look right?" is half of web dev, and this makes it something the AI can answer itself:
 
 ```sh
 claude mcp add playwright -- npx @playwright/mcp@latest
 ```
 
-### 3. Cloudflare's servers — for after launch
+### 3. Cloudflare's servers: for after launch
 
-Cloudflare runs [official MCP servers](https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/): a docs one (same story as Astro's), plus builds and observability servers that let the AI check *why a deploy failed* and read logs itself — instead of you playing copy-paste middleman with build output.
+Cloudflare runs [official MCP servers](https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/): a docs one (same story as Astro's), plus builds and observability servers that let the AI check *why a deploy failed* and read logs itself, instead of you playing copy-paste middleman with build output.
 
 ```sh
 claude mcp add --transport http cf-docs https://docs.mcp.cloudflare.com/mcp
@@ -56,14 +56,14 @@ claude mcp add --transport http cf-docs https://docs.mcp.cloudflare.com/mcp
 
 ## The restraint rule
 
-The counterintuitive tip: **don't collect these like Pokémon.** Every connected server takes up space in the AI's context — the working memory it uses to think about *your actual problem* — whether or not it gets used. A pile of idle servers makes the assistant slightly worse at everything.
+The counterintuitive tip: **don't collect these like Pokémon.** Every connected server takes up space in the AI's context (the working memory it uses to think about *your actual problem*) whether or not it gets used. A pile of idle servers makes the assistant slightly worse at everything.
 
 My kit for this site: Astro Docs + Playwright daily, Cloudflare docs during launch week, builds/observability only once there's a deploy to babysit. Add servers when a task needs them; prune when it doesn't.
 
 ## Wrapping the series
 
-Nine posts ago this site was a borrowed theme on an old framework with a broken dark mode and a domain typo in its config. Now it's a from-scratch Astro 7 site I understand top to bottom — designed on purpose, SEO'd like Yoast built it, deployed on Cloudflare, and documented here in full.
+Nine posts ago this site was a borrowed theme on an old framework with a broken dark mode and a domain typo in its config. Now it's a from-scratch Astro 7 site I understand top to bottom: designed on purpose, SEO'd like Yoast built it, deployed on Cloudflare, and documented here in full.
 
 The honest summary of AI-assisted dev, from someone who just did a whole rebuild that way: the AI did the labor, the reading, and the remembering. I did the deciding. Both halves were necessary. And I learned more from directing this rebuild than from any tutorial I've ever followed.
 
-Thanks for riding along — and if you try a rebuild like this, I'd love to hear how it goes! 🤙
+Thanks for riding along, and if you try a rebuild like this, I'd love to hear how it goes! 🤙

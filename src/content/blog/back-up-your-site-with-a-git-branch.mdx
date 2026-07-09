@@ -14,7 +14,7 @@ Step one of rebuilding my site from scratch was deleting almost everything in it
 
 Technically, yes. Git keeps the full history of every file, so nothing committed is ever really gone. But here's the practical problem: once you delete files and pile new commits on top, *finding* the old stuff means digging through history with commands you have to look up every time.
 
-A **branch** fixes that. A branch is just a named pointer to a specific moment in your repo's history. Point one at your site as it exists today, and the entire old codebase stays one click away on GitHub — forever, no digging.
+A **branch** fixes that. A branch is just a named pointer to a specific moment in your repo's history. Point one at your site as it exists today, and the entire old codebase stays one click away on GitHub. Forever, no digging.
 
 ## The whole backup
 
@@ -23,7 +23,7 @@ git branch legacy-site origin/main
 git push -u origin legacy-site
 ```
 
-That's it. The first line creates a branch called `legacy-site` pointing at the current state of `main` (the old site). The second pushes it to GitHub. Nothing about your live site changes — you've just planted a flag that says "the old site lives here."
+That's it. The first line creates a branch called `legacy-site` pointing at the current state of `main` (the old site). The second pushes it to GitHub. Nothing about your live site changes; you've just planted a flag that says "the old site lives here."
 
 Now you can delete files on your working branch with total confidence.
 
@@ -35,13 +35,13 @@ Here's the part I didn't know before this project. You don't have to *switch* br
 git show legacy-site:src/components/BaseHead.astro
 ```
 
-That prints the old `BaseHead` component to your terminal without touching your working files. During the rebuild we used this constantly — "what props did the old social icons take?" was one `git show` away, while the new code stayed untouched in the editor.
+That prints the old `BaseHead` component to your terminal without touching your working files. During the rebuild we used this constantly. "What props did the old social icons take?" was one `git show` away, while the new code stayed untouched in the editor.
 
 You can also just browse the branch on GitHub with the branch picker dropdown. Old site, fully intact, read-only.
 
 ## Branches vs. tags (two-sentence version)
 
-A **tag** is like a branch except it's meant to never move — a permanent label like `v1-legacy`. A **branch** can accept new commits; a tag is a snapshot. For a backup, either works; I did both, because they're free:
+A **tag** is like a branch except it's meant to never move: a permanent label like `v1-legacy`. A **branch** can accept new commits; a tag is a snapshot. For a backup, either works; I did both, because they're free:
 
 ```sh
 git tag v1-legacy origin/main
@@ -50,10 +50,10 @@ git push origin v1-legacy
 
 ## The mindset shift
 
-The real value here isn't technical, it's psychological. Every destructive step in the rebuild — deleting the layouts, the components, the old configs — felt fine, because "undo" was always available. If the rebuild had gone sideways I could have walked away with nothing lost.
+The real value here isn't technical, it's psychological. Every destructive step in the rebuild (deleting the layouts, the components, the old configs) felt fine, because "undo" was always available. If the rebuild had gone sideways I could have walked away with nothing lost.
 
 If you're about to do anything drastic to a project: branch first. It costs five seconds and buys unlimited courage. 💪
 
-Next up: [starting clean with Astro 7 and Tailwind 4](/blog/starting-clean-with-astro-7-and-tailwind-4/) — what a from-scratch Astro project actually looks like in 2026.
+Next up: [starting clean with Astro 7 and Tailwind 4](/blog/starting-clean-with-astro-7-and-tailwind-4/), aka what a brand-new Astro project looks like in 2026.
 
 Thanks for reading and have a good one! 🤙

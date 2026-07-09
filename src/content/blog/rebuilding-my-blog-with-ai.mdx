@@ -2,47 +2,47 @@
 title: How I Rebuilt My Blog From Scratch With AI
 date: '2026-07-09'
 draft: true
-summary: 'I tore this entire site down to the studs and rebuilt it with Astro 7 — with an AI doing the heavy lifting. Here''s the story, and the start of a series.'
+summary: 'I tore this entire site down to the studs and rebuilt it with Astro 7, with an AI doing the heavy lifting. Here''s the story, and the start of a series.'
 tags: ['rebuild', 'ai', 'astro']
 ---
 
 *This is part 1 of my [rebuild series](/tags/rebuild/), where I document tearing this site down and rebuilding it from scratch.*
 
-If you're reading this, you're looking at a brand new website. Same posts, same me — but every single line of code under the hood was rewritten from scratch. And I'll be honest with you: I didn't write most of it. An AI did. I just told it what I wanted, made the decisions, and learned a ton along the way. 🤙
+If you're reading this, you're looking at a brand new website. Same posts, same me, but every single line of code under the hood was rewritten from scratch. And I'll be honest with you: I didn't write most of it. An AI did. I just told it what I wanted, made the decisions, and learned a ton along the way. 🤙
 
 This post kicks off a series documenting the whole thing, in pieces simple enough that I could have followed them a couple years ago.
 
 ## Why rebuild at all?
 
-The old version of this site was a port of a popular theme — [tailwind-nextjs-starter-blog](https://github.com/timlrx/tailwind-nextjs-starter-blog) — adapted to [Astro](https://astro.build). It served me well while I was learning, but it had problems:
+The old version of this site was a port of a popular theme, [tailwind-nextjs-starter-blog](https://github.com/timlrx/tailwind-nextjs-starter-blog), adapted to [Astro](https://astro.build). It served me well while I was learning, but it had problems:
 
 - It was somebody else's design with my name on it.
 - It was stuck on Astro 3, several major versions behind.
-- The homepage was just a list of posts. I wanted a **landing page** — about me, my work, my hobbies — with the blog one click away.
+- The homepage was just a list of posts. I wanted a **landing page** (about me, my work, my hobbies) with the blog one click away.
 - The dark mode toggle was broken. (More on that in part 4. It was broken in a *really* educational way. 😜)
 
-I also wanted serious SEO — and it turns out the founder of Yoast (the WordPress SEO plugin that runs half the internet) has been building [SEO tools for Astro](https://joost.blog/astro-seo-complete-guide/). That sealed it.
+I also wanted serious SEO, and it turns out the founder of Yoast (the WordPress SEO plugin that runs half the internet) has been building [SEO tools for Astro](https://joost.blog/astro-seo-complete-guide/). That sealed it.
 
 ## How the AI part actually worked
 
-I used Claude Code, and the part that surprised me most wasn't the code — it was the *planning*. Before touching anything, it:
+I used Claude Code, and the part that surprised me most wasn't the code. It was the *planning*. Before touching anything, it:
 
 1. **Explored my repo** and figured out how the old site worked, including things I'd forgotten about.
-2. **Researched the tools** — it looked up the actual npm versions and discovered that the SEO package I wanted required Astro 6 or 7, which changed the whole plan.
-3. **Asked me real questions.** Not "are you sure?" busywork — actual decisions: Netlify or Cloudflare? Keep the projects page or fold it into the landing page? And my favorite: *"Your config says `jshlk.com` but your site title says `jpshlk.com` — which is right?"* It found a typo in my canonical domain that had been sitting there the entire time.
+2. **Researched the tools.** It looked up the actual npm versions and discovered that the SEO package I wanted required Astro 6 or 7, which changed the whole plan.
+3. **Asked me real questions.** Not "are you sure?" busywork; actual decisions: Netlify or Cloudflare? Keep the projects page or fold it into the landing page? And my favorite: *"Your config says `jshlk.com` but your site title says `jpshlk.com`. Which one is right?"* It found a typo in my canonical domain that had been sitting there the entire time.
 
-Then it wrote a phased plan, and I pushed back on it. The first version was a "refactor." I said no — complete rewrite, build the design system first, then the landing page, then bring the content over. It threw away the old plan and made a new one. That back-and-forth is the actual skill of working with AI, as far as I can tell: it does the labor, but *you* have to know what you want.
+Then it wrote a phased plan, and I pushed back on it. The first version was a "refactor." I said no: complete rewrite, build the design system first, then the landing page, then bring the content over. It threw away the old plan and made a new one. That back-and-forth is the actual skill of working with AI, as far as I can tell: it does the labor, but *you* have to know what you want.
 
 ## The plan we landed on
 
 Six phases, each one a working checkpoint:
 
 1. **Back up the old site** to a git branch (part 2)
-2. **Clean-slate scaffold** — Astro 7, Tailwind CSS v4, TypeScript, no UI framework (part 3)
-3. **Design system** — colors, type, components, and a dark mode that finally works (part 4)
-4. **Landing page** — hero, about, work, hobbies (part 5)
-5. **Content migration** — all my posts, without editing a single one (part 6)
-6. **SEO layer + launch** — the Yoast founder's toolkit, then Cloudflare (parts 7 and 8)
+2. **Clean-slate scaffold:** Astro 7, Tailwind CSS v4, TypeScript, no UI framework (part 3)
+3. **Design system:** colors, type, components, and a dark mode that finally works (part 4)
+4. **Landing page:** hero, about, work, hobbies (part 5)
+5. **Content migration:** all my posts, without editing a single one (part 6)
+6. **SEO layer + launch:** the Yoast founder's toolkit, then Cloudflare (parts 7 and 8)
 
 Plus a bonus part 9 on MCP servers, the plumbing that makes AI dev tools way smarter.
 
