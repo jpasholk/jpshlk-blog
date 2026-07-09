@@ -2,47 +2,47 @@
 title: Moving From Netlify to Cloudflare
 date: '2026-07-09'
 draft: true
-summary: 'How I''m cutting my rebuilt site over from Netlify to Cloudflare with zero downtime — and why pushing a total rewrite to GitHub never once endangered the live site.'
+summary: 'How I''m cutting my rebuilt site over from Netlify to Cloudflare with zero downtime, and why pushing a total rewrite to GitHub never once endangered the live site.'
 tags: ['rebuild', 'web-development']
 ---
 
 *This is part 8 of my [rebuild series](/tags/rebuild/). In [part 7](/blog/agent-ready-seo-with-the-yoast-founders-tools/) I wired up the SEO layer.*
 
-{/* TODO: This post was drafted before the actual cutover — update the details (and add screenshots!) with what actually happened when you deploy. */}
+{/* TODO: This post was drafted before the actual cutover. Update the details (and add screenshots!) with what actually happened when you deploy. */}
 
 Here's a thing that worried me early in the rebuild: the entire rewrite was being pushed to GitHub *while Netlify was live-deploying my site from that same repo*. Wasn't I one push away from replacing my site with a half-finished skeleton?
 
-Nope — and understanding why is half of this post. The other half is the actual move to Cloudflare.
+Nope, and understanding why is half of this post. The other half is the actual move to Cloudflare.
 
 ## Why the rewrite never threatened the live site
 
-Netlify (and Cloudflare, and everyone) deploys from **one specific branch** — the "production branch," usually `main`. The whole rebuild happened on a *different* branch. You can push anything you want to a feature branch; production doesn't blink.
+Netlify (and Cloudflare, and everyone) deploys from **one specific branch**, the "production branch," usually `main`. The whole rebuild happened on a *different* branch. You can push anything you want to a feature branch; production doesn't blink.
 
 Two more safety facts worth knowing:
 
-- **Branch previews are sandboxes.** If your host builds feature branches, they deploy to separate preview URLs — never your domain.
+- **Branch previews are sandboxes.** If your host builds feature branches, they deploy to separate preview URLs, never your domain.
 - **Failed builds don't take sites down.** If a production build fails, hosts keep serving the last successful deploy. When I eventually merge to `main`, old Netlify will try to build the new site, fail (it's not configured with the Node 22 the new site needs)... and keep serving the old site like nothing happened. The failure is cosmetic.
 
 So the sequence is stress-free: old site keeps running on Netlify until the new one is verified on Cloudflare, then DNS flips.
 
 ## Setting up Cloudflare
 
-The new site is fully static — a folder of files — so hosting it anywhere is easy. On Cloudflare:
+The new site is fully static (a folder of files), so hosting it anywhere is easy. On Cloudflare:
 
 1. **Workers & Pages → Create → Pages → Connect to Git**, pick the repo.
 2. Build command: `npm run build`. Output directory: `dist`.
 3. One environment variable: `NODE_VERSION` = `22`. **This is the gotcha.** Astro 7 requires Node 22.12+, and build images default to older versions. Forget this and you get a cryptic build failure as your first Cloudflare experience.
 4. Deploy. You get a free `*.pages.dev` preview URL to test the real, built site on the real internet.
 
-The repo also carries a `wrangler.jsonc` (Cloudflare's config file) and a `public/_redirects` file — the `/about → /` redirects from part 5, in the format both Cloudflare and Netlify understand. Having redirects in a file in the repo instead of clicking them together in a dashboard means they're versioned, reviewed, and portable.
+The repo also carries a `wrangler.jsonc` (Cloudflare's config file) and a `public/_redirects` file with the `/about → /` redirects from part 5, in the format both Cloudflare and Netlify understand. Having redirects in a file in the repo instead of clicking them together in a dashboard means they're versioned, reviewed, and portable.
 
 ## The DNS cutover
 
-DNS is the internet's phone book — it's what points `jpshlk.com` at a particular host. The cutover:
+DNS is the internet's phone book: it's what points `jpshlk.com` at a particular host. The cutover:
 
 1. In the Cloudflare Pages project: **Custom domains → Add** → `jpshlk.com`.
 2. Follow the wizard (if your DNS isn't on Cloudflare yet, it'll walk you through moving the nameservers and imports your existing records).
-3. Wait for propagation — minutes to a few hours.
+3. Wait for propagation (minutes to a few hours).
 
 Until the moment DNS flips, visitors get old-Netlify. After, new-Cloudflare. There's no in-between state where the site is down, because both sites are fully working the entire time.
 
@@ -50,13 +50,13 @@ Until the moment DNS flips, visitors get old-Netlify. After, new-Cloudflare. The
 
 The rebuild ships a bunch of machine-facing files, so "is it live?" is more than loading the homepage. My checklist, each one a URL:
 
-- `/robots.txt` — allows crawling, points at the sitemap
-- `/sitemap-index.xml` — lists every page
-- `/llms.txt` — the AI-readable site summary
-- `/blog/learning-astro.md` — a markdown alternate serves
-- `/about` — redirects to the homepage (301, not a 404)
-- `/blog/learning-astr` — typo on purpose; the fuzzy 404 should auto-correct it
-- The Ice post — its GitHub star buttons load (a third-party script I couldn't test during development)
+- `/robots.txt`: allows crawling, points at the sitemap
+- `/sitemap-index.xml`: lists every page
+- `/llms.txt`: the AI-readable site summary
+- `/blog/learning-astro.md`: a markdown alternate serves
+- `/about`: redirects to the homepage (301, not a 404)
+- `/blog/learning-astr`: typo on purpose; the fuzzy 404 should auto-correct it
+- The Ice post: its GitHub star buttons load (a third-party script I couldn't test during development)
 
 Then the slower burns: submit the sitemap in Google Search Console, run a post through [validator.schema.org](https://validator.schema.org/), and do the two-step IndexNow key dance from part 7.
 
@@ -64,7 +64,7 @@ Then the slower burns: submit the sitemap in Google Search Console, run a post t
 
 ## Retiring Netlify
 
-After a week or two of Cloudflare behaving, the Netlify site gets deleted. It served me well — this isn't a Netlify-is-bad move, it's a consolidation (my DNS was heading to Cloudflare anyway). The old code stays browsable forever on the `legacy-site` branch from part 2. ⚰️
+After a week or two of Cloudflare behaving, the Netlify site gets deleted. It served me well; this isn't a Netlify-is-bad move, it's a consolidation (my DNS was heading to Cloudflare anyway). The old code stays browsable forever on the `legacy-site` branch from part 2. ⚰️
 
 Next up, the series finale: [MCP servers that level up AI web dev](/blog/mcp-servers-that-level-up-ai-web-dev/).
 

@@ -2,7 +2,7 @@
 title: A Tiny Design System and a Dark Mode That Works
 date: '2026-07-09'
 draft: true
-summary: 'My old theme toggle was broken in two educational ways. Building a small design system — and a dark mode that survives page transitions — fixed both.'
+summary: 'My old theme toggle was broken in two educational ways. Building a small design system and a dark mode that survives page transitions fixed both.'
 tags: ['rebuild', 'astro', 'web-development']
 ---
 
@@ -14,21 +14,21 @@ Before building any real pages, we built the *pieces* pages are made of. And in 
 
 Forget the enterprise version of that phrase. At personal-site scale, a design system is three things:
 
-1. **Tokens** — the named values everything uses: a `primary` color scale, one font (Space Grotesk), consistent grays. They live in the `@theme` block from part 3.
-2. **A handful of components** — mine has eight: `Link`, `Button`, `Card`, `TagPill`, `Prose` (styles post content), `Header`, `Footer`, `ThemeToggle`.
-3. **A styleguide page** — a private `/styleguide` route that renders every token and component in both light and dark mode. When I tweak the design, I look at one page instead of clicking through the whole site. It's marked `noindex` and left out of the sitemap, so it's for my eyes only.
+1. **Tokens**: the named values everything uses. A `primary` color scale, one font (Space Grotesk), consistent grays. They live in the `@theme` block from part 3.
+2. **A handful of components.** Mine has eight: `Link`, `Button`, `Card`, `TagPill`, `Prose` (styles post content), `Header`, `Footer`, `ThemeToggle`.
+3. **A styleguide page**: a private `/styleguide` route that renders every token and component in both light and dark mode. When I tweak the design, I look at one page instead of clicking through the whole site. It's marked `noindex` and left out of the sitemap, so it's for my eyes only.
 
 The point of building this *before* the homepage: every later page is just arranging pieces that already look right.
 
 ## Why dark mode toggles break
 
-Here's what I learned about why my old toggle failed — two separate bugs, both classics.
+Here's what I learned about why my old toggle failed: two separate bugs, both classics.
 
 ### Bug 1: the flash (FOUC)
 
-The theme choice lives in `localStorage`, which only JavaScript can read. If that JavaScript runs *after* the page paints, dark-mode users get a blinding white flash on every load. That's called FOUC — flash of unstyled content.
+The theme choice lives in `localStorage`, which only JavaScript can read. If that JavaScript runs *after* the page paints, dark-mode users get a blinding white flash on every load. That's called FOUC, short for flash of unstyled content.
 
-The fix: a tiny script in the `<head>` marked `is:inline`, which tells Astro "don't optimize or move this — run it right here, before anything renders":
+The fix: a tiny script in the `<head>` marked `is:inline`, which tells Astro "don't optimize or move this, run it right here, before anything renders":
 
 ```astro
 <!-- src/layouts/BaseLayout.astro -->
@@ -51,11 +51,11 @@ In plain words: check for a saved choice; if there isn't one, follow the system 
 
 ### Bug 2: view transitions eat your JavaScript
 
-This site uses Astro's view transitions (the `<ClientRouter />` component) for those smooth animated page changes. Under the hood, clicking a link doesn't do a full page load — Astro fetches the next page and *swaps the document*.
+This site uses Astro's view transitions (the `<ClientRouter />` component) for those smooth animated page changes. Under the hood, clicking a link doesn't do a full page load. Instead, Astro fetches the next page and *swaps the document*.
 
 That swap is where naive theme code dies twice over: the fresh document arrives without your `dark` class (instant un-theming), and your click handlers were attached to elements that just got thrown away (the toggle goes dead after one navigation). **That was my old site's bug.** The toggle worked until you clicked a link. Then, nothing.
 
-Astro provides events for exactly this. `astro:after-swap` fires right after the new document lands — that's the `apply` listener in the snippet above, re-applying the theme mid-swap. And `astro:page-load` fires after every navigation, which is where the button wires itself up:
+Astro provides events for exactly this. `astro:after-swap` fires right after the new document lands; that's the `apply` listener in the snippet above, re-applying the theme mid-swap. And `astro:page-load` fires after every navigation, which is where the button wires itself up:
 
 ```astro
 <!-- src/components/ThemeToggle.astro -->

@@ -29,7 +29,7 @@ interface Props {
 
 const { page, tagName, tagDescription } = Astro.props;
 
-const pageSuffix = page.lastPage > 1 ? ` — page ${page.currentPage}` : '';
+const pageSuffix = page.lastPage > 1 ? ` - page ${page.currentPage}` : '';
 const title = `Posts tagged ${tagName}${pageSuffix}`;
 const description = `${tagDescription ?? `Posts tagged ${tagName}.`} ${page.total} ${
   page.total === 1 ? 'post' : 'posts'

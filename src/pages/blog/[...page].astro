@@ -19,10 +19,10 @@ interface Props {
 const { page } = Astro.props;
 
 const pagePath = page.currentPage === 1 ? '/blog/' : `/blog/${page.currentPage}/`;
-const title = page.currentPage === 1 ? 'Blog' : `Blog — page ${page.currentPage}`;
+const title = page.currentPage === 1 ? 'Blog' : `Blog - page ${page.currentPage}`;
 const pageSuffix =
   page.lastPage > 1 ? ` Page ${page.currentPage} of ${page.lastPage}.` : '';
-const description = `All ${page.total} posts about iPhone and Mac apps, iOS Shortcuts, e-commerce, and web development — newest first.${pageSuffix}`;
+const description = `All ${page.total} posts about iPhone and Mac apps, iOS Shortcuts, e-commerce, and web development, newest first.${pageSuffix}`;
 ---
 
 <BaseLayout

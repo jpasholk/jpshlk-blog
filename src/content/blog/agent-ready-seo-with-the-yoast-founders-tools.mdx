@@ -2,25 +2,25 @@
 title: Agent-Ready SEO With Yoast Founder's Astro Tools
 date: '2026-07-09'
 draft: true
-summary: 'Joost de Valk built Yoast SEO for WordPress. Now he builds SEO tools for Astro — and wiring them into my site found real bugs I''d shipped years ago.'
+summary: 'Joost de Valk built Yoast SEO for WordPress. Now he builds SEO tools for Astro, and wiring them into my site found real bugs I''d shipped years ago.'
 tags: ['rebuild', 'astro', 'ai']
 ---
 
 *This is part 7 of my [rebuild series](/tags/rebuild/). In [part 6](/blog/migrating-22-posts-without-editing-a-single-one/) I migrated all my posts without editing them.*
 
-If you've ever touched WordPress, you've seen Yoast SEO — the plugin with the green/orange/red dots that runs on millions of sites. Its founder, [Joost de Valk](https://joost.blog/), has moved on from WordPress and now builds SEO tooling for Astro: the open-source [seo-graph suite](https://github.com/jdevalk/seo-graph). His [Astro SEO guide](https://joost.blog/astro-seo-complete-guide/) is the reference I worked from.
+If you've ever touched WordPress, you've seen Yoast SEO, the plugin with the green/orange/red dots that runs on millions of sites. Its founder, [Joost de Valk](https://joost.blog/), has moved on from WordPress and now builds SEO tooling for Astro: the open-source [seo-graph suite](https://github.com/jdevalk/seo-graph). His [Astro SEO guide](https://joost.blog/astro-seo-complete-guide/) is the reference I worked from.
 
-This was the part of the rebuild I was most excited about, and it over-delivered — mostly by finding *my* mistakes.
+This was the part of the rebuild I was most excited about, and it over-delivered, mostly by finding *my* mistakes.
 
 ## What the suite gives you (plain-words tour)
 
 **A `<Seo>` head component.** One component renders everything a page's `<head>` needs: title, description, canonical URL, Open Graph tags (the preview card when you share a link), Twitter card, robots directives. Before, my site hand-rolled all of this in a homemade component; now it's maintained by someone whose entire career is this.
 
-**A schema.org JSON-LD graph.** This is structured data — a machine-readable description of each page embedded as JSON. Every post on this site now describes itself to crawlers as a connected graph: a `BlogPosting`, on a `WebPage`, part of this `WebSite`, written by a `Person` (me), with `BreadcrumbList` navigation. Same entity model Yoast made famous, rebuilt for Astro.
+**A schema.org JSON-LD graph.** This is structured data, a machine-readable description of each page embedded as JSON. Every post on this site now describes itself to crawlers as a connected graph: a `BlogPosting`, on a `WebPage`, part of this `WebSite`, written by a `Person` (me), with `BreadcrumbList` navigation. Same entity model Yoast made famous, rebuilt for Astro.
 
 **llms.txt.** Like `robots.txt`, but for AI: a [proposed standard](https://llmstxt.org) file summarizing your site for language models. Mine lists every real page with its description, auto-generated at build time.
 
-**Markdown alternates.** Every post is also served as plain markdown — add `.md` to any post URL (like `/blog/learning-astro.md`) and you get the raw text, no HTML. Each page advertises this with a `<link rel="alternate" type="text/markdown">` tag so AI agents can find the clean version instead of scraping HTML. This is what "agent-ready" means: my content is *easier for machines to read correctly*.
+**Markdown alternates.** Every post is also served as plain markdown. Add `.md` to any post URL (like `/blog/learning-astro.md`) and you get the raw text, no HTML. Each page advertises this with a `<link rel="alternate" type="text/markdown">` tag so AI agents can find the clean version instead of scraping HTML. This is what "agent-ready" means: my content is *easier for machines to read correctly*.
 
 **Schema endpoints.** JSON feeds of the whole site's structured data (`/schema/post.json`), a `schemamap.xml` index of them, and a standard `/.well-known/api-catalog` discovery file.
 
@@ -30,8 +30,8 @@ This was the part of the rebuild I was most excited about, and it over-delivered
 
 The integration audits every page at build time, and this is where I got humbled. On the *brand-new, carefully built* site, it flagged:
 
-- **Every internal link caused a redirect.** Links were written as `/blog/my-post` but the built pages live at `/blog/my-post/` — trailing slash. Each click "worked" via a silent redirect, wasting a round-trip. Every link on the site got fixed in one pass.
-- **Copy-pasted tag descriptions.** My `bugs` and `news` tags both had the description "Posts about AI." — a copy-paste error that had been live for *years*, caught by the duplicate-metadata check. 😅
+- **Every internal link caused a redirect.** Links were written as `/blog/my-post` but the built pages live at `/blog/my-post/` (trailing slash). Each click "worked" via a silent redirect, wasting a round-trip. Every link on the site got fixed in one pass.
+- **Copy-pasted tag descriptions.** My `bugs` and `news` tags both had the description "Posts about AI." That copy-paste error had been live for *years*; the duplicate-metadata check caught it. 😅
 - **A dead link** in an old post pointing to `/aboutme`, a page that no longer existed. Now a redirect.
 
 None of these are things a human reads a site and notices. All of them are things a robot reading every page catches instantly.
@@ -40,11 +40,11 @@ None of these are things a human reads a site and notices. All of them are thing
 
 IndexNow pings search engines (Bing, Yandex, and friends) the moment pages change, instead of waiting to be crawled. The suite submits changed URLs automatically after each production build.
 
-But there's a trap, straight from the docs: search engines verify you own the site by fetching a key file at `https://yoursite.com/<key>.txt`. **Submit URLs before that file is live and you get a 403 — and the key is treated as invalid forever.** So my setup splits it into two deploys: first ship the key file and confirm it loads, *then* flip a second switch (`INDEXNOW_SUBMIT=true`) to start submitting. Order of operations as a config design. 📋
+But there's a trap, straight from the docs: search engines verify you own the site by fetching a key file at `https://yoursite.com/<key>.txt`. **Submit URLs before that file is live and you get a 403, and the key is treated as invalid forever.** So my setup splits it into two deploys: first ship the key file and confirm it loads, *then* flip a second switch (`INDEXNOW_SUBMIT=true`) to start submitting. Order of operations as a config design. 📋
 
 ## Was it worth it?
 
-Checking the final result: every post's head has one clean JSON-LD graph (validated, no dangling references), an OG image, correct canonicals, the markdown alternate link, and the site ships llms.txt, robots.txt, sitemap, RSS, and the schema endpoints. That's roughly the whole checklist from Joost's guide — on a personal blog, built in an afternoon.
+Checking the final result: every post's head has one clean JSON-LD graph (validated, no dangling references), an OG image, correct canonicals, the markdown alternate link, and the site ships llms.txt, robots.txt, sitemap, RSS, and the schema endpoints. That's roughly the whole checklist from Joost's guide, on a personal blog, built in an afternoon.
 
 The validators alone would have been worth it. It's like having a very pedantic friend who reads your entire site every time you build it, for free.
 
