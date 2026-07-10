@@ -1,4 +1,5 @@
 ---
+import { getImage } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CodeCopy from '@/components/CodeCopy.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
@@ -18,7 +19,17 @@ interface Props {
 const { post, prev, next } = Astro.props;
 const { title, date, lastmod, summary, tags, seo, featureImage, canonicalUrl } = post.data;
 
-const ogImage = seo?.image?.src ?? featureImage?.src;
+// Share images are generated at build time from one full-size source.
+// Never upscale small legacy images, and stay on PNG/JPEG: some link
+// preview crawlers still choke on WebP/AVIF.
+const ogSource = seo?.image?.src ?? featureImage?.src;
+const ogImage = ogSource
+  ? await getImage({
+      src: ogSource,
+      width: Math.min(1200, ogSource.width),
+      format: ogSource.format === 'png' ? 'png' : 'jpeg',
+    })
+  : undefined;
 ---
 
 <BaseLayout
@@ -27,9 +38,9 @@ const ogImage = seo?.image?.src ?? featureImage?.src;
   canonical={canonicalUrl}
   ogType="article"
   ogImage={ogImage ? new URL(ogImage.src, assetBase).href : undefined}
-  ogImageAlt={ogImage ? (seo?.image?.alt ?? featureImage?.alt ?? title) : undefined}
-  ogImageWidth={ogImage?.width}
-  ogImageHeight={ogImage?.height}
+  ogImageAlt={ogSource ? (seo?.image?.alt ?? featureImage?.alt ?? title) : undefined}
+  ogImageWidth={ogImage?.attributes.width}
+  ogImageHeight={ogImage?.attributes.height}
   article={{
     publishedTime: date,
     modifiedTime: postDateModified(post),
