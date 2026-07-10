@@ -8,8 +8,6 @@ tags: ['rebuild', 'web-development']
 
 *This is part 8 of my [rebuild series](/tags/rebuild/). In [part 7](/blog/agent-ready-seo-with-the-yoast-founders-tools/) I wired up the SEO layer.*
 
-{/* TODO: add merge-day details (and screenshots!) once you actually flip the switch. */}
-
 The original plan for this rebuild ended with a move to Cloudflare. Spoiler: I'm still on Netlify, the launch plan got *simpler*, and testing the new site in public exposed my first real production bug before production even existed. Let me walk through all three.
 
 ## Why I didn't move to Cloudflare (yet)
@@ -71,6 +69,16 @@ Then the smoke test, each item a URL to check on the live domain:
 - The share card: paste a link in Discord and see the real image this time
 
 Slower burns after that: submit the sitemap in Google Search Console, validate a post at [validator.schema.org](https://validator.schema.org/), and do the two-step IndexNow key dance from part 7.
+
+## How merge day actually went
+
+Launch day was July 10, 2026, and I have receipts.
+
+The merge button turned out to be a terminal command. Since `main` hadn't moved since the rebuild branch split off, the merge was a clean **fast-forward**: `git merge --ff-only`, push, done. No merge commit, no conflicts possible, and the history on `main` is now literally the rebuild branch's history. Right before it, I finally clicked **Leave fork network** in the repo settings, so this site's repo stopped being "forked from" the theme I'd long since rewritten away from.
+
+The pre-merge smoke test earned its keep one more time. Remember the `/about` redirect on the checklist? On the branch deploy it was returning a **200 with a meta-refresh page** instead of a real 301. Astro generates a physical HTML page for configured redirects, and a real file at that path quietly wins over the `_redirects` rule that was supposed to send the proper status code. Netlify's fix is one character: the `!` force flag (`/about / 301!`). Browsers never noticed the difference; search engines would have.
+
+The deploy itself was almost anticlimactic. I polled the live domain for `/uses/` (a page the old site never had) and it flipped to 200 in about forty seconds. Every smoke-test URL above passed on production, all nineteen unpublished drafts stayed invisible, and even the one old URL with capital letters in it now 301s to its lowercase home. The old site served its last request and nobody's bookmarks broke. 🚀
 
 Next up: [teaching my AI to write like me](/blog/teaching-my-ai-to-write-like-me/), or the day I declared war on em dashes.
 
