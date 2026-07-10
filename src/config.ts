@@ -30,6 +30,7 @@ export const NAVIGATION = [
   { href: '/', title: 'Home' },
   { href: '/blog/', title: 'Blog' },
   { href: '/projects/', title: 'Projects' },
+  { href: '/uses/', title: 'Uses' },
   { href: '/tags/', title: 'Tags' },
 ] as const;
 
