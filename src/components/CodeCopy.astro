@@ -8,7 +8,7 @@
 
 <script>
   function addCopyButtons() {
-    for (const pre of document.querySelectorAll('article pre')) {
+    for (const pre of document.querySelectorAll<HTMLPreElement>('article pre')) {
       if (pre.querySelector('.code-copy')) continue;
       const button = document.createElement('button');
       button.type = 'button';
@@ -18,7 +18,7 @@
       button.addEventListener('click', async () => {
         const code = pre.querySelector('code');
         try {
-          await navigator.clipboard.writeText(code?.innerText ?? pre.innerText);
+          await navigator.clipboard.writeText(code?.textContent ?? pre.textContent ?? '');
           button.textContent = 'Copied!';
         } catch {
           button.textContent = 'Copy failed';
