@@ -1,0 +1,49 @@
+---
+title: Adding Reading Time to an Astro Blog
+date: '2026-07-10'
+draft: true
+summary: 'The little "4 min read" label, implemented in five lines: count the words in each post at build time and divide by an average reading speed.'
+tags: ['astro']
+---
+
+Posts on this site now show a reading time next to the date, the little "4 min read" you see on every publishing platform. I assumed this needed a library. It needed five lines.
+
+## The whole implementation
+
+Astro's content collections hand you each post's raw markdown as `post.body`. From there it's arithmetic:
+
+```ts
+// src/lib/posts.ts
+/** Whole minutes at ~200 words per minute, never less than 1. */
+export function readingTime(post: Post): number {
+  const words = (post.body ?? '').split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+```
+
+Split the text on whitespace, count the pieces, divide by 200 words per minute, round. The `Math.max` keeps a two-sentence post from claiming "0 min read," which reads like a bug even though it's technically accurate.
+
+Then it goes wherever a date already renders. On the post cards and the post header, the line became:
+
+```astro
+<FormattedDate date={date} />
+<span aria-hidden="true"> · </span>{readingTime(post)} min read
+```
+
+That `aria-hidden` on the separator dot is a small courtesy: screen readers skip the decorative dot instead of announcing it.
+
+## On being honestly imprecise
+
+Reading time is an estimate wearing a number's clothing, so it's worth being clear-eyed about the choices:
+
+- **200 words per minute** is a middle-of-the-road adult reading speed. Slower than skimmers, faster than careful readers. Every site picks something in the 180 to 265 range; none of them are "right."
+- **Code blocks count as words** in my version. You could strip them first, but people do read code (often slower than prose), so leaving them in feels closer to true for a dev blog.
+- **Whole minutes only.** "3.5 min read" implies a precision the whole exercise doesn't have.
+
+The point of the label was never accuracy anyway. It answers one reader question: "is this a coffee-break read or a commitment?" Plus or minus a minute doesn't change that answer.
+
+## Why build time makes this free
+
+The part I keep appreciating about Astro: this computation runs once, during `npm run build`, for all posts. Visitors download a page that already says "4 min read" as plain text. No JavaScript ships, nothing runs in the browser, and the cost of the feature at read time is zero bytes.
+
+Five lines, one small reader courtesy. More of this energy. 🤙

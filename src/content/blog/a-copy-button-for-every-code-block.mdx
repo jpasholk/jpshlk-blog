@@ -1,0 +1,58 @@
+---
+title: A Copy Button for Every Code Block
+date: '2026-07-10'
+draft: true
+summary: 'Table stakes for a dev blog: a clipboard button on each code block. Mine is one small script, and it''s a perfect little case study of the view-transitions rule.'
+tags: ['astro', 'web-development']
+---
+
+If a blog shows code, readers will copy it. Making them drag-select inside a scrolling code block is just rude. So every code block on this site now has a Copy button in the corner, and the implementation is small enough to walk through completely.
+
+## Inject, don't template
+
+The obvious approach is to add the button in the markup. But my code blocks come from markdown rendering, and I'm not about to customize the whole rendering pipeline for one button. Instead, a tiny script decorates the finished page:
+
+```astro
+<script>
+  function addCopyButtons() {
+    for (const pre of document.querySelectorAll('article pre')) {
+      if (pre.querySelector('.code-copy')) continue;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'code-copy';
+      button.textContent = 'Copy';
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+      button.addEventListener('click', async () => {
+        const code = pre.querySelector('code');
+        try {
+          await navigator.clipboard.writeText(code?.innerText ?? pre.innerText);
+          button.textContent = 'Copied!';
+        } catch {
+          button.textContent = 'Copy failed';
+        }
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      });
+      pre.appendChild(button);
+    }
+  }
+
+  document.addEventListener('astro:page-load', addCopyButtons);
+</script>
+```
+
+Find every code block in the article, drop a button in, and on click write the code's text to the clipboard with the browser's built-in `navigator.clipboard`. The button confirms with "Copied!" for two seconds. A dash of CSS floats it in the block's top-right corner.
+
+## The last line is the whole lesson
+
+Look at that final line: the function runs on `astro:page-load`, not on script load. This is [the view-transitions rule from the rebuild](/blog/a-tiny-design-system-and-dark-mode-that-works/) paying rent again: this site swaps pages client-side, so a script that runs only once decorates only the *first* page you visit. Navigate to another post and its code blocks would arrive naked.
+
+`astro:page-load` fires after every navigation, full or client-side, so every post gets dressed. And the guard clause near the top (`if the button already exists, skip`) makes re-runs harmless instead of stacking duplicate buttons.
+
+Two details I'd flag for anyone borrowing this:
+
+- **`innerText`, not `textContent`**, when reading the code. `innerText` respects the rendered line breaks, so pasted code keeps its formatting.
+- **The `catch` matters.** Clipboard access can fail (unusual browser settings, embedded webviews), and "Copy failed" is a better experience than a button that lies.
+
+Tested the fun way: an automated browser clicked the button on my most code-heavy post and read the clipboard back, all 13 blocks. Copy away. 🤙

@@ -1,0 +1,57 @@
+---
+title: Related Posts With No Database
+date: '2026-07-10'
+draft: true
+summary: 'A "keep reading" section that suggests my most related posts, computed at build time from shared tags, with a frontmatter override when I want to pick by hand.'
+tags: ['astro']
+---
+
+Every post on this site now ends with a small "keep reading" section: up to three related posts, each with its date and reading time. On a big platform that's a recommendation engine. On a static Astro site it's about thirty lines that run once at build time, and I want to show how little magic is involved.
+
+## Tags were already the data
+
+My posts have tags. Two posts sharing tags are probably related. That observation is the entire algorithm:
+
+```ts
+// src/lib/posts.ts
+export async function getRelatedPosts(post: Post, limit = 3): Promise<Post[]> {
+  const picked = (await getEntries(post.data.related)).filter(
+    (entry) => !entry.data.draft,
+  ) as Post[];
+
+  const all = await getPublishedPosts();
+  const tagIds = new Set(post.data.tags.map((tag) => tag.id));
+  const byTags = all
+    .filter((p) => p.id !== post.id && !picked.some((r) => r.id === p.id))
+    .map((p) => ({
+      post: p,
+      shared: p.data.tags.filter((tag) => tagIds.has(tag.id)).length,
+    }))
+    .filter((entry) => entry.shared > 0)
+    .sort(
+      (a, b) =>
+        b.shared - a.shared || b.post.data.date.valueOf() - a.post.data.date.valueOf(),
+    )
+    .map((entry) => entry.post);
+
+  return [...picked, ...byTags].slice(0, limit);
+}
+```
+
+In plain words: score every other post by how many tags it shares with this one, drop the zeroes, sort by score (newest first as the tiebreaker), and take the top three. Because this is Astro, it runs during `npm run build`, so visitors get plain HTML. No database, no API, no JavaScript shipped for it.
+
+## The hand-pick override
+
+The fun detail is the first line. My post frontmatter has always had a `related` field (a leftover from my old theme that nothing ever read). Now it's the override switch: name specific posts there and they take the front of the line, with tag-scoring only topping up the remaining slots.
+
+```yaml
+related: ['learning-astro', 'jekyll-tags']
+```
+
+So the default is automatic, and editorial judgment beats the algorithm whenever I care enough to have one. That's the right power balance for a personal blog.
+
+## The component is the boring part
+
+A small `RelatedPosts.astro` component calls the helper and renders a list, and the post layout drops it after the article. If there are no related posts, it renders nothing at all rather than an awkward empty heading. The whole feature is one helper, one component, and one line in the layout.
+
+If you're on any static site generator with tags, you already have everything this needs. The recommendation engine was inside you all along. 😜

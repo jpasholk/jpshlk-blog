@@ -1,0 +1,53 @@
+---
+title: Shipping Full Posts in My RSS Feed
+date: '2026-07-10'
+draft: true
+summary: 'My feed used to send two-sentence summaries. Now it carries entire posts, rendered from MDX at build time with Astro''s container API. RSS readers, rejoice.'
+tags: ['astro', 'web-development']
+---
+
+RSS people are a particular breed (affectionately, I am one): we want the whole post in the reader, not a teaser with a "read more" link. My feed used to ship only summaries, not out of strategy but because full content is genuinely the fiddliest of the small blog features. Here's why, and the fix.
+
+## Why this one is actually tricky
+
+My posts are MDX, which is markdown that can *import components*. Eleven of my posts render live Astro components right in their bodies. A simple markdown-to-HTML converter would choke on those imports, and Astro's normal rendering only happens inside pages, not inside the code that generates `rss.xml`.
+
+The answer is Astro's **container API**: a way to spin up a tiny, self-contained Astro renderer anywhere, teach it about MDX, and ask it to render a post to an HTML string:
+
+```ts
+// src/pages/rss.xml.ts (the interesting part)
+import { getContainerRenderer as getMDXRenderer } from '@astrojs/mdx';
+import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { loadRenderers } from 'astro:container';
+import { render } from 'astro:content';
+
+const renderers = await loadRenderers([getMDXRenderer()]);
+const container = await AstroContainer.create({ renderers });
+
+for (const post of posts) {
+  const { Content } = await render(post);
+  let html = await container.renderToString(Content);
+  // ...cleanup, then into the feed item as `content`
+}
+```
+
+Every post, components and all, becomes finished HTML at build time, and each feed item carries it in the `content` field alongside the summary.
+
+## The cleanup pass nobody warns you about
+
+Rendering was half the job. The HTML that comes out is written for *my site*, and a feed item lives in someone else's reader app, so two fixes run on every post:
+
+```ts
+html = html
+  .replace(/^<!DOCTYPE html>/i, '')
+  .replaceAll('src="/', `src="${site}/`)
+  .replaceAll('href="/', `href="${site}/`);
+```
+
+First, the container can prepend a doctype, which has no business inside a feed item. Second, and more importantly: my images and internal links are root-relative (`/_astro/photo.webp`, `/blog/other-post/`). In a feed reader there is no "root," so every relative URL must become absolute (`https://jpshlk.com/_astro/photo.webp`) or images simply won't load. This is the classic full-content-RSS bug, and you only find it by opening your own feed in a real reader.
+
+## Was it worth it?
+
+The rebuilt feed carries all 22 posts in full: text, images with working URLs, even the posts with embedded components. It weighs about 200KB, which is nothing for something fetched occasionally by feed readers.
+
+If you write for the web, the people who add your site to an RSS reader are your most loyal audience by definition. They opted in. Shipping them the entire post instead of a teaser is the least a site can do, and now this one does. Subscribe away: [/rss.xml](/rss.xml). 🤙
