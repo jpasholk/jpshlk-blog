@@ -24,3 +24,9 @@ pnpm-debug.log*
 # test pages
 
 links.astro
+# private planning docs
+BLOG-PLAN.md
+
+# local tooling
+.claude/
+links.astro.old-site-local
