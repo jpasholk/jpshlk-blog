@@ -1,0 +1,67 @@
+---
+title: Teaching My AI to Write Like Me
+date: '2026-07-09'
+draft: true
+summary: 'AI drafts kept sneaking em dashes into my posts. One rules file taught every future session my voice, and a one-line grep catches whatever slips through.'
+tags: ['rebuild', 'ai']
+---
+
+*This is part 9 of my [rebuild series](/tags/rebuild/). In [part 8](/blog/launching-with-netlify-branch-deploys/) the site launched on Netlify branch deploys.*
+
+The AI that rebuilt this site also drafted this blog series in my voice. It nailed the short paragraphs, the emoji, the general vibe. Then I sat down to review the first draft and spotted them immediately: **em dashes**. Everywhere. That long horizontal dash (the one in "code — it was the planning") that I never type but every AI apparently loves.
+
+This post is about how I got rid of them permanently, because the fix turned out to be a genuinely useful pattern for anything you want an AI to consistently do or not do.
+
+## Why AIs love the em dash
+
+Language models learn to write from mountains of published text, and edited professional prose *adores* the em dash. It's a flexible little hinge that can replace a comma, a colon, or parentheses, so it shows up constantly in the writing AIs learned from. Which means it shows up constantly in *their* writing, to the point where people now joke it's the tell for AI-generated text.
+
+That's exactly why I wanted them gone. Beyond just not being my style, a page full of em dashes reads as "a robot wrote this," even when the ideas and stories are genuinely mine.
+
+## The fix: a rules file the AI always reads
+
+The permanent piece is a file called `CLAUDE.md` in the root of my site's repo. It's plain markdown, and AI coding tools automatically read it at the start of every session in this project. Think of it as a sticky note on the workshop door: whoever shows up to work today reads it first. Mine now includes a writing-style section that says, among other things:
+
+```markdown
+## Writing style (applies to ALL generated text)
+
+- **Never use em dashes (—) or en dashes (–).** Not in blog posts,
+  page copy, summaries, README, comments, or commit messages. Use a
+  comma, period, colon, semicolon, parentheses, or a plain hyphen
+  instead.
+- Blog posts are casual and first-person, in Josh's voice: short
+  paragraphs, plain words, occasional emoji (🤙 😜).
+- Post titles must be 52 characters or fewer. Summaries must be
+  40 to 200 characters.
+```
+
+The key thing to understand: this isn't a setting I toggled once for one chat. It's **repo-level memory**. Next week, next month, a completely fresh AI session on this project reads that file before touching anything. My voice became configuration, versioned in git right next to the code.
+
+## The cleanup: 99 em dashes, zero find-and-replace
+
+The rules file prevents future dashes, but the existing drafts had **99 of them**. Here's the part I appreciated: the cleanup wasn't a blind find-and-replace, because an em dash doesn't have one correct replacement. Each one got an actual editing decision:
+
+- "same me — but every line changed" became "same me, but every line changed" (comma)
+- "wasn't the code — it was the planning" became "wasn't the code. It was the planning." (period, stronger beat)
+- "the rebuild — deleting layouts, components, configs — felt fine" became parentheses
+- List items like "**Design system** — colors, type" became "**Design system:** colors, type" (colon)
+
+Sentence by sentence, choosing punctuation that keeps the rhythm. Meanwhile my three *old* posts that contain em dashes I actually typed myself years ago were left completely alone. The rule is about generated text, not about rewriting history.
+
+## Trust, but grep
+
+Here's the honest part: an instruction file is very effective, but it's not physics. Models have deep habits, and one dash could someday slip through in a long draft. So the rules file also includes its own enforcement, a one-line check anyone (human or AI) can run before committing content:
+
+```sh
+grep -rn '—' src/content/blog/*.mdx
+```
+
+That searches every post for the character and prints any line containing it. Instructions prevent; verification catches. That pair is the whole pattern, and it applies way beyond punctuation: any rule you give an AI gets dramatically more reliable when there's a cheap mechanical check backing it up.
+
+## The bigger takeaway
+
+I expected "make the AI write like me" to be an ongoing nag-and-correct chore. Instead it compressed into three durable things: a rules file (prevention), one editing pass (cleanup), and a grep (enforcement). The AI drafts *with* my rules now, and my job stays what it should be: the edit, the stories, the taste.
+
+Next up, the series finale: [MCP servers that level up AI web dev](/blog/mcp-servers-that-level-up-ai-web-dev/).
+
+Thanks for reading and have a good one! 🤙
