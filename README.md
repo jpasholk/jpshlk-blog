@@ -5,7 +5,7 @@ Personal site and blog of Josh Pasholk, a custom-built [Astro](https://astro.bui
 ## Stack
 
 - **Astro 7** (static output) with the content layer (`src/content.config.ts`) and `<ClientRouter />` view transitions
-- **Tailwind CSS v4** (CSS-first config in `src/styles/global.css`), self-hosted Space Grotesk
+- **Tailwind CSS v4** (CSS-first config in `src/styles/global.css`), self-hosted Inter
 - **TypeScript + vanilla JS**, no UI framework
 - **SEO**: [`@jdevalk/astro-seo-graph`](https://github.com/jdevalk/seo-graph): `<Seo>` head component, schema.org JSON-LD graph, llms.txt, markdown alternates (`/blog/<slug>.md`), schema endpoints (`/schema/*.json`, `/schemamap.xml`, `/.well-known/api-catalog`), IndexNow, fuzzy 404 redirects
 

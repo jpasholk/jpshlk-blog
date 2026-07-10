@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inter';
 @plugin '@tailwindcss/typography';
 
 /* Class-based dark mode: an inline script toggles `.dark` on <html>. */
@@ -10,7 +10,7 @@
  * classes like `text-primary-500` directly in MDX content.
  */
 @theme inline {
-  --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
   --color-primary-50: var(--color-sky-50);
   --color-primary-100: var(--color-sky-100);
