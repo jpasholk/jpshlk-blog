@@ -25,6 +25,36 @@
   --color-primary-950: var(--color-sky-950);
 }
 
+@layer components {
+  /* Copy button injected into article code blocks by CodeCopy.astro.
+     Prose code blocks are dark in both themes, so one style works. */
+  article pre {
+    position: relative;
+  }
+
+  .code-copy {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    border: 1px solid var(--color-zinc-600);
+    border-radius: 6px;
+    background: var(--color-zinc-800);
+    color: var(--color-zinc-300);
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: opacity 0.15s;
+  }
+
+  .code-copy:hover,
+  .code-copy:focus-visible {
+    opacity: 1;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

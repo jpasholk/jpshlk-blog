@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import CodeCopy from '@/components/CodeCopy.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import Prose from '@/components/Prose.astro';
+import RelatedPosts from '@/components/RelatedPosts.astro';
 import TagPill from '@/components/TagPill.astro';
-import type { Post } from '@/lib/posts';
+import { readingTime, type Post } from '@/lib/posts';
 import { postDateModified, postGraph } from '@/lib/schema';
 import { assetBase } from '@/lib/urls';
 
@@ -39,6 +41,7 @@ const ogImage = seo?.image?.src ?? featureImage?.src;
     <header class="border-b border-zinc-200 pb-8 text-center dark:border-zinc-800">
       <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
         <FormattedDate date={date} />
+        <span aria-hidden="true"> · </span>{readingTime(post)} min read
         {
           lastmod && (
             <>
@@ -72,6 +75,8 @@ const ogImage = seo?.image?.src ?? featureImage?.src;
     </div>
   </article>
 
+  <RelatedPosts post={post} />
+
   {
     (prev || next) && (
       <nav
@@ -99,6 +104,8 @@ const ogImage = seo?.image?.src ?? featureImage?.src;
       </nav>
     )
   }
+
+  <CodeCopy />
 
   <!-- Renders <a class="github-button"> markers used by some posts; -->
   <!-- data-astro-rerun re-parses them after ClientRouter swaps. -->
