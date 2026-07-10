@@ -18,6 +18,8 @@ const year = new Date().getFullYear();
     <div class="flex flex-wrap items-center justify-center gap-x-2 text-sm text-zinc-500 dark:text-zinc-400">
       <span>© {year} {AUTHOR.name}</span>
       <span aria-hidden="true">·</span>
+      <a href="/how-this-site-works/" class="hover:text-primary-500">How this site works</a>
+      <span aria-hidden="true">·</span>
       <a href="/rss.xml" class="hover:text-primary-500">RSS</a>
       <span aria-hidden="true">·</span>
       <a href={SITE.repo} target="_blank" rel="noopener noreferrer" class="hover:text-primary-500">Source</a>
