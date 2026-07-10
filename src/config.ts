@@ -41,7 +41,7 @@ export const NAVIGATION = [
  * on branch deploys or local dev. An empty code disables it entirely.
  */
 export const GOATCOUNTER = {
-  code: '', // set to the counter name, e.g. 'jpshlk', once the account exists
+  code: 'jpshlk', // counter name — account created 2026-07-10
   enabled: process.env.CONTEXT === 'production',
 } as const;
 
