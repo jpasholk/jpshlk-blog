@@ -1,0 +1,46 @@
+---
+title: Astro Resizes My Share Images Now
+date: '2026-07-10'
+draft: true
+summary: "I was hand-making a small copy of every share card image. Now Astro's getImage generates the 1200 wide og version at build time from one big original."
+tags: ['astro', 'web-development']
+---
+
+I had two versions of the same illustration sitting in my downloads: the full-size original and a smaller copy I'd made for the share card. And then a thought hit me: did I actually need to make that smaller one myself?
+
+Turns out yes, I did. My post layout took whatever image the frontmatter pointed at and shipped it to the og tags untouched. No resize, no compression, nothing. Whatever file I referenced was byte for byte what Discord, iMessage, and every social crawler downloaded when someone shared a link. (og tags are the Open Graph meta tags in a page's head that tell those apps what preview image to show.)
+
+That's a fine system as long as I keep hand-making 1200 pixel copies forever. I would rather not.
+
+## getImage, the Image component's quiet sibling
+
+Astro ships an `<Image />` component that optimizes images and renders an `<img>` tag. What I needed was the first half of that without the second half: give me the optimized file's URL so I can put it in a meta tag. That's exactly what `getImage()` from `astro:assets` does. Same optimization engine, no markup opinions.
+
+Here's the entire change in my post layout:
+
+```ts
+import { getImage } from 'astro:assets';
+
+const ogSource = seo?.image?.src ?? featureImage?.src;
+const ogImage = ogSource
+  ? await getImage({
+      src: ogSource,
+      width: Math.min(1200, ogSource.width),
+      format: ogSource.format === 'png' ? 'png' : 'jpeg',
+    })
+  : undefined;
+```
+
+At build time, sharp (the image library Astro bundles) generates a resized copy into the build output with a hashed filename, and the og tags point there with the real width and height baked in. The original never ships. It's just raw material.
+
+## Two deliberately boring choices
+
+**The format follows the source.** Astro would happily hand back WebP, and for images on the page that's great. For share images it's a trap: a few link preview crawlers still handle WebP and AVIF badly, and a share card that renders blank on one platform is worse than a slightly bigger file everywhere. So flat PNG illustrations stay PNG and photos stay JPEG. Formats from 1996 have one great feature: everything renders them.
+
+**Never upscale.** `Math.min(1200, ogSource.width)` means an old 800 pixel image stays 800 pixels instead of getting inflated into a blurry 1200. The platforms handle small-ish images fine; fake resolution helps nobody.
+
+## The workflow now
+
+I make one image at 1.91:1 (the aspect ratio share cards actually display, so nothing gets cropped), as big as I like, and drop it in `src/assets/`. The frontmatter references it once. Astro derives the og version at build time, and if I embed the same image in the post body, Astro optimizes that rendition separately too. One master file, every size derived from it.
+
+The bonus I didn't see coming: every old post with a share image got the same treatment for free the moment the layout changed. Twenty posts' worth of share cards, resized in one build, and I never opened an image editor. 🤙
