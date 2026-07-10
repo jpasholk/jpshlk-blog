@@ -6,6 +6,7 @@ import Seo from '@jdevalk/astro-seo-graph/Seo.astro';
 import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.astro';
 import { SITE, SOCIALS } from '@/config';
+import { assetBase } from '@/lib/urls';
 
 interface Props {
   title: string;
@@ -31,7 +32,7 @@ const {
   noindex = false,
   canonical,
   ogType = 'website',
-  ogImage = new URL('/og-default.png', SITE.url).href,
+  ogImage = new URL('/og-default.png', assetBase).href,
   ogImageAlt = SITE.title,
   ogImageWidth = 1200,
   ogImageHeight = 630,

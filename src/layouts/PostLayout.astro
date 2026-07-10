@@ -3,9 +3,9 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import Prose from '@/components/Prose.astro';
 import TagPill from '@/components/TagPill.astro';
-import { SITE } from '@/config';
 import type { Post } from '@/lib/posts';
 import { postDateModified, postGraph } from '@/lib/schema';
+import { assetBase } from '@/lib/urls';
 
 interface Props {
   post: Post;
@@ -24,7 +24,7 @@ const ogImage = seo?.image?.src ?? featureImage?.src;
   description={seo?.description ?? summary}
   canonical={canonicalUrl}
   ogType="article"
-  ogImage={ogImage ? new URL(ogImage.src, SITE.url).href : undefined}
+  ogImage={ogImage ? new URL(ogImage.src, assetBase).href : undefined}
   ogImageAlt={ogImage ? (seo?.image?.alt ?? featureImage?.alt ?? title) : undefined}
   ogImageWidth={ogImage?.width}
   ogImageHeight={ogImage?.height}
