@@ -134,5 +134,28 @@ const goatcounter =
       <slot />
     </main>
     <Footer />
+
+    <script>
+      // Fills the home page's RandomQuote. Lives here instead of in the
+      // component so the astro:before-swap listener is loaded on EVERY
+      // page: the quote must be written into the incoming document
+      // before ClientRouter swaps it in, or it pops in visibly after
+      // the crossfade when navigating home from any other page.
+      function showRandomQuote(doc: Document) {
+        const container = doc.querySelector('[data-random-quote]');
+        const data = doc.querySelector('[data-quotes]');
+        if (!container || !data?.textContent) return;
+        const quotes: Array<{ text: string; author: string }> = JSON.parse(data.textContent);
+        const quote = quotes[Math.floor(Math.random() * quotes.length)];
+        if (!quote) return;
+        container.querySelector('[data-quote-text]')!.textContent = `“${quote.text}”`;
+        container.querySelector('[data-quote-author]')!.textContent = `— ${quote.author}`;
+      }
+
+      showRandomQuote(document);
+      document.addEventListener('astro:before-swap', (e) => {
+        showRandomQuote((e as Event & { newDocument: Document }).newDocument);
+      });
+    </script>
   </body>
 </html>

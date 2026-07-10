@@ -2,7 +2,9 @@
 /**
  * Shows a random quote on every visit, including ClientRouter
  * navigations. Quotes are inlined at build time as JSON so no
- * client fetch is needed.
+ * client fetch is needed. The filling script lives in BaseLayout:
+ * it must already be loaded on the page the visitor navigates FROM
+ * (any page), or the quote pops in after the crossfade.
  */
 import quotesData from '@/data/quotes.json';
 ---
@@ -13,18 +15,3 @@ import quotesData from '@/data/quotes.json';
 </figure>
 
 <script type="application/json" data-quotes set:html={JSON.stringify(quotesData.quotes)} />
-
-<script>
-  function showRandomQuote() {
-    const container = document.querySelector('[data-random-quote]');
-    const data = document.querySelector('[data-quotes]');
-    if (!container || !data?.textContent) return;
-    const quotes: Array<{ text: string; author: string }> = JSON.parse(data.textContent);
-    const quote = quotes[Math.floor(Math.random() * quotes.length)];
-    if (!quote) return;
-    container.querySelector('[data-quote-text]')!.textContent = `“${quote.text}”`;
-    container.querySelector('[data-quote-author]')!.textContent = `— ${quote.author}`;
-  }
-
-  document.addEventListener('astro:page-load', showRandomQuote);
-</script>
