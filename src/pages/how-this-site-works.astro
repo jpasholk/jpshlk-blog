@@ -1,0 +1,333 @@
+---
+/**
+ * Living documentation: visual diagrams of how this site's Astro
+ * components, layouts, and slots compose. Update alongside structural
+ * changes to the site.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { pageGraph } from '@/lib/schema';
+
+const description =
+  "A visual tour of how this site's Astro components, layouts, and slots fit together, from build time to the browser.";
+
+// Diagram vocabulary, shared across all six sections.
+const box = 'rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900';
+const leaf = 'rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950';
+const slotBox = 'rounded-xl border-2 border-dashed border-primary-500 bg-primary-500/10 p-4';
+const slotTag = 'mb-2 inline-block font-mono text-xs font-semibold text-primary-700 dark:text-primary-300';
+const chip = 'inline-block whitespace-nowrap rounded-full border border-zinc-200 bg-primary-50 px-2.5 py-0.5 font-mono text-xs text-primary-700 dark:border-zinc-800 dark:bg-primary-950 dark:text-primary-300';
+const boxLabel = 'text-sm font-semibold';
+const filePath = 'font-mono text-xs text-zinc-500 dark:text-zinc-400';
+const caption = 'mt-2 mb-6 max-w-prose text-zinc-600 dark:text-zinc-400';
+const note = 'mt-5 max-w-prose text-sm text-zinc-600 dark:text-zinc-400';
+const h2 = 'mt-14 text-2xl font-bold tracking-tight';
+const num = 'mr-2 text-primary-600 dark:text-primary-400';
+const pre = 'overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-100 p-4 font-mono text-xs leading-relaxed dark:border-zinc-800 dark:bg-zinc-900';
+const arrow = 'flex flex-none flex-col items-center px-2 text-primary-500';
+const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500 dark:text-zinc-400';
+---
+
+<BaseLayout
+  title="How This Site Works"
+  description={description}
+  graph={pageGraph('How This Site Works', '/how-this-site-works/', description)}
+>
+  <header class="pt-10">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">How this site works</h1>
+    <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
+      Six diagrams of this site's anatomy: what runs at build time, how layouts
+      and slots compose pages, where the data comes from, and the little bit of
+      JavaScript that runs in your browser right now.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-zinc-200 pt-4 text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+      <span class="inline-flex items-center gap-2">
+        <span class="h-3.5 w-6 flex-none rounded border border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"></span>
+        component (.astro file)
+      </span>
+      <span class="inline-flex items-center gap-2">
+        <span class="h-3.5 w-6 flex-none rounded border-2 border-dashed border-primary-500 bg-primary-500/10"></span>
+        a <code class="font-mono text-xs">&lt;slot /&gt;</code>: a hole content falls into
+      </span>
+      <span class="inline-flex items-center gap-2">
+        <span class="h-3.5 w-6 flex-none rounded-full border border-zinc-200 bg-primary-50 dark:border-zinc-800 dark:bg-primary-950"></span>
+        script or head element
+      </span>
+    </div>
+  </header>
+
+  <section>
+    <h2 class={h2}><span class={num}>1</span>The big picture: it all happens at build time</h2>
+    <p class={caption}>
+      Astro components are not shipped to visitors. They run once, on my machine
+      or Netlify's, at build time. What comes out is plain HTML files. That is
+      why the site is fast: your browser gets finished pages.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-[560px] items-center">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>The source</p>
+          <p class={`${filePath} mb-3`}>src/</p>
+          <div class="flex flex-col gap-2">
+            <p class={leaf}><span class={filePath}>content/ (MDX posts, tags, projects)</span></p>
+            <p class={leaf}><span class={filePath}>pages/ (one file per route)</span></p>
+            <p class={leaf}><span class={filePath}>layouts/ + components/</span></p>
+          </div>
+        </div>
+        <div class={arrow}>
+          <span class={arrowLabel}>npm run build</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>The built site</p>
+          <p class={`${filePath} mb-3`}>dist/</p>
+          <div class="flex flex-col gap-2">
+            <p class={leaf}><span class={filePath}>index.html, blog/&hellip;/index.html</span></p>
+            <p class={leaf}><span class={filePath}>rss.xml, sitemap, llms.txt</span></p>
+            <p class={leaf}><span class={filePath}>optimized images + one CSS file</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>2</span>Slots in sixty seconds</h2>
+    <p class={caption}>
+      A <code class="font-mono text-sm">&lt;slot /&gt;</code> is a hole. Whatever
+      you write between a component's opening and closing tags falls through
+      into that hole. That is the entire trick that makes layouts work.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+          BaseLayout.astro declares the hole
+        </p>
+        <pre class={pre}>&lt;html&gt;
+  &lt;head&gt;&hellip;&lt;/head&gt;
+  &lt;body&gt;
+    &lt;Header /&gt;
+    &lt;main&gt;
+      <span class="font-semibold text-primary-700 dark:text-primary-300">&lt;slot /&gt;</span>  <span class="text-zinc-500">&larr; the hole</span>
+    &lt;/main&gt;
+    &lt;Footer /&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+          index.astro fills the hole
+        </p>
+        <pre class={pre}>&lt;BaseLayout title="Josh Pasholk"&gt;
+  <span class="font-semibold text-primary-700 dark:text-primary-300">&lt;Hero /&gt;
+  &lt;About /&gt;
+  &lt;WorkSection /&gt;
+  &lt;LatestPosts /&gt;
+  &lt;RandomQuote /&gt;</span> <span class="text-zinc-500">&larr; all of this lands
+     where the slot was</span>
+&lt;/BaseLayout&gt;</pre>
+      </div>
+    </div>
+    <p class={note}>
+      So every page gets the same head, header, and footer for free, and only has to bring the middle. Change <code class="font-mono text-xs">BaseLayout.astro</code> once and every page on the site changes.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>3</span>The homepage, as nested boxes</h2>
+    <p class={caption}>
+      Boxes inside boxes literally is the architecture. Solid boxes are
+      components; the dashed region is BaseLayout's slot, filled by whatever <code class="font-mono text-sm">index.astro</code> put between its tags.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class={`${box} min-w-[520px]`}>
+        <p class={boxLabel}>BaseLayout</p>
+        <p class={`${filePath} mb-3`}>src/layouts/BaseLayout.astro (owns &lt;html&gt; and &lt;head&gt;)</p>
+        <div class="flex flex-col gap-2">
+          <p class="flex flex-wrap gap-2">
+            <span class={chip}>theme script (is:inline)</span>
+            <span class={chip}>&lt;Seo /&gt; meta + JSON-LD</span>
+            <span class={chip}>&lt;ClientRouter /&gt;</span>
+          </p>
+          <p class={leaf}>
+            <span class={boxLabel}>Header</span>
+            <span class={filePath}> nav + ThemeToggle + mobile menu</span>
+          </p>
+          <div class={slotBox}>
+            <span class={slotTag}>&lt;slot /&gt; : filled by src/pages/index.astro</span>
+            <div class="flex flex-col gap-2">
+              <p class={leaf}><span class={boxLabel}>Hero</span> <span class={filePath}>components/home/Hero.astro</span></p>
+              <p class={leaf}><span class={boxLabel}>About</span> <span class={filePath}>components/home/About.astro</span></p>
+              <p class={leaf}><span class={boxLabel}>WorkSection</span> <span class={filePath}>reads the projects collection</span></p>
+              <div class="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+                <p class={boxLabel}>LatestPosts</p>
+                <p class={`${filePath} mb-2`}>components/home/LatestPosts.astro (newest 5 posts)</p>
+                <p class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+                  <span class={boxLabel}>PostCard &times; 5</span>
+                  <span class={filePath}> each renders TagPill + FormattedDate</span>
+                </p>
+              </div>
+              <p class={leaf}><span class={boxLabel}>RandomQuote</span> <span class={filePath}>components/home/RandomQuote.astro</span></p>
+            </div>
+          </div>
+          <p class={leaf}>
+            <span class={boxLabel}>Footer</span>
+            <span class={filePath}> SocialIcon row (mastodon, github, routinehub, &hellip;)</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>4</span>A blog post: layouts nest, so slots nest</h2>
+    <p class={caption}>
+      A post page uses two layouts. PostLayout sits inside BaseLayout's slot,
+      and declares a slot of its own, which is where the actual writing (the
+      rendered MDX) lands.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class={`${box} min-w-[520px]`}>
+        <p class={boxLabel}>BaseLayout</p>
+        <p class={`${filePath} mb-3`}>same shell as the homepage: head, Header, Footer</p>
+        <div class={slotBox}>
+          <span class={slotTag}>&lt;slot /&gt; : filled by PostLayout</span>
+          <div class="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+            <p class={boxLabel}>PostLayout</p>
+            <p class={`${filePath} mb-3`}>src/layouts/PostLayout.astro</p>
+            <div class="flex flex-col gap-2">
+              <p class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+                <span class={filePath}>post header: FormattedDate, title (view-transition name), TagPills</span>
+              </p>
+              <div class={slotBox}>
+                <span class={slotTag}>&lt;slot /&gt; : filled by &lt;Content /&gt;, the rendered MDX</span>
+                <div class="flex flex-col gap-2">
+                  <p class={leaf}>
+                    <span class={boxLabel}>Prose wrapper</span>
+                    <span class={filePath}> typography styles for the article body</span>
+                  </p>
+                  <p class={leaf}>
+                    <span class={filePath}>the MDX itself can import components: 11 posts pull in Link.astro and SocialIcon</span>
+                  </p>
+                </div>
+              </div>
+              <p class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+                <span class={filePath}>prev / next post links</span>
+              </p>
+              <p><span class={chip}>GitHub buttons script (data-astro-rerun)</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Who fills what:</strong> the route file <code class="font-mono text-xs">src/pages/blog/[...slug].astro</code> looks up the post, calls <code class="font-mono text-xs">render(post)</code> to turn MDX into <code class="font-mono text-xs">&lt;Content /&gt;</code>,
+      and writes <code class="font-mono text-xs">&lt;PostLayout post=&#123;post&#125;&gt;&lt;Content /&gt;&lt;/PostLayout&gt;</code>.
+      One file, two slots filled.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>5</span>Where the data comes from: props go down</h2>
+    <p class={caption}>
+      Components never go looking for data. Data is loaded once, then handed
+      down the tree as props (function arguments for components). One-way
+      traffic.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-[860px] items-stretch">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>MDX files</p>
+          <p class={`${filePath} mb-2`}>src/content/blog/*.mdx</p>
+          <span class={chip}>frontmatter + body</span>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>schema validates</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true"><path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path></svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Typed collection</p>
+          <p class={`${filePath} mb-2`}>src/content.config.ts</p>
+          <span class={chip}>title, date, tags&hellip;</span>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>sort + filter drafts</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true"><path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path></svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Helper</p>
+          <p class={`${filePath} mb-2`}>src/lib/posts.ts</p>
+          <span class={chip}>getPublishedPosts()</span>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>props</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true"><path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path></svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Component</p>
+          <p class={`${filePath} mb-2`}>&lt;PostCard post=&#123;post&#125; /&gt;</p>
+          <span class={chip}>renders title, date, tags</span>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      The same pipeline feeds the blog list, the tag pages, the RSS feed, the
+      landing page's LatestPosts, and the SEO schema endpoints. One source of
+      truth, many consumers.
+    </p>
+  </section>
+
+  <section class="mb-16">
+    <h2 class={h2}><span class={num}>6</span>The browser layer: what happens on a click</h2>
+    <p class={caption}>
+      Almost everything above ran at build time. Here is the small amount of
+      JavaScript that actually runs for you, the visitor, in order, when you
+      click a link on this site.
+    </p>
+    <ol class="relative flex flex-col gap-6 border-l-2 border-zinc-200 pl-6 dark:border-zinc-800">
+      <li class="relative">
+        <span class="absolute top-1.5 -left-[31px] size-3.5 rounded-full border-[3px] border-primary-500 bg-white dark:bg-zinc-950" aria-hidden="true"></span>
+        <p class="font-semibold">First visit: theme script runs before paint</p>
+        <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
+          The <code class="font-mono text-xs">is:inline</code> script in the head
+          reads <code class="font-mono text-xs">localStorage</code> (or the system setting) and applies the <code class="font-mono text-xs">dark</code> class before any pixel renders. No flash.
+        </p>
+      </li>
+      <li class="relative">
+        <span class="absolute top-1.5 -left-[31px] size-3.5 rounded-full border-[3px] border-primary-500 bg-white dark:bg-zinc-950" aria-hidden="true"></span>
+        <p class="font-semibold">You click a link</p>
+        <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
+          <code class="font-mono text-xs">&lt;ClientRouter /&gt;</code> intercepts
+          it, fetches the next page's HTML, and swaps the document instead of
+          doing a full reload. This is what enables the title morph animation
+          between the blog list and a post.
+        </p>
+      </li>
+      <li class="relative">
+        <span class="absolute top-1.5 -left-[31px] size-3.5 rounded-full border-[3px] border-primary-500 bg-white dark:bg-zinc-950" aria-hidden="true"></span>
+        <p class="font-semibold"><code class="font-mono">astro:after-swap</code> fires</p>
+        <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
+          The new document arrived without the <code class="font-mono text-xs">dark</code> class, so the theme script's listener re-applies it mid-swap. Still no
+          flash.
+        </p>
+      </li>
+      <li class="relative">
+        <span class="absolute top-1.5 -left-[31px] size-3.5 rounded-full border-[3px] border-primary-500 bg-white dark:bg-zinc-950" aria-hidden="true"></span>
+        <p class="font-semibold"><code class="font-mono">astro:page-load</code> fires</p>
+        <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
+          ThemeToggle and the mobile menu re-bind their click handlers to the
+          fresh DOM, RandomQuote picks a new quote, and the GitHub buttons
+          script re-runs on posts that need it.
+        </p>
+      </li>
+    </ol>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">The house rule that keeps all this working:</strong> on a view-transitions site, any JavaScript that touches the page must run on <code class="font-mono text-xs">astro:page-load</code>, not just once at startup.
+    </p>
+    <p class={note}>
+      One last thing: this page is itself a box in the section 3 diagram. You
+      are reading it inside the very slot described in section 2. 🤙
+    </p>
+  </section>
+</BaseLayout>
