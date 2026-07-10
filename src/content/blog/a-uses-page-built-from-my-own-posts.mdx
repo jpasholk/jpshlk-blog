@@ -1,0 +1,61 @@
+---
+title: A Uses Page Built From My Own Posts
+date: '2026-07-10'
+draft: true
+summary: 'I added a /uses page without writing it from scratch. The list came from grepping my own blog posts for the tools I have already written about.'
+tags: ['astro', 'apps']
+---
+
+The site has a new page: [/uses/](/uses/), the classic "what hardware and software do you use" page that half the internet's personal sites have. There's a whole directory of them at [uses.tech](https://uses.tech) if you want to fall down that rabbit hole. For a blog that's mostly me writing about apps I like, it was the most obviously missing page.
+
+## The list wrote itself
+
+Here's the part I enjoyed: I didn't sit down and brainstorm my setup. The tools were already scattered through my own archive. Ice, Scroll Reverser, UI Actions, Setapp, Darksun, RoutineHub: I'd written about all of them at some point. So building the page was mostly grepping my own posts, which had two nice side effects.
+
+First, every item earned its spot by being something I cared enough to write about. No padding the list with apps I opened twice.
+
+Second, most items get an "I wrote about it" link back to the original post. The uses page doubles as a little index into the archive.
+
+## A typed array, not a database
+
+Each section of the page is just data in the page's frontmatter, rendered in a loop:
+
+```ts
+interface UsesItem {
+  name: string;
+  url?: string;
+  blurb: string;
+  post?: string;
+}
+
+interface UsesSection {
+  title: string;
+  intro?: string;
+  items: UsesItem[];
+}
+```
+
+I considered a content collection (Astro's way of turning a folder of files into queryable, type-checked data, like my projects page uses), but a collection earns its keep when multiple pages consume the data. This list has exactly one consumer. A plain array in the page file means adding a tool later is a one-object edit, right next to where it renders.
+
+## The build watches my back
+
+Internal links on this site always use trailing slashes, and the SEO tooling validates every one of them at build time. That caught something real while I was writing the page: I almost linked a couple of items to posts that are still sitting in drafts. Draft posts don't exist in the production build, so those links would have 404'd. Instead the build fails loudly and I fix it before anyone sees it. Guardrails that run in `npm run build` are the best kind, because I can't forget to run them.
+
+## One line of nav
+
+Adding the page to the site navigation was a single line, because the header reads from one config array:
+
+```ts
+// src/config.ts
+export const NAVIGATION = [
+  { href: '/', title: 'Home' },
+  { href: '/blog/', title: 'Blog' },
+  { href: '/projects/', title: 'Projects' },
+  { href: '/uses/', title: 'Uses' },
+  { href: '/tags/', title: 'Tags' },
+] as const;
+```
+
+Desktop nav and mobile menu both pick it up automatically, and the page registers itself in the sitemap and llms.txt without any extra wiring.
+
+The hardware section is honestly a bit thin right now (a Mac and an iPhone, groundbreaking stuff). I'll flesh out the models and desk gear soon. The apps are the interesting part anyway. 🤙
