@@ -1,0 +1,29 @@
+---
+title: 'Tags as Content: Why I Made Each Tag an MDX Page'
+date: '2026-07-10'
+summary: 'Every tag on this site is its own MDX page with a name, a description, and real content. Why that beats a plain string array.'
+tags: ['astro', 'rebuild']
+draft: true
+---
+
+{/* TODO: intro. The hook: on the rebuild, tags stopped being loose strings in frontmatter and became their own MDX content collection. It sounds like overkill until a typo'd tag fails the build instead of silently creating an empty tag page. */}
+
+## Tags as a content collection, not strings
+
+{/* TODO: how the tags collection is defined next to blog in the config */}
+
+{/* TODO: posts reference tags, so an unknown tag fails the build */}
+
+## What a real tag page buys you
+
+{/* TODO: a name and description instead of a bare slug */}
+
+{/* TODO: tag pages with actual content, not auto-generated stubs */}
+
+{/* TODO: image: screenshot of a tag page, alt: The mac tag page showing its description and post list */}
+
+## The cost side
+
+{/* TODO: one small file per tag, and you have to create it before first use */}
+
+{/* TODO: why that friction turned out to be a feature */}
