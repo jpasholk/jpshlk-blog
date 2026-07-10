@@ -1,0 +1,35 @@
+---
+/**
+ * Adds a copy button to every code block in the article. Buttons are
+ * injected client-side on astro:page-load so they survive ClientRouter
+ * swaps; the guard keeps re-runs idempotent.
+ */
+---
+
+<script>
+  function addCopyButtons() {
+    for (const pre of document.querySelectorAll('article pre')) {
+      if (pre.querySelector('.code-copy')) continue;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'code-copy';
+      button.textContent = 'Copy';
+      button.setAttribute('aria-label', 'Copy code to clipboard');
+      button.addEventListener('click', async () => {
+        const code = pre.querySelector('code');
+        try {
+          await navigator.clipboard.writeText(code?.innerText ?? pre.innerText);
+          button.textContent = 'Copied!';
+        } catch {
+          button.textContent = 'Copy failed';
+        }
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      });
+      pre.appendChild(button);
+    }
+  }
+
+  document.addEventListener('astro:page-load', addCopyButtons);
+</script>
