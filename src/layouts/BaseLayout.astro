@@ -4,7 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import Seo from '@jdevalk/astro-seo-graph/Seo.astro';
 import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.astro';
-import { SITE, SOCIALS } from '@/config';
+import { GOATCOUNTER, SITE, SOCIALS } from '@/config';
 import { assetBase } from '@/lib/urls';
 
 interface Props {
@@ -38,6 +38,11 @@ const {
   article,
   graph,
 } = Astro.props;
+
+const goatcounter =
+  GOATCOUNTER.enabled && GOATCOUNTER.code
+    ? `https://${GOATCOUNTER.code}.goatcounter.com/count`
+    : null;
 ---
 
 <!doctype html>
@@ -62,6 +67,28 @@ const {
         document.addEventListener('astro:after-swap', apply);
       })();
     </script>
+
+    {
+      goatcounter && (
+        <>
+          <script is:inline>
+            // GoatCounter under ClientRouter: swaps are not real page
+            // loads, so automatic counting is off and each pageview is
+            // counted on astro:page-load, which fires on the first load
+            // and after every swap. The listener survives swaps because
+            // the document object is never replaced. No data-astro-rerun:
+            // rerunning would stack listeners and double count.
+            window.goatcounter = { no_onload: true };
+            document.addEventListener('astro:page-load', () => {
+              if (window.goatcounter.count) {
+                window.goatcounter.count({ path: location.pathname + location.search });
+              }
+            });
+          </script>
+          <script is:inline defer data-goatcounter={goatcounter} src="https://gc.zgo.at/count.js"></script>
+        </>
+      )
+    }
 
     <Seo
       title={title}

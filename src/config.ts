@@ -34,4 +34,15 @@ export const NAVIGATION = [
   { href: '/tags/', title: 'Tags' },
 ] as const;
 
+/**
+ * GoatCounter analytics. The code is public (it only names the
+ * dashboard), so it lives here instead of an env var. Scripts only
+ * render on Netlify production deploys (CONTEXT=production), never
+ * on branch deploys or local dev. An empty code disables it entirely.
+ */
+export const GOATCOUNTER = {
+  code: '', // set to the counter name, e.g. 'jpshlk', once the account exists
+  enabled: process.env.CONTEXT === 'production',
+} as const;
+
 export const POSTS_PER_PAGE = 5;
