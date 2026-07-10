@@ -1,0 +1,49 @@
+---
+title: Privacy Friendly Analytics With GoatCounter
+date: '2026-07-10'
+draft: true
+summary: 'The site now has analytics that respect visitors: GoatCounter, no cookies, counting SPA navigations under Astro view transitions, and only in production.'
+tags: ['astro', 'web-development']
+---
+
+I want to know if anyone reads this site. I don't want to know who you are, follow you around the internet, or make you click a cookie banner to find out. That narrows the field nicely, and I landed on [GoatCounter](https://www.goatcounter.com): free for personal sites, open source, no cookies, and the whole script is a few kilobytes. It counts pageviews and referrers, and that's genuinely all I need.
+
+## The view transitions wrinkle
+
+GoatCounter's script normally counts a pageview when a page loads. Simple. Except this site uses Astro's view transitions, which turn navigation into SPA-style swaps (SPA meaning single page app: the browser swaps in new content with JavaScript instead of doing a full page load). Click from the homepage to a post and no page load ever happens, so a naive analytics install counts your first page and then goes silent while you read five more.
+
+The fix is to turn off automatic counting and count by hand on Astro's `astro:page-load` event, which fires on the first real load and again after every swap:
+
+```html
+<script is:inline>
+  window.goatcounter = { no_onload: true };
+  document.addEventListener('astro:page-load', () => {
+    if (window.goatcounter.count) {
+      window.goatcounter.count({ path: location.pathname + location.search });
+    }
+  });
+</script>
+<script is:inline defer data-goatcounter={goatcounter} src="https://gc.zgo.at/count.js"></script>
+```
+
+Two details in there took actual thought:
+
+**`defer`, not `async`.** A deferred script is guaranteed to run before the browser fires `DOMContentLoaded`, and Astro fires `astro:page-load` after that. So by the time my first pageview event fires, `count.js` has definitely loaded. With `async` the script lands whenever the network feels like it, and the very first pageview becomes a coin flip. The `if` guard is a backstop, but `defer` is what actually closes the race.
+
+**No re-running on swaps.** Astro has a `data-astro-rerun` attribute for scripts that should execute again after every swap. This script must not do that: it registers an event listener on `document`, which survives swaps because the document object is never replaced. Re-running it would stack up duplicate listeners and double count every view. One registration, counted forever.
+
+## Only in production
+
+I don't want my own dev server or the branch deploy I stare at all day polluting the numbers. Netlify sets a `CONTEXT` environment variable at build time: `production` for real deploys of the production branch, `branch-deploy` and `deploy-preview` for everything else, and nothing at all locally. So the gate is one line in my site config:
+
+```ts
+// src/config.ts
+export const GOATCOUNTER = {
+  code: 'jpshlk', // the counter name; empty string disables everything
+  enabled: process.env.CONTEXT === 'production',
+} as const;
+```
+
+The layout only renders the scripts when both the code is set and the context is production. Branch deploys and local dev ship literally zero analytics bytes, not a disabled script, no script at all. And since the counter code just names a public dashboard, it lives in the config file instead of pretending to be a secret in an environment variable.
+
+The pleasant surprise of the whole feature: the analytics itself was trivial, and all the real thinking went into when it should run. That's most web development lately, now that I think about it. 😜
