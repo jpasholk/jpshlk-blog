@@ -1,0 +1,77 @@
+---
+title: Launching With Netlify Branch Deploys
+date: '2026-07-09'
+draft: true
+summary: 'My rebuilt site went live on a sandbox URL next to production, a Discord share exposed my first real bug, and launch day is now just a merge button.'
+tags: ['rebuild', 'web-development']
+---
+
+*This is part 8 of my [rebuild series](/tags/rebuild/). In [part 7](/blog/agent-ready-seo-with-the-yoast-founders-tools/) I wired up the SEO layer.*
+
+{/* TODO: add merge-day details (and screenshots!) once you actually flip the switch. */}
+
+The original plan for this rebuild ended with a move to Cloudflare. Spoiler: I'm still on Netlify, the launch plan got *simpler*, and testing the new site in public exposed my first real production bug before production even existed. Let me walk through all three.
+
+## Why I didn't move to Cloudflare (yet)
+
+The Cloudflare pitch is real: unlimited free bandwidth, DNS and hosting in one dashboard, some clever edge features. But when I sat down to actually do it, the first step was moving my domain's nameservers, and my email lives on this domain. A botched DNS move doesn't just break a website; it quietly eats your email. Meanwhile Netlify was already connected to the repo and working.
+
+So I applied the most underrated rule in side projects: **"site launched" beats "migration researched."** The rebuild is fully static files and doesn't care who hosts it, so moving later is a real option, not a locked door. Maybe someday. Not launch week.
+
+## Branch deploys: a sandbox next to production
+
+Here's the setup that made launching stress-free. Netlify builds your production site from **one branch** (usually `main`), which still had my old site. The entire rebuild lived on a different branch. With **branch deploys** turned on, Netlify also builds that branch and serves it at its own permanent URL, something like:
+
+```
+https://claude-astro-website-refactor-1truey--jpshlk.netlify.app
+```
+
+That's the real built site, on the real internet, sitting harmlessly next to production. To turn it on: Site configuration, then Build &amp; deploy, then "Branches and deploy contexts," pick "Let me add individual branches," and enter your branch name.
+
+One trick made it zero-config: the repo's `netlify.toml` (build command, publish folder, Node 22, which Astro 7 requires) lives **on the rebuild branch**. Config files only affect branches that contain them, so the branch built correctly while old `main` kept its old settings. And on merge day, production inherits the right settings automatically because the file merges in with everything else.
+
+Safety net worth knowing: **failed builds never take a site down.** Hosts keep serving the last successful deploy. Even a broken merge would leave the old site quietly running.
+
+## The Discord bug 🐛
+
+Testing in public works. I shared the branch URL in a Discord server, and the link preview came up with the title, the description... and a sad broken-image placeholder where the share image should be.
+
+Here's the diagnosis, and it's a good one. Every page declares a share image (the `og:image` tag from part 7) as an absolute URL on my real domain: `https://jpshlk.com/og-default.png`. Correct for SEO. Except `jpshlk.com` was still serving my *old* site, which has no such file. Discord read the page from the branch URL, then went to fetch the image from the production domain and got a 404.
+
+The fix asks a smarter question at build time: "which host is actually serving *this* build?" Netlify tells every build its context through environment variables, so a tiny helper picks the right base for share images:
+
+```ts
+// src/lib/urls.ts
+export const assetBase =
+  process.env.CONTEXT && process.env.CONTEXT !== 'production'
+    ? (process.env.DEPLOY_PRIME_URL ?? SITE.url)
+    : SITE.url;
+```
+
+Branch deploys and previews absolutize the share image against their own URL, where the file actually exists. Production uses the real domain. Canonical URLs and all the JSON-LD from part 7 stay on the real domain in every context, because those are identity signals, not fetched files. Nothing to undo at launch; the code just always does the right thing for wherever it's running.
+
+One more gotcha for your notes: Discord caches link previews per URL, so after the fix I had to share the link with `?v=2` stuck on the end to see the new card. The original URL kept showing the sad cloud from its cache. That one cost me a confused minute. 😅
+
+## Launch day is a merge button
+
+Because of all the above, launching the new site is genuinely this:
+
+1. Merge the rebuild branch into `main` on GitHub.
+2. Netlify rebuilds production from `main`, now containing the new site and its `netlify.toml`.
+3. The domain serves the new site. No DNS changes, no downtime, nothing to reconfigure.
+
+Then the smoke test, each item a URL to check on the live domain:
+
+- `/robots.txt`: allows crawling, points at the sitemap
+- `/sitemap-index.xml`: lists every page
+- `/llms.txt`: the AI-readable site summary
+- `/blog/learning-astro.md`: a markdown alternate serves
+- `/about`: redirects to the homepage (301, not a 404)
+- `/blog/learning-astr`: typo on purpose; the fuzzy 404 should auto-correct it
+- The share card: paste a link in Discord and see the real image this time
+
+Slower burns after that: submit the sitemap in Google Search Console, validate a post at [validator.schema.org](https://validator.schema.org/), and do the two-step IndexNow key dance from part 7.
+
+Next up: [teaching my AI to write like me](/blog/teaching-my-ai-to-write-like-me/), or the day I declared war on em dashes.
+
+Thanks for reading and have a good one! 🤙

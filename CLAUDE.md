@@ -9,7 +9,7 @@ Josh Pasholk's personal site: Astro 7, Tailwind CSS v4 (CSS-first config), TypeS
 - Post titles must be 52 characters or fewer (the layout appends " | jpshlk.com" and the SEO validator caps titles at 65). Summaries must be 40 to 200 characters.
 - Post bodies use `##` and below (the title is the page's only H1) and internal links always have trailing slashes (`/blog/my-post/`).
 
-Check for violations before committing content: `grep -rn '—' src/content/blog/*.mdx` (posts `ice-macOS-menu-bar-manager`, `new-scam-bank-notification`, and `settapp-apps-for-power-users` contain pre-existing em dashes in Josh's original writing; leave those alone).
+Check for violations before committing content: `grep -rn '—' src/content/blog/*.mdx` (posts `ice-macOS-menu-bar-manager`, `new-scam-bank-notification`, and `settapp-apps-for-power-users` contain pre-existing em dashes in Josh's original writing, and `teaching-my-ai-to-write-like-me` quotes em dashes as examples, and `turning-my-homepage-into-a-landing-page` quotes the RandomQuote attribution dash in a code snippet; leave those alone).
 
 ## Workflow
 

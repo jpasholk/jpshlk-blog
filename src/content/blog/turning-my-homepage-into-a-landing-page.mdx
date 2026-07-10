@@ -2,7 +2,7 @@
 title: Turning My Homepage Into a Landing Page
 date: '2026-07-09'
 draft: true
-summary: 'The homepage used to be a wall of blog posts. Now it introduces me, my work, and my hobbies, with the blog one click away. Here''s how it''s put together.'
+summary: 'The homepage used to be a wall of blog posts. Now it leads with who I am and what I do, with the blog one click away. Here''s how it''s put together.'
 tags: ['rebuild', 'astro']
 ---
 
@@ -14,7 +14,7 @@ The new homepage flips it: **who I am first, blog second.**
 
 ## The anatomy
 
-The page is six sections, each its own component in `src/components/home/`:
+The page is five sections, each its own component in `src/components/home/`:
 
 ```astro
 // src/pages/index.astro (the important part)
@@ -22,20 +22,18 @@ The page is six sections, each its own component in `src/components/home/`:
   <Hero />
   <About />
   <WorkSection />
-  <HobbiesSection />
   <LatestPosts />
   <RandomQuote />
 </BaseLayout>
 ```
 
 - **Hero**: photo, name, "Digital Duct Tape @ Plantonix," a two-line intro, and two buttons (read the blog / see my work).
-- **About**: the bio that used to hide on the `/about` page (family, coffee & beer, pool, disc golf, what I actually do at work).
+- **About**: the bio that used to hide on the `/about` page (family, coffee & beer, pool, disc golf, what I do at work, and what I'm learning: Claude Skills, Obsidian, Astro).
 - **WorkSection**: cards for Plantonix, my Jekyll UiKit theme, and my iOS Shortcuts on RoutineHub. These come from a tiny *projects* content collection (part 6), so adding a project is a new markdown file, not code.
-- **HobbiesSection**: emoji cards. 🥏🎱☕️🍺🎮🥾 No icon library needed; emoji are free and on-brand for me.
 - **LatestPosts**: the five newest posts, reusing the same `PostCard` component the blog page uses.
 - **RandomQuote**: the random quote widget from the old site, rebuilt (story below).
 
-Sections have anchor IDs (`#work`, `#hobbies`), so the old `/projects` audience and the hero's "See my work" button can jump straight to a section. And if you want to see how these components nest inside the layout, the full visual map lives at [how this site works](/how-this-site-works/).
+Sections have anchor IDs (like `#work`), so the old `/projects` audience and the hero's "See my work" button can jump straight to a section. Fun fact: the first version of this page also had a Hobbies section with emoji cards. I cut it the next day. Getting to delete your own ideas cheaply is half the point of building from components. And if you want to see how these components nest inside the layout, the full visual map lives at [how this site works](/how-this-site-works/).
 
 ## Killing the About page (politely)
 

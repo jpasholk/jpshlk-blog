@@ -6,7 +6,7 @@ summary: 'AI coding tools are only as good as what they can see. MCP servers giv
 tags: ['rebuild', 'ai']
 ---
 
-*This is part 9, the finale, of my [rebuild series](/tags/rebuild/). In [part 8](/blog/moving-from-netlify-to-cloudflare/) I moved the site to Cloudflare.*
+*This is part 10, the finale, of my [rebuild series](/tags/rebuild/). In [part 9](/blog/teaching-my-ai-to-write-like-me/) I taught the AI to write like me.*
 
 {/* TODO: revisit after you've actually used these for a while. Swap in your own impressions. */}
 
@@ -46,7 +46,7 @@ This one earned its spot during the rebuild. The dark mode fix in part 4 wasn't 
 claude mcp add playwright -- npx @playwright/mcp@latest
 ```
 
-### 3. Cloudflare's servers: for after launch
+### 3. Cloudflare's servers: for if I ever migrate
 
 Cloudflare runs [official MCP servers](https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/): a docs one (same story as Astro's), plus builds and observability servers that let the AI check *why a deploy failed* and read logs itself, instead of you playing copy-paste middleman with build output.
 
@@ -58,11 +58,11 @@ claude mcp add --transport http cf-docs https://docs.mcp.cloudflare.com/mcp
 
 The counterintuitive tip: **don't collect these like Pokémon.** Every connected server takes up space in the AI's context (the working memory it uses to think about *your actual problem*) whether or not it gets used. A pile of idle servers makes the assistant slightly worse at everything.
 
-My kit for this site: Astro Docs + Playwright daily, Cloudflare docs during launch week, builds/observability only once there's a deploy to babysit. Add servers when a task needs them; prune when it doesn't.
+My kit for this site: Astro Docs + Playwright daily, with the Cloudflare servers shelved unless that migration ever happens. Add servers when a task needs them; prune when it doesn't.
 
 ## Wrapping the series
 
-Nine posts ago this site was a borrowed theme on an old framework with a broken dark mode and a domain typo in its config. Now it's a from-scratch Astro 7 site I understand top to bottom: designed on purpose, SEO'd like Yoast built it, deployed on Cloudflare, and documented here in full.
+Ten posts ago this site was a borrowed theme on an old framework with a broken dark mode and a domain typo in its config. Now it's a from-scratch Astro 7 site I understand top to bottom: designed on purpose, SEO'd like Yoast built it, launched on Netlify, and documented here in full.
 
 The honest summary of AI-assisted dev, from someone who just did a whole rebuild that way: the AI did the labor, the reading, and the remembering. I did the deciding. Both halves were necessary. And I learned more from directing this rebuild than from any tutorial I've ever followed.
 
