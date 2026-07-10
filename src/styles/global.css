@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/space-grotesk';
 @plugin '@tailwindcss/typography';
 
 /* Class-based dark mode: an inline script toggles `.dark` on <html>. */
