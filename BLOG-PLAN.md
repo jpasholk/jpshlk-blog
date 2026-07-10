@@ -34,6 +34,8 @@ Last updated: 2026-07-11. Living document; update as posts publish.
 | `adding-reading-time-to-an-astro-blog` | readingTime helper |
 | `a-copy-button-for-every-code-block` | CodeCopy component |
 | `shipping-full-posts-in-my-rss-feed` | Container-API full-content feed |
+| `a-uses-page-built-from-my-own-posts` | The /uses page (tags: `astro` / `apps`) |
+| `privacy-friendly-analytics-with-goatcounter` | GoatCounter analytics, production-gated |
 
 ## Publishing order and cadence
 
@@ -65,11 +67,11 @@ Suggested rhythm: **1 to 2 posts per week**. Fast enough to build momentum, slow
 
 ## Backlog (future features, each doubles as a post)
 
-- **`/uses` page**: apps, gear, setup. The most on-brand missing page for an apps blogger.
+- ~~**`/uses` page**~~: DONE 2026-07-10. Live at `/uses/`; hardware section still needs real models and desk gear.
 - **`/now` page**: what you are into lately; pairs with the Obsidian habit.
 - **`/shortcuts` collection**: your RoutineHub shortcuts as first-class content on your own site.
 - **Pagefind search**: static site search, worth it as the post count grows.
-- **Privacy-friendly analytics** (GoatCounter or Plausible): ideally before launch so day one gets counted.
+- ~~**Privacy-friendly analytics**~~: DONE 2026-07-10, GoatCounter, gated to production deploys. One manual step left before launch: create the account at goatcounter.com and set `GOATCOUNTER.code` in `src/config.ts`.
 - **Mastodon-powered comments**: replies to a post's Mastodon thread shown as comments.
 - **Per-post generated OG images**: build-time cards with the post title (the deluxe version of featureImage).
 - **Dark mode refinements** (parked by choice): smart reset to auto, live sunset switching.
