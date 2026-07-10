@@ -1,0 +1,46 @@
+---
+title: Give Every Post Its Own Share Image
+date: '2026-07-10'
+draft: true
+summary: 'Sharing any post used to show the same generic card. Three lines of frontmatter per post now promote each post''s hero image to its social share card.'
+tags: ['astro', 'web-development']
+---
+
+When you paste a link in Discord, iMessage, or Slack, that little preview card comes from the page's `og:image` tag, a line of metadata naming the picture to show. Until this week, every post on this site shared one generic dark card with my logo on it. Fine, but a wall of my links all looked identical.
+
+Now every post promotes its own hero image to the share card, and the whole change was frontmatter.
+
+## The three lines
+
+My blog's content schema (the contract that validates each post's metadata) has an optional `featureImage` field, courtesy of the [seo-graph suite](/blog/agent-ready-seo-with-the-yoast-founders-tools/) this site uses. Using it looks like this, at the top of a post:
+
+```yaml
+featureImage:
+  src: ../../assets/darksun-screenshots.png
+  alt: 'Darksun iOS Screenshots'
+```
+
+That's it. The layout already knows the priority order: an explicit SEO override wins, then `featureImage`, then the site's default card. Behind the scenes the image goes through Astro's asset pipeline, which means the `og:image:width` and `og:image:height` tags get filled in from the real file automatically. Preview cards render faster and more reliably when the dimensions are declared up front.
+
+One deliberate quirk: `alt` text is **required**. The schema refuses an image without it, because a share image without a description is an accessibility failure. If you try to skip it, the build fails and points at the exact file. I've come around to loving validators that refuse to let me be lazy.
+
+## Backfilling 22 old posts in one pass
+
+New posts get `featureImage` as I write them. The 22 existing posts were a different problem: nobody wants to hand-edit that many files. But every one of my posts already *opens* with an image in its body, so the backfill was mechanical: read each post's first image and its alt text, and write them into the frontmatter.
+
+Three posts got skipped on purpose, which is its own little lesson in edge cases:
+
+- Two posts have no images at all. They keep the default site card, which is the correct fallback.
+- One post's first image is a remote URL on someone else's server. Astro's image pipeline wants local files it can measure and optimize, so that post keeps the default card too.
+
+## Did it work?
+
+The proof is in the build output. Each post's page now carries its own image tags:
+
+```html
+<meta property="og:image" content="https://jpshlk.com/_astro/darksun-screenshots.CvxF6Mhq.png">
+<meta property="og:image:width" content="6009">
+<meta property="og:image:height" content="3000">
+```
+
+And the site's SEO validators, which read every built page, stayed quiet. Twenty posts, one mechanical pass, and my links finally look like *themselves* when shared. 🤙
