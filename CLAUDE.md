@@ -4,7 +4,7 @@ Josh Pasholk's personal site: Astro 7, Tailwind CSS v4 (CSS-first config), TypeS
 
 ## Writing style (applies to ALL generated text)
 
-- **Never use em dashes (—) or en dashes (–).** Not in blog posts, page copy, summaries, README, comments, or commit messages. Use a comma, period, colon, semicolon, parentheses, or a plain hyphen instead. The only allowed em dash is the quote-attribution dash inside the RandomQuote component's display output.
+- **Never use em dashes (—) or en dashes (–).** Not in blog posts, page copy, summaries, README, comments, or commit messages. Use a comma, period, colon, semicolon, parentheses, or a plain hyphen instead. The only allowed em dash is the quote-attribution dash in the RandomQuote display output, written by the quote script in `src/layouts/BaseLayout.astro`.
 - Blog posts are casual and first-person, in Josh's voice: short paragraphs, plain words, occasional emoji (🤙 😜). Explain jargon in one sentence the first time it appears.
 - Post titles must be 52 characters or fewer (the layout appends " | jpshlk.com" and the SEO validator caps titles at 65). Summaries must be 40 to 200 characters.
 - Post bodies use `##` and below (the title is the page's only H1) and internal links always have trailing slashes (`/blog/my-post/`).
