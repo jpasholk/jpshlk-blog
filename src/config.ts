@@ -32,7 +32,6 @@ export const NAVIGATION = [
   { href: '/projects/', title: 'Projects' },
   { href: '/uses/', title: 'Uses' },
   { href: '/tags/', title: 'Tags' },
-  { href: '/search/', title: 'Search' },
 ] as const;
 
 /**
