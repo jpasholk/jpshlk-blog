@@ -54,11 +54,13 @@ export default defineConfig({
       ],
     ],
   },
-  // The landing page absorbed the old About page; /aboutme is linked
-  // from an old post body. Mirrored in public/_redirects for Cloudflare.
+  // /about is a real page again (it absorbed /now and /uses, whose
+  // URLs now land on their sections). /aboutme is linked from an old
+  // post body. Mirrored in public/_redirects for Cloudflare.
   redirects: {
-    '/about': '/',
-    '/aboutme': '/',
+    '/aboutme': '/about/',
+    '/uses': '/about/#uses',
+    '/now': '/about/#now',
   },
   integrations: [
     mdx(),
@@ -88,8 +90,9 @@ export default defineConfig({
             !/^\/(?:blog|tags\/[^/]+)\/\d+\/$/.test(path) &&
             !path.startsWith('/styleguide') &&
             // Redirect stubs, the 404 page, and the search page: not content.
-            path !== '/about/' &&
             path !== '/aboutme/' &&
+            path !== '/uses/' &&
+            path !== '/now/' &&
             path !== '/404' &&
             path !== '/search/'
           );
