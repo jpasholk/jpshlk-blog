@@ -1,0 +1,68 @@
+---
+/**
+ * The /now page: what I'm into lately, in the nownownow.com spirit.
+ * Update the sections and bump `updated` whenever life changes.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { pageGraph } from '@/lib/schema';
+
+const updated = new Date('2026-07-11');
+
+const description =
+  "What I'm up to right now: the work, the projects, and the hobbies currently getting my attention. Updated whenever life changes.";
+
+const h2 = 'mt-14 text-2xl font-bold tracking-tight';
+const body = 'mt-3 max-w-prose text-zinc-600 dark:text-zinc-400';
+const link = 'font-medium text-primary-600 underline-offset-2 hover:underline dark:text-primary-400';
+---
+
+<BaseLayout title="Now" description={description} graph={pageGraph('Now', '/now/', description)}>
+  <div data-pagefind-body>
+    <header class="pt-10">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">What I'm doing now</h1>
+      <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
+        The current snapshot: what's getting my time and attention lately.
+        Last updated <FormattedDate date={updated} />.
+      </p>
+    </header>
+
+    <section>
+      <h2 class={h2}>Working on</h2>
+      <p class={body}>
+        Web and marketing operations at Plantonix, keeping an Amazon and
+        Shopify based business humming. Same as always, never the same twice.
+      </p>
+      <p class={body}>
+        And this site. I rebuilt the whole thing from scratch with an AI pair
+        programmer, and I'm still riding that momentum: <a href="/blog/rebuilding-my-blog-with-ai/" class={link}>the rebuild series</a> is
+        being written and published as I go, and new features keep landing
+        (site search being the latest, this page being the newest).
+      </p>
+    </section>
+
+    <section>
+      <h2 class={h2}>Playing with</h2>
+      <p class={body}>
+        <a href="https://claude.com/claude-code" class={link}>Claude Code</a> for
+        basically everything on this site, and <a href="https://obsidian.md" class={link}>Obsidian</a> for
+        notes. Still early on the Obsidian habit, but it's sticking. There's
+        always an iOS Shortcut or two mid-build, too.
+      </p>
+    </section>
+
+    <section>
+      <h2 class={h2}>Life lately</h2>
+      <p class={body}>
+        Time with family, friends, and my lovely girlfriend. When I get a free
+        evening it usually goes to pool or disc golf, with hot coffee or cold
+        beer nearby depending on the hour.
+      </p>
+    </section>
+
+    <p class="mt-14 mb-4 max-w-prose text-zinc-600 dark:text-zinc-400">
+      This is a <a href="https://nownownow.com/about" class={link}>now page</a>.
+      If you have a site, you should make one too.
+    </p>
+  </div>
+</BaseLayout>
