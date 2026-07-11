@@ -35,9 +35,10 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
   <header class="pt-10">
     <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">How this site works</h1>
     <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
-      Six diagrams of this site's anatomy: what runs at build time, how layouts
-      and slots compose pages, where the data comes from, and the little bit of
-      JavaScript that runs in your browser right now.
+      Eight diagrams of this site's anatomy: what runs at build time, how
+      layouts and slots compose pages, where the data and images come from,
+      how search works with no server, and the little bit of JavaScript that
+      runs in your browser right now.
     </p>
     <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-zinc-200 pt-4 text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
       <span class="inline-flex items-center gap-2">
@@ -86,6 +87,7 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
             <p class={leaf}><span class={filePath}>index.html, blog/&hellip;/index.html</span></p>
             <p class={leaf}><span class={filePath}>rss.xml, sitemap, llms.txt</span></p>
             <p class={leaf}><span class={filePath}>optimized images + one CSS file</span></p>
+            <p class={leaf}><span class={filePath}>pagefind/ (the search index, see 7)</span></p>
           </div>
         </div>
       </div>
@@ -149,10 +151,11 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
             <span class={chip}>theme script (is:inline)</span>
             <span class={chip}>&lt;Seo /&gt; meta + JSON-LD</span>
             <span class={chip}>&lt;ClientRouter /&gt;</span>
+            <span class={chip}>Pagefind loader script</span>
           </p>
           <p class={leaf}>
             <span class={boxLabel}>Header</span>
-            <span class={filePath}> nav + ThemeToggle + mobile menu</span>
+            <span class={filePath}> nav + search button and modal + ThemeToggle + mobile menu</span>
           </p>
           <div class={slotBox}>
             <span class={slotTag}>&lt;slot /&gt; : filled by src/pages/index.astro</span>
@@ -278,8 +281,100 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
     </p>
   </section>
 
+  <section>
+    <h2 class={h2}><span class={num}>6</span>Images: three jobs, one build</h2>
+    <p class={caption}>
+      There are 36 original images in <code class="font-mono text-sm">src/assets/</code>,
+      and posts reference them with plain markdown. Nobody resizes anything by
+      hand; the build does all three image jobs.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-140 items-center">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Originals</p>
+          <p class={`${filePath} mb-3`}>src/assets/</p>
+          <div class="flex flex-col gap-2">
+            <p class={leaf}><span class={filePath}>full-size photos + screenshots</span></p>
+            <p class={leaf}><span class={filePath}>referenced by 22 posts and Hero.astro</span></p>
+          </div>
+        </div>
+        <div class={arrow}>
+          <span class={arrowLabel}>astro build</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Optimized copies</p>
+          <p class={`${filePath} mb-3`}>dist/_astro/</p>
+          <div class="flex flex-col gap-2">
+            <p class={leaf}><span class={filePath}>resized, compressed, hashed filenames</span></p>
+            <p class={leaf}><span class={filePath}>share images: one per post, for link previews</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Job one, content images:</strong> a markdown <code class="font-mono text-xs">![alt](../../assets/photo.jpg)</code> in a post (or the <code class="font-mono text-xs">&lt;Image /&gt;</code> component in Hero) comes out the other side compressed and cache-friendly, automatically.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Job two, share images:</strong> PostLayout renders each post's feature image to a link-preview version at build time: capped at 1200px wide, never upscaled, and kept as PNG or JPEG because some link crawlers still choke on modern formats.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Job three, the passthrough bucket:</strong> <code class="font-mono text-xs">public/</code> is for files that must not be touched: favicons, <code class="font-mono text-xs">robots.txt</code>, the redirects file, and the default share image. They are copied into <code class="font-mono text-xs">dist/</code> exactly as-is.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>7</span>Search: no server, and a second kind of component</h2>
+    <p class={caption}>
+      The search button in the header (Cmd+K works too) and the{' '}
+      <a href="/search/" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">/search/</a> page
+      run on <a href="https://pagefind.app" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">Pagefind</a>, which indexes the finished HTML right after the build.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-180 items-center">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Built pages</p>
+          <p class={`${filePath} mb-3`}>dist/**/*.html</p>
+          <p class={leaf}><span class={filePath}>only pages marked data-pagefind-body: posts, home, /uses/, /projects/</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>pagefind --site dist</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Search index</p>
+          <p class={`${filePath} mb-3`}>dist/pagefind/</p>
+          <p class={leaf}><span class={filePath}>index chunks + the UI bundle, all static files</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>your query</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Your browser</p>
+          <p class={`${filePath} mb-3`}>no API, no server</p>
+          <p class={leaf}><span class={filePath}>downloads only the tiny chunks that match</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">A second kind of component:</strong> everything in sections 2 through 4 was Astro components, which run at build time and disappear. The search UI is the opposite: <em>web components</em>, custom HTML tags that a script brings to life in your browser. The header renders just this:
+    </p>
+    <pre class={`${pre} mt-3`}>&lt;pagefind-modal-trigger instance="modal" compact&gt;&lt;/pagefind-modal-trigger&gt;
+&lt;pagefind-modal instance="modal" reset-on-close&gt;&lt;/pagefind-modal&gt;</pre>
+    <p class={note}>
+      The empty <code class="font-mono text-xs">&lt;pagefind-modal&gt;</code> builds its own input, results, and keyboard hints once the loader script (that chip in section 3's diagram) fetches the bundle. In dev there is no index yet, so a CSS rule hides the undefined tags and the search page shows a fallback note instead.
+    </p>
+  </section>
+
   <section class="mb-16">
-    <h2 class={h2}><span class={num}>6</span>The browser layer: what happens on a click</h2>
+    <h2 class={h2}><span class={num}>8</span>The browser layer: what happens on a click</h2>
     <p class={caption}>
       Almost everything above ran at build time. Here is the small amount of
       JavaScript that actually runs for you, the visitor, in order, when you
@@ -318,7 +413,10 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           ThemeToggle and the mobile menu re-bind their click handlers to the
           fresh DOM, RandomQuote picks a new quote, and the GitHub buttons
-          script re-runs on posts that need it.
+          script re-runs on posts that need it. The Pagefind loader also runs
+          here: it fetches the search components once per visit and prunes
+          anything from their registry that the swap just removed, so the
+          search button never points at a dead modal.
         </p>
       </li>
     </ol>
