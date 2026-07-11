@@ -14,9 +14,11 @@ import { pageGraph } from '@/lib/schema';
   description={SITE.description}
   graph={pageGraph(SITE.title, '/', SITE.description)}
 >
-  <Hero />
-  <About />
-  <WorkSection />
+  <div data-pagefind-body data-pagefind-meta="title:Home">
+    <Hero />
+    <About />
+    <WorkSection />
+  </div>
   <LatestPosts />
   <RandomQuote />
 </BaseLayout>

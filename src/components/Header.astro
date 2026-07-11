@@ -32,6 +32,8 @@ const isActive = (href: string) =>
       }
     </nav>
 
+    <pagefind-modal-trigger instance="modal" compact></pagefind-modal-trigger>
+
     <ThemeToggle />
 
     <button
@@ -75,6 +77,11 @@ const isActive = (href: string) =>
     }
   </ul>
 </nav>
+
+<!-- Site-wide search modal, opened by the header trigger or mod+k. -->
+<!-- Left empty, it builds its own input, summary, and results. The -->
+<!-- "modal" instance keeps its state separate from the /search page. -->
+<pagefind-modal instance="modal" reset-on-close></pagefind-modal>
 
 <script>
   function bindMobileMenu() {
