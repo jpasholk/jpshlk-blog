@@ -1,8 +1,10 @@
+import { rehypeHeadingIds } from '@astrojs/markdown-remark';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import seoGraph, { indexNowOnBranch } from '@jdevalk/astro-seo-graph/integration';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 const SITE_URL = 'https://jpshlk.com';
 
@@ -29,7 +31,29 @@ const indexNow =
 
 export default defineConfig({
   site: SITE_URL,
-  prefetch: true,
+  // Viewport strategy: pages are prefetched as their links scroll into
+  // view, so most ClientRouter swaps start from cache. (Speculation
+  // Rules prerendering would be wasted here: the ClientRouter swap
+  // never consumes a prerendered page.)
+  prefetch: { prefetchAll: true, defaultStrategy: 'viewport' },
+  markdown: {
+    rehypePlugins: [
+      // Astro normally adds heading ids AFTER user plugins run, so the
+      // autolink plugin would see id-less headings and skip them all.
+      // Running the id plugin explicitly first fixes the order.
+      rehypeHeadingIds,
+      // Appends a hover anchor link (the # next to headings) to each
+      // heading that has an id.
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: 'append',
+          properties: { className: ['heading-anchor'], ariaLabel: 'Link to this section' },
+          content: { type: 'text', value: '#' },
+        },
+      ],
+    ],
+  },
   // The landing page absorbed the old About page; /aboutme is linked
   // from an old post body. Mirrored in public/_redirects for Cloudflare.
   redirects: {

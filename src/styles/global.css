@@ -53,6 +53,29 @@
   .code-copy:focus-visible {
     opacity: 1;
   }
+
+}
+
+/* Hover anchors appended to article headings by
+   rehype-autolink-headings (see astro.config.ts). Unlayered on
+   purpose: the typography plugin's link underline lives in a later
+   cascade layer and would beat any layered text-decoration here. */
+.heading-anchor {
+  margin-left: 0.4em;
+  font-weight: 400;
+  text-decoration: none;
+  color: var(--color-primary-600);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.dark .heading-anchor {
+  color: var(--color-primary-400);
+}
+
+:is(h1, h2, h3, h4, h5, h6):hover > .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
 }
 
 /* Pagefind Component UI: match the sky/zinc theme in both modes.
