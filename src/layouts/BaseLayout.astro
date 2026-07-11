@@ -62,6 +62,8 @@ const goatcounter =
             ? stored === 'dark'
             : window.matchMedia('(prefers-color-scheme: dark)').matches;
           document.documentElement.classList.toggle('dark', dark);
+          // Pagefind's Component UI keys its dark scheme off this attribute.
+          document.documentElement.dataset.pfTheme = dark ? 'dark' : 'light';
         };
         apply();
         document.addEventListener('astro:after-swap', apply);
@@ -120,6 +122,8 @@ const goatcounter =
       ]}
     />
 
+    <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css" />
+
     <ClientRouter />
   </head>
   <body class="flex min-h-screen flex-col">
@@ -155,6 +159,69 @@ const goatcounter =
       showRandomQuote(document);
       document.addEventListener('astro:before-swap', (e) => {
         showRandomQuote((e as Event & { newDocument: Document }).newDocument);
+      });
+    </script>
+
+    <script>
+      // Loads Pagefind's Component UI once per browsing session. The
+      // custom elements self-register and auto-mount whenever they
+      // appear in the DOM (including after ClientRouter swaps), so no
+      // init call is needed. The bundle only exists in the built site
+      // (dist/pagefind/); in dev the load fails, the flag is set, and
+      // the search page reveals its fallback message. Until (or unless)
+      // the elements are defined, CSS hides them entirely.
+      async function loadPagefindComponents() {
+        const w = window as any;
+        if (w.PagefindComponents || w.__pagefindFailed) return;
+        try {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = '/pagefind/pagefind-component-ui.js';
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.append(s);
+          });
+        } catch {
+          w.__pagefindFailed = true;
+          document.dispatchEvent(new CustomEvent('pagefind:failed'));
+        }
+      }
+
+      // Pagefind's instance registry lives on window and survives
+      // ClientRouter swaps, but it never drops components that leave
+      // the DOM. Without this pruning, the header's modal trigger
+      // keeps opening the PREVIOUS page's dead modal ("The element is
+      // not in a Document"). Drop every registration and hook whose
+      // element is no longer connected; the swapped-in elements have
+      // already re-registered by the time astro:page-load fires.
+      function prunePagefindRegistry() {
+        const manager = (window as any).PagefindComponents?.getInstanceManager?.();
+        if (!manager?.getInstance) return;
+        const live = (c: unknown) => !(c instanceof Element) || c.isConnected;
+        for (const name of ['default', 'modal']) {
+          const instance = manager.getInstance(name);
+          if (!instance) continue;
+          if (Array.isArray(instance.components)) {
+            instance.components = instance.components.filter(live);
+          }
+          for (const type of Object.keys(instance.componentsByType ?? {})) {
+            if (Array.isArray(instance.componentsByType[type])) {
+              instance.componentsByType[type] = instance.componentsByType[type].filter(live);
+            }
+          }
+          for (const event of Object.keys(instance.__hooks__ ?? {})) {
+            if (Array.isArray(instance.__hooks__[event])) {
+              instance.__hooks__[event] = instance.__hooks__[event].filter(
+                (entry: { owner?: unknown }) => typeof entry === 'function' || live(entry?.owner),
+              );
+            }
+          }
+        }
+      }
+
+      document.addEventListener('astro:page-load', () => {
+        prunePagefindRegistry();
+        loadPagefindComponents();
       });
     </script>
   </body>

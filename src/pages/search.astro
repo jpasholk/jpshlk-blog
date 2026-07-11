@@ -13,8 +13,11 @@ const description =
       Looking for something I wrote? Type away.
     </p>
 
-    <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
-    <div id="search" class="mt-8"></div>
+    <div class="mt-8">
+      <pagefind-input placeholder="Search posts and pages"></pagefind-input>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </div>
 
     <p id="search-fallback" hidden class="mt-8 max-w-prose text-zinc-600 dark:text-zinc-400">
       Search could not load. If this is a local dev server, the index only exists after a build:
@@ -33,38 +36,37 @@ const description =
 </BaseLayout>
 
 <script>
-  // Pagefind's UI script only exists in the built site (dist/pagefind/),
-  // so it is loaded dynamically instead of via a static tag. That also
-  // sidesteps ClientRouter script re-execution ordering: this handler
-  // runs on astro:page-load (first load and every swap, the Header
-  // pattern) and the dataset.mounted guard resets naturally because
-  // each swap replaces the #search element.
-  async function initSearch() {
-    const el = document.getElementById('search');
-    if (!el || el.dataset.mounted) return;
-    el.dataset.mounted = 'true';
-    try {
-      if (!(window as any).PagefindUI) {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement('script');
-          s.src = '/pagefind/pagefind-ui.js';
-          s.onload = resolve;
-          s.onerror = reject;
-          document.head.append(s);
-        });
-      }
-      const ui = new (window as any).PagefindUI({
-        element: '#search',
-        showSubResults: true,
-        showImages: false,
-        autofocus: true,
-      });
-      const q = new URLSearchParams(location.search).get('q');
-      if (q) ui.triggerSearch(q);
-    } catch {
-      document.getElementById('search-fallback')?.removeAttribute('hidden');
+  // BaseLayout loads the Component UI bundle; the elements above mount
+  // themselves. This script only covers the gaps: revealing the
+  // fallback when the bundle is missing (dev servers), focusing the
+  // input (the component's autofocus attribute only works during
+  // initial document parsing, before the bundle has loaded), and
+  // prefilling from a ?q= query param, which the components do not
+  // read natively.
+  function showFallback() {
+    document.getElementById('search-fallback')?.removeAttribute('hidden');
+  }
+
+  async function initSearchPage() {
+    if (!document.getElementById('search-fallback')) return;
+    if ((window as any).__pagefindFailed) showFallback();
+
+    await customElements.whenDefined('pagefind-input');
+    // Scoped to main: the header's search modal builds its own
+    // pagefind-input, which would match an unscoped selector first.
+    const field = document.querySelector<HTMLInputElement>('main pagefind-input input');
+    if (!field) return;
+    field.focus();
+
+    const q = new URLSearchParams(location.search).get('q');
+    if (q && !field.value) {
+      field.value = q;
+      (window as any).PagefindComponents?.getInstanceManager?.()
+        .getInstance('default')
+        ?.triggerSearch(q);
     }
   }
 
-  document.addEventListener('astro:page-load', initSearch);
+  document.addEventListener('pagefind:failed', showFallback);
+  document.addEventListener('astro:page-load', initSearchPage);
 </script>
