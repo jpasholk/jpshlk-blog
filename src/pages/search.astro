@@ -1,0 +1,70 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { pageGraph } from '@/lib/schema';
+
+const description =
+  'Search everything on this site: blog posts, projects, and the uses page. It all runs in your browser, no server involved.';
+---
+
+<BaseLayout title="Search" description={description} graph={pageGraph('Search', '/search/', description)}>
+  <div class="pt-10">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Search</h1>
+    <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
+      Looking for something I wrote? Type away.
+    </p>
+
+    <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+    <div id="search" class="mt-8"></div>
+
+    <p id="search-fallback" hidden class="mt-8 max-w-prose text-zinc-600 dark:text-zinc-400">
+      Search could not load. If this is a local dev server, the index only exists after a build:
+      run <code>npm run build</code> and <code>npm run preview</code>.
+    </p>
+    <noscript>
+      <p class="mt-8 max-w-prose text-zinc-600 dark:text-zinc-400">
+        Search needs JavaScript. Everything here is also browsable from the
+        <a href="/blog/" class="font-medium text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">blog</a>
+        and
+        <a href="/tags/" class="font-medium text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">tags</a>
+        pages.
+      </p>
+    </noscript>
+  </div>
+</BaseLayout>
+
+<script>
+  // Pagefind's UI script only exists in the built site (dist/pagefind/),
+  // so it is loaded dynamically instead of via a static tag. That also
+  // sidesteps ClientRouter script re-execution ordering: this handler
+  // runs on astro:page-load (first load and every swap, the Header
+  // pattern) and the dataset.mounted guard resets naturally because
+  // each swap replaces the #search element.
+  async function initSearch() {
+    const el = document.getElementById('search');
+    if (!el || el.dataset.mounted) return;
+    el.dataset.mounted = 'true';
+    try {
+      if (!(window as any).PagefindUI) {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = '/pagefind/pagefind-ui.js';
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.append(s);
+        });
+      }
+      const ui = new (window as any).PagefindUI({
+        element: '#search',
+        showSubResults: true,
+        showImages: false,
+        autofocus: true,
+      });
+      const q = new URLSearchParams(location.search).get('q');
+      if (q) ui.triggerSearch(q);
+    } catch {
+      document.getElementById('search-fallback')?.removeAttribute('hidden');
+    }
+  }
+
+  document.addEventListener('astro:page-load', initSearch);
+</script>

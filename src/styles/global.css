@@ -53,6 +53,32 @@
   .code-copy:focus-visible {
     opacity: 1;
   }
+
+  /* Pagefind UI on /search: match the sky/zinc theme in both modes. */
+  #search {
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: var(--color-primary-600);
+    --pagefind-ui-text: var(--color-zinc-800);
+    --pagefind-ui-background: var(--color-white);
+    --pagefind-ui-border: var(--color-zinc-200);
+    --pagefind-ui-tag: var(--color-zinc-100);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-font: var(--font-sans);
+  }
+
+  .dark #search {
+    --pagefind-ui-primary: var(--color-primary-400);
+    --pagefind-ui-text: var(--color-zinc-200);
+    --pagefind-ui-background: var(--color-zinc-950);
+    --pagefind-ui-border: var(--color-zinc-800);
+    --pagefind-ui-tag: var(--color-zinc-800);
+  }
+
+  /* Excerpt highlights, matching the site's ::selection tint. */
+  #search mark {
+    @apply rounded-xs bg-primary-500/30 text-inherit;
+  }
 }
 
 @layer base {
