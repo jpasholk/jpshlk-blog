@@ -1,0 +1,70 @@
+---
+title: Static Site Search With Pagefind
+date: '2026-07-11'
+draft: true
+summary: 'The site finally has search: a /search page and a Cmd+K modal on every page, powered by Pagefind with no server involved. Plus the two sneaky bugs it took to get there.'
+tags: ['astro', 'web-development']
+---
+
+The site has search now. There's a proper [/search/](/search/) page, and a little magnifying glass in the header that opens a search modal from any page. Press Cmd+K (or Ctrl+K) and it pops up wherever you are. This was a roadmap item in [the rebuild story](/blog/rebuilding-my-blog-with-ai/), and it's the feature I was most curious about, because this site has no server. It's static files on a CDN. Where does search even run?
+
+In your browser, it turns out. [Pagefind](https://pagefind.app) runs after the site builds, reads the finished HTML, and writes a search index into the output as a pile of small static files. When you search, the browser downloads only the tiny chunks of the index it needs for your query. No API, no database, no monthly bill. For a blog this size, a search costs about as much bandwidth as a small image.
+
+## One build step and one attribute
+
+The entire indexing setup is one change to the build script:
+
+```json
+// package.json
+"build": "astro build && pagefind --site dist"
+```
+
+Astro builds the site, Pagefind indexes what came out. Netlify runs `npm run build` either way, so deploys needed zero changes.
+
+Deciding what gets indexed was the actual design work. Pagefind has a nice rule: the moment any page has a `data-pagefind-body` attribute, every page without one is excluded. So instead of sprinkling "please ignore me" markers on tag archives, pagination pages, and the styleguide, I opted in exactly four things: blog posts, the homepage, [/uses/](/uses/), and [/projects/](/projects/). One attribute on the post layout covers every post at once, and a `data-pagefind-ignore` on the date line keeps "min read" from being a searchable phrase on all of them. 😜
+
+Drafts stay out of the index for free, since they're never built in production to begin with.
+
+## The UI I built twice
+
+I shipped Pagefind's classic search UI first. It worked on the first build. Then that same build's output showed a friendly note: as of Pagefind 1.5 there's a new Component UI, and new setups should use that instead.
+
+The new one is built on web components, which are custom HTML tags the browser wires up automatically once a script defines them. That means the search page is just markup now, and the header modal is two tags:
+
+```html
+<!-- Header.astro -->
+<pagefind-modal-trigger instance="modal" compact></pagefind-modal-trigger>
+<pagefind-modal instance="modal" reset-on-close></pagefind-modal>
+```
+
+The empty modal builds its own input, results list, and keyboard hints. The trigger renders the button with the Cmd+K badge and registers the shortcut. I'll take that trade over the imperative "call this init function at the right moment" dance every time.
+
+## View transitions strike again
+
+Long-time readers of this series know the pattern by now: every feature works, and then view transitions have opinions. (I was fighting them [years before this rebuild](/blog/odd-behavior-with-transitions/), too.) View transitions turn navigation into SPA-style swaps, meaning the browser replaces the page content with JavaScript instead of doing a full page load.
+
+Here's the wrinkle this time. Pagefind's components register themselves in a registry that lives on `window`, which survives those swaps. The elements themselves don't survive; every navigation swaps in fresh ones. But the registry never forgets the old ones. So after navigating once, clicking the search button tried to open the previous page's modal, an element that no longer existed. The console said it plainly: "The element is not in a Document."
+
+The fix is a small cleanup that runs after every swap and prunes anything from the registry that's no longer attached to the page. A dozen lines, found by clicking around the way a reader would. This is exactly the kind of bug automated checks don't catch, because everything type-checks and everything builds.
+
+## The CSS that silently lost
+
+The Component UI is themed with CSS variables, so matching the site's colors should have been a paste job. My first try had no effect at all, and dark mode stayed stubbornly on Pagefind's built-in gray.
+
+The culprit was CSS cascade layers, the feature Tailwind 4 organizes all its styles with. Layers have a blunt rule: any style inside a layer loses to any style outside one, no matter how specific the selectors are. My variable overrides sat inside a Tailwind layer. Pagefind's stylesheet is unlayered. Pagefind won every time, politely and silently.
+
+```css
+/* global.css: OUTSIDE any layer, or Pagefind's own CSS wins */
+html:root {
+  --pf-border-focus: var(--color-primary-600);
+  --pf-background: var(--color-white);
+}
+```
+
+The overrides now live outside the layers with a comment explaining why, so future me doesn't helpfully "clean that up" and break dark mode again.
+
+## Small calls at the end
+
+Search started as a sixth link in the nav. With the header button on every page, that felt redundant, so the nav is back to five items and the search page link moved to the footer next to RSS. The footer works without JavaScript too, which matters here: the header button only appears once Pagefind's script loads, but a plain link always renders. And in local dev, where no index exists yet, the search page shows a friendly note instead of a broken box.
+
+The pleasant surprise of the whole feature: search itself was one build step and a handful of HTML tags. The real work was two invisible bugs, and neither of them was about search. 🤙
