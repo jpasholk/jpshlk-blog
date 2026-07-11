@@ -123,7 +123,6 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
         </p>
         <pre class={pre}>&lt;BaseLayout title="Josh Pasholk"&gt;
   <span class="font-semibold text-primary-700 dark:text-primary-300">&lt;Hero /&gt;
-  &lt;About /&gt;
   &lt;WorkSection /&gt;
   &lt;LatestPosts /&gt;
   &lt;RandomQuote /&gt;</span> <span class="text-zinc-500">&larr; all of this lands
@@ -161,7 +160,6 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
             <span class={slotTag}>&lt;slot /&gt; : filled by src/pages/index.astro</span>
             <div class="flex flex-col gap-2">
               <p class={leaf}><span class={boxLabel}>Hero</span> <span class={filePath}>components/home/Hero.astro</span></p>
-              <p class={leaf}><span class={boxLabel}>About</span> <span class={filePath}>components/home/About.astro</span></p>
               <p class={leaf}><span class={boxLabel}>WorkSection</span> <span class={filePath}>reads the projects collection</span></p>
               <div class="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
                 <p class={boxLabel}>LatestPosts</p>
@@ -337,7 +335,7 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
         <div class={`${box} flex-1`}>
           <p class={boxLabel}>Built pages</p>
           <p class={`${filePath} mb-3`}>dist/**/*.html</p>
-          <p class={leaf}><span class={filePath}>only pages marked data-pagefind-body: posts, home, /uses/, /projects/</span></p>
+          <p class={leaf}><span class={filePath}>only pages marked data-pagefind-body: posts, home, /about/, /projects/</span></p>
         </div>
         <div class={`${arrow} self-center`}>
           <span class={arrowLabel}>pagefind --site dist</span>
