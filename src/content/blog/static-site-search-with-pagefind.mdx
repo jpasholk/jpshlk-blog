@@ -21,7 +21,7 @@ The entire indexing setup is one change to the build script:
 
 Astro builds the site, Pagefind indexes what came out. Netlify runs `npm run build` either way, so deploys needed zero changes.
 
-Deciding what gets indexed was the actual design work. Pagefind has a nice rule: the moment any page has a `data-pagefind-body` attribute, every page without one is excluded. So instead of sprinkling "please ignore me" markers on tag archives, pagination pages, and the styleguide, I opted in exactly four things: blog posts, the homepage, [/uses/](/uses/), and [/projects/](/projects/). One attribute on the post layout covers every post at once, and a `data-pagefind-ignore` on the date line keeps "min read" from being a searchable phrase on all of them. 😜
+Deciding what gets indexed was the actual design work. Pagefind has a nice rule: the moment any page has a `data-pagefind-body` attribute, every page without one is excluded. So instead of sprinkling "please ignore me" markers on tag archives, pagination pages, and the styleguide, I opted in exactly four things: blog posts, the homepage, [/about/](/about/), and [/projects/](/projects/). One attribute on the post layout covers every post at once, and a `data-pagefind-ignore` on the date line keeps "min read" from being a searchable phrase on all of them. 😜
 
 Drafts stay out of the index for free, since they're never built in production to begin with.
 
