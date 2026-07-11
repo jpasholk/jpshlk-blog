@@ -53,32 +53,47 @@
   .code-copy:focus-visible {
     opacity: 1;
   }
+}
 
-  /* Pagefind UI on /search: match the sky/zinc theme in both modes. */
-  #search {
-    --pagefind-ui-scale: 0.9;
-    --pagefind-ui-primary: var(--color-primary-600);
-    --pagefind-ui-text: var(--color-zinc-800);
-    --pagefind-ui-background: var(--color-white);
-    --pagefind-ui-border: var(--color-zinc-200);
-    --pagefind-ui-tag: var(--color-zinc-100);
-    --pagefind-ui-border-width: 1px;
-    --pagefind-ui-border-radius: 8px;
-    --pagefind-ui-font: var(--font-sans);
-  }
+/* Pagefind Component UI: match the sky/zinc theme in both modes.
+   These rules must stay OUTSIDE the components layer: Pagefind's own
+   stylesheet is unlayered and would beat any layered rule outright.
+   Unlayered, html:root and :root.dark outrank the bundle's :root and
+   [data-pf-theme="dark"] blocks on specificity. */
+html:root {
+  --pf-font: var(--font-sans);
+  --pf-border-radius: 8px;
+  --pf-text: var(--color-zinc-800);
+  --pf-text-secondary: var(--color-zinc-600);
+  --pf-text-muted: var(--color-zinc-500);
+  --pf-background: var(--color-white);
+  --pf-border: var(--color-zinc-200);
+  --pf-border-focus: var(--color-primary-600);
+  --pf-outline-focus: var(--color-primary-600);
+  --pf-hover: var(--color-zinc-100);
+  --pf-mark: color-mix(in oklab, var(--color-primary-500) 30%, transparent);
+}
 
-  .dark #search {
-    --pagefind-ui-primary: var(--color-primary-400);
-    --pagefind-ui-text: var(--color-zinc-200);
-    --pagefind-ui-background: var(--color-zinc-950);
-    --pagefind-ui-border: var(--color-zinc-800);
-    --pagefind-ui-tag: var(--color-zinc-800);
-  }
+:root.dark {
+  --pf-text: var(--color-zinc-200);
+  --pf-text-secondary: var(--color-zinc-400);
+  --pf-text-muted: var(--color-zinc-400);
+  --pf-background: var(--color-zinc-950);
+  --pf-border: var(--color-zinc-800);
+  --pf-border-focus: var(--color-primary-400);
+  --pf-outline-focus: var(--color-primary-400);
+  --pf-hover: var(--color-zinc-900);
+  --pf-mark: color-mix(in oklab, var(--color-primary-500) 30%, transparent);
+}
 
-  /* Excerpt highlights, matching the site's ::selection tint. */
-  #search mark {
-    @apply rounded-xs bg-primary-500/30 text-inherit;
-  }
+/* Hide search components until their definitions load (and forever
+   in dev, where the pagefind bundle does not exist). */
+pagefind-modal-trigger:not(:defined),
+pagefind-modal:not(:defined),
+pagefind-input:not(:defined),
+pagefind-summary:not(:defined),
+pagefind-results:not(:defined) {
+  display: none;
 }
 
 @layer base {
