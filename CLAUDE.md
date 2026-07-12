@@ -15,3 +15,14 @@ Check for violations before committing content: `grep -rn '—' src/content/blog
 
 - Development happens on feature branches. `main` is the live site; never push or merge to it without explicit permission.
 - Run `npm run check` and `npm run build` before committing. Draft posts (`draft: true`) only render in `npm run dev`.
+- Ready-to-execute plans for the remaining roadmap features live in `docs/plans/` (RoutineHub shortcuts, comments, generated share images). Start there before re-deriving a design.
+- `src/pages/how-this-site-works.astro` is living documentation; update it alongside structural changes.
+
+## Gotchas (hard-won, do not relearn)
+
+- Pagefind's Component UI keeps a registry on `window` that never drops removed elements; the prune-on-`astro:page-load` script in `BaseLayout.astro` is what keeps the search modal working across view transitions. Do not remove it.
+- Third-party CSS is unlayered and beats anything inside a Tailwind `@layer`; the Pagefind and heading-anchor styles in `global.css` are unlayered on purpose.
+- `rehypeHeadingIds` must run before `rehype-autolink-headings` in `astro.config.ts` (Astro otherwise adds heading ids after user plugins).
+- Astro collapses whitespace at template line boundaries; keep inline links on the same line as surrounding text or use `{' '}`.
+- On this view-transitions site, any page-touching JavaScript must run on `astro:page-load`, not once at startup.
+- Verify UI changes with a real browser against `npm run preview` (playwright-core; in the CCR sandbox use `executablePath: '/opt/pw-browsers/chromium'`). The build passing is not the same as the feature working.
