@@ -2,11 +2,13 @@
 /**
  * Decorative desktop-only effect: columns of this site's own source code in
  * the left and right gutters, drifting with a parallax feel. The columns
- * are fixed to the viewport and a scroll listener slides them up by a set
- * distance (--cg-drift) over the page's full scroll range, so the code
- * moves slower than the content and never runs out on long pages. Fixed
- * "fog" patches in the page background color sit on top; as the code
- * drifts behind them, lines fade in and out through the soft gaps.
+ * are fixed to the viewport and a scroll listener slides them up at a
+ * constant fraction of the content's scroll speed (--cg-speed), so the
+ * code always reads as clearly slower than the page. On very long pages
+ * the total slide is capped at --cg-max-drift (the ratio eases down so
+ * the columns never run out). Fixed "fog" patches in the page background
+ * color sit on top; as the code drifts behind them, lines fade in and
+ * out through the soft gaps.
  *
  * The drift is driven by JS in every browser on purpose. A CSS
  * scroll-driven animation looked ideal and worked in Chrome, but Safari
@@ -24,9 +26,9 @@
 import GutterCode from '@/components/GutterCode.astro';
 import { SNIPPETS } from '@/lib/gutter-code';
 
-// Columns only need to cover one viewport plus the drift distance, so a
+// Columns only need to cover one viewport plus the maximum drift, so a
 // handful of repeats is enough regardless of how long the page is.
-const REPEATS = 7;
+const REPEATS = 9;
 const leftCode = Array(REPEATS).fill(`${SNIPPETS.schema}\n\n${SNIPPETS.posts}`).join('\n\n');
 const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).join('\n\n');
 ---
@@ -46,11 +48,14 @@ const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).
   }
 
   .cg-col {
-    --cg-drift: 1200px;
+    /* Code speed as a fraction of content speed, and the cap on how far
+       the columns may slide in total (which also sizes them). */
+    --cg-speed: 0.35;
+    --cg-max-drift: 2400px;
     position: fixed;
     top: 0;
     z-index: 0;
-    height: calc(100vh + var(--cg-drift));
+    height: calc(100vh + var(--cg-max-drift));
     width: min(360px, max(0px, calc((100vw - 48rem) / 2)));
     overflow: hidden;
     user-select: none;
@@ -119,36 +124,44 @@ const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).
 
 <script>
   // Drives the drift (see the component comment for why this is JS in
-  // every browser). The listeners live on the persistent window and
-  // document, so they survive ClientRouter swaps; astro:page-load
+  // every browser). The code moves at --cg-speed of the content's speed;
+  // on pages long enough that full-speed drift would exceed
+  // --cg-max-drift, the ratio eases down so the columns never run out.
+  // The listeners live on the persistent window and document, so they
+  // survive ClientRouter swaps; astro:page-load re-reads the config and
   // re-syncs each new page (fresh columns, restored scroll position).
+  // The transform is written directly in the scroll handler (two cheap
+  // style writes) so it tracks the scroll position without rAF lag.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const desktop = window.matchMedia('(min-width: 80rem)'); // Tailwind xl
 
-  function update() {
+  let speed = 0.35;
+  let maxDrift = 2400;
+
+  function apply() {
     if (reduceMotion.matches || !desktop.matches) return;
     const cols = document.querySelectorAll<HTMLElement>('.cg-col');
     if (!cols.length) return;
-    const drift = parseFloat(getComputedStyle(cols[0]!).getPropertyValue('--cg-drift')) || 0;
     const max = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    const ratio = max > 0 ? Math.min(speed, maxDrift / max) : 0;
+    const y = Math.min(maxDrift, Math.max(0, ratio * window.scrollY));
     for (const col of cols) {
-      col.style.transform = `translateY(${-progress * drift}px)`;
+      col.style.transform = `translateY(${-y}px)`;
     }
   }
 
-  let ticking = false;
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      ticking = false;
-      update();
-    });
+  function sync() {
+    const col = document.querySelector('.cg-col');
+    if (col) {
+      const styles = getComputedStyle(col);
+      speed = parseFloat(styles.getPropertyValue('--cg-speed')) || speed;
+      maxDrift = parseFloat(styles.getPropertyValue('--cg-max-drift')) || maxDrift;
+    }
+    apply();
   }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
-  document.addEventListener('astro:page-load', update);
-  update();
+  window.addEventListener('scroll', apply, { passive: true });
+  window.addEventListener('resize', sync, { passive: true });
+  document.addEventListener('astro:page-load', sync);
+  sync();
 </script>
