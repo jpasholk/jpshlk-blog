@@ -1,9 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import Card from '@/components/Card.astro';
-import Link from '@/components/Link.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
 import { pageGraph } from '@/lib/schema';
 
 const projects = (await getCollection('projects')).sort(
@@ -18,31 +16,6 @@ const projects = (await getCollection('projects')).sort(
 >
   <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Projects</h1>
   <div class="mt-8 grid gap-4 sm:grid-cols-2">
-    {
-      projects.map(({ data }) => (
-        <Card class="flex flex-col">
-          {data.image && (
-            <Image
-              src={data.image}
-              alt={data.imageAlt ?? `A preview of ${data.title}`}
-              width={800}
-              class="mb-4 rounded-lg"
-            />
-          )}
-          <h2 class="text-lg font-semibold">{data.title}</h2>
-          <p class="mt-2 grow text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            {data.description}
-          </p>
-          <p class="mt-4">
-            <Link
-              href={data.url}
-              class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
-            >
-              {data.linkLabel}
-            </Link>
-          </p>
-        </Card>
-      ))
-    }
+    {projects.map((project) => <ProjectCard project={project} />)}
   </div>
 </BaseLayout>

@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Card from '@/components/Card.astro';
+import Button from '@/components/Button.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  headingLevel?: 'h2' | 'h3';
+  imageWidth?: number;
+}
+
+const { project, headingLevel = 'h2', imageWidth = 800 } = Astro.props;
+const { id } = project;
+const { title, description, url, linkLabel, image, imageAlt } = project.data;
+
+const Heading = headingLevel;
+const href = `/projects/${id}/`;
+---
+
+<Card class="flex flex-col">
+  {
+    image && (
+      <a href={href} aria-label={`View ${title}`} class="mb-4 block">
+        <Image
+          src={image}
+          alt={imageAlt ?? `A preview of ${title}`}
+          width={imageWidth}
+          class="rounded-lg"
+          transition:name={`project-image-${id}`}
+        />
+      </a>
+    )
+  }
+  <Heading class="text-lg font-semibold">
+    <a
+      href={href}
+      class="hover:text-primary-600 dark:hover:text-primary-400"
+      transition:name={`project-title-${id}`}
+    >
+      {title}
+    </a>
+  </Heading>
+  <p class="mt-2 grow text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+    {description}
+  </p>
+  <div class="mt-4 flex flex-wrap gap-3">
+    <Button href={href} variant="primary">View project</Button>
+    <Button href={url} variant="ghost" target="_blank" rel="noopener noreferrer">
+      {linkLabel}
+    </Button>
+  </div>
+</Card>
