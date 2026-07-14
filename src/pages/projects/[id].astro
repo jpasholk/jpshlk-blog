@@ -1,0 +1,78 @@
+---
+import { getCollection, render } from 'astro:content';
+import { getImage, Image } from 'astro:assets';
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+import Prose from '@/components/Prose.astro';
+import { pageGraph } from '@/lib/schema';
+import { assetBase } from '@/lib/urls';
+
+export const getStaticPaths = (async () => {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project },
+  }));
+}) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+const { id } = project;
+const { title, description, url, linkLabel, image, imageAlt } = project.data;
+const { Content } = await render(project);
+
+// Share image is generated at build time from the project image.
+// Stay on PNG/JPEG: some link preview crawlers still choke on WebP/AVIF.
+const ogImage = image
+  ? await getImage({
+      src: image,
+      width: Math.min(1200, image.width),
+      format: image.format === 'png' ? 'png' : 'jpeg',
+    })
+  : undefined;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={ogImage ? new URL(ogImage.src, assetBase).href : undefined}
+  ogImageAlt={ogImage ? (imageAlt ?? title) : undefined}
+  ogImageWidth={ogImage?.attributes.width}
+  ogImageHeight={ogImage?.attributes.height}
+  graph={pageGraph(title, `/projects/${id}/`, description)}
+>
+  <article class="pt-10">
+    {
+      image && (
+        <Image
+          src={image}
+          alt={imageAlt ?? `A preview of ${title}`}
+          width={1400}
+          class="rounded-xl"
+          loading="eager"
+          transition:name={`project-image-${id}`}
+        />
+      )
+    }
+    <h1
+      class="mt-8 text-3xl font-bold tracking-tight sm:text-4xl"
+      transition:name={`project-title-${id}`}
+    >
+      {title}
+    </h1>
+    <p class="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
+      {description}
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <Button href={url} variant="primary" target="_blank" rel="noopener noreferrer">
+        {linkLabel}
+      </Button>
+      <Button href="/projects/" variant="ghost">All projects</Button>
+    </div>
+    <div class="mt-8">
+      <Prose>
+        <Content />
+      </Prose>
+    </div>
+  </article>
+</BaseLayout>
