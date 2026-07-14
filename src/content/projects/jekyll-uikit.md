@@ -3,6 +3,18 @@ title: Jekyll UiKit
 description: 'A Jekyll theme built on the UIkit front-end framework: a clean starter for static sites with UIkit components wired in.'
 url: https://github.com/jpasholk/jekyll-uikit
 linkLabel: View on GitHub
+image: ../../assets/jekyll-uikit-screenshot.png
+imageAlt: 'The Jekyll UiKit theme homepage in a browser, with a hero reading "A Simple, Elegant Jekyll Theme" over a misty lake with wooden boats.'
 featured: false
 order: 4
 ---
+
+Jekyll UiKit is one of my older projects, from back when I was building static sites with Jekyll. It is a theme built on UIkit, a lightweight front end framework, so you get a clean starting point with the components already wired in: a hero, a features grid, blog and tag pages, and Algolia search.
+
+## Where it stands
+
+I am not actively maintaining this one anymore, but it is still public and still works if you want it. If you are on Jekyll and like the UIkit look, it is a solid base to fork and make your own.
+
+## Getting started
+
+Setup lives in the project README on GitHub, including how to install it and wire up the moving pieces. Head over to the [repo](https://github.com/jpasholk/jekyll-uikit) to grab it.

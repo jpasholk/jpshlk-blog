@@ -8,3 +8,15 @@ imageAlt: 'The CocoCalcs garden soil calculator in dark mode on a MacBook and tw
 featured: true
 order: 1
 ---
+
+CocoCalcs started as napkin math. Every time I mixed up a fresh batch of soil for a new bed, I found myself scribbling the same ratios on whatever paper was nearby, then second guessing whether I had the amounts right. So I built a little calculator to do the scribbling for me.
+
+## What it does
+
+You give it the size of your bed (length, width, and depth) and it tells you how much of each ingredient to buy. It breaks the mix down into coco coir, perlite, vermiculite, and worm castings, so you know exactly what goes in the wheelbarrow.
+
+There are a few preset ratios to start from, or you can dial in a custom blend if you already have a recipe you like. Results come back in the units that actually help at the store and in the garden: cubic feet, cubic yards, and quarts.
+
+## Built with
+
+CocoCalcs is an Astro and Tailwind site, with dark mode and a layout that works fine on a phone while you are standing in the middle of the garden with dirt on your hands. Give it a try at [cococalcs.jpshlk.com](https://cococalcs.jpshlk.com/).
