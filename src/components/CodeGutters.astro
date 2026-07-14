@@ -1,0 +1,141 @@
+---
+/**
+ * Decorative desktop-only effect: faint columns of this site's own source
+ * code in the left and right gutters, most visible at the window edges and
+ * fading to nothing toward the reading column. Purely ornamental: hidden
+ * from assistive tech and search, non-interactive, no client JS.
+ *
+ * The snippets below are real (lightly trimmed) excerpts from the codebase.
+ * If those files change meaningfully, refresh these so the margins keep
+ * telling the truth about how the site works.
+ */
+
+// Left gutter: content model + post helpers.
+const left = [
+  `const blog = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      date: z.coerce.date(),
+      tags: z.array(reference('tags')).default([]),
+      draft: z.boolean().default(false),
+      summary: z.string().optional(),
+      related: z.array(reference('blog')).default([]),
+    }),
+});`,
+  `export async function getPublishedPosts(): Promise<Post[]> {
+  const posts = await getCollection('blog', ({ data }) =>
+    import.meta.env.DEV ? true : !data.draft,
+  );
+  return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+}
+
+/** Whole minutes at ~200 words per minute, never less than 1. */
+export function readingTime(post: Post): number {
+  const words = (post.body ?? '').split(/\\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}`,
+];
+
+// Right gutter: the theme pre-paint script + schema graph.
+const right = [
+  `// Apply the theme before first paint, and again after every
+// ClientRouter swap (the new document arrives without the class).
+const apply = () => {
+  const stored = localStorage.getItem('theme');
+  const dark = stored
+    ? stored === 'dark'
+    : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.classList.toggle('dark', dark);
+};
+apply();
+document.addEventListener('astro:after-swap', apply);`,
+  `export const person = buildPiece({
+  '@id': ids.person,
+  '@type': 'Person',
+  name: AUTHOR.name,
+  url: \`\${SITE.url}/\`,
+  jobTitle: AUTHOR.occupation,
+  sameAs: Object.values(SOCIALS),
+});
+
+export const postUrl = (post: Post) =>
+  \`\${SITE.url}/blog/\${post.id}/\`;`,
+];
+
+// Repeat each column's text so it fills tall viewports; overflow is clipped.
+const leftText = Array(3).fill(left.join('\n\n')).join('\n\n');
+const rightText = Array(3).fill(right.join('\n\n')).join('\n\n');
+---
+
+<div class="code-gutters hidden xl:block" aria-hidden="true" data-pagefind-ignore>
+  <div class="code-gutter code-gutter--left"><pre>{leftText}</pre></div>
+  <div class="code-gutter code-gutter--right"><pre>{rightText}</pre></div>
+</div>
+
+<style>
+  .code-gutter {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+    width: min(360px, max(0px, calc((100vw - 48rem) / 2)));
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    /* Faint, primary-tinted code that reads as texture, not content. */
+    color: color-mix(in oklab, var(--color-primary-600) 22%, var(--color-zinc-300));
+  }
+
+  :global(.dark) .code-gutter {
+    color: color-mix(in oklab, var(--color-primary-400) 22%, var(--color-zinc-700));
+  }
+
+  .code-gutter pre {
+    margin: 0;
+    padding: 2.5rem 1.25rem;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    line-height: 1.55;
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  .code-gutter--left {
+    left: 0;
+  }
+
+  .code-gutter--right {
+    right: 0;
+  }
+
+  /* Push the right column's code toward the outer (opaque) edge. */
+  .code-gutter--right pre {
+    text-align: right;
+  }
+
+  /* Fade toward the reading column (inner edge), with a soft top/bottom
+     falloff so the columns melt into the page instead of hard-cropping. */
+  .code-gutter--left {
+    -webkit-mask-image:
+      linear-gradient(to right, #000 0%, #000 22%, transparent 90%),
+      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, #000 0%, #000 22%, transparent 90%),
+      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
+    mask-composite: intersect;
+  }
+
+  .code-gutter--right {
+    -webkit-mask-image:
+      linear-gradient(to left, #000 0%, #000 22%, transparent 90%),
+      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to left, #000 0%, #000 22%, transparent 90%),
+      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
+    mask-composite: intersect;
+  }
+</style>
