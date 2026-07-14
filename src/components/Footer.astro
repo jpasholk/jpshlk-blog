@@ -1,15 +1,11 @@
 ---
-import CodeBand from '@/components/CodeBand.astro';
-import SocialIcon from '@/components/social-icons/index.astro';
 import { AUTHOR, SITE, SOCIALS } from '@/config';
-import { SNIPPETS } from '@/lib/gutter-code';
+import SocialIcon from '@/components/social-icons/index.astro';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="mx-auto mt-16 w-full max-w-3xl px-4 pb-8 sm:px-6">
-  {/* Mobile/tablet slice of the code-in-the-margins effect. */}
-  <CodeBand code={SNIPPETS.graph} class="-mx-4 -mb-6 sm:-mx-6" />
   <div class="flex flex-col items-center gap-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
     <div class="flex items-center gap-4">
       <SocialIcon kind="mastodon" href={SOCIALS.mastodon} size={6} label="Mastodon" />

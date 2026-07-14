@@ -1,21 +1,26 @@
 ---
 /**
  * Decorative desktop-only effect: columns of this site's own source code in
- * the left and right gutters. The code scrolls with the page (full document
- * height), while fixed "fog" patches in the page's background color sit on
- * top of it. As you scroll, lines of code drift behind the stationary fog
- * and fade in and out.
+ * the left and right gutters, drifting with a parallax feel. The columns are
+ * fixed to the viewport and a scroll-driven animation slides them up by a
+ * set distance (--cg-drift) over the page's full scroll range, so the code
+ * moves slower than the content and never runs out on long pages. Fixed
+ * "fog" patches in the page background color sit on top; as the code drifts
+ * behind them, lines fade in and out through the soft gaps.
  *
- * Purely ornamental: hidden from assistive tech and search, non-interactive,
- * no client JS. Shown only at xl and up, where the centered max-w-3xl column
- * leaves room; below that, CodeBand.astro and the Hero side strips carry the
- * effect instead. Snippets and highlighter live in src/lib/gutter-code.ts.
+ * Browsers without scroll-driven animation support simply ignore
+ * animation-timeline and get calm, stationary columns; reduced-motion users
+ * get the same. Purely ornamental: hidden from assistive tech and search,
+ * non-interactive, no client JS. Shown only at xl and up; below that, the
+ * Hero side strips carry the effect instead. Snippets and highlighter live
+ * in src/lib/gutter-code.ts.
  */
 import GutterCode from '@/components/GutterCode.astro';
 import { SNIPPETS } from '@/lib/gutter-code';
 
-// Repeat enough to cover tall pages; overflow is clipped, fog hides the ends.
-const REPEATS = 12;
+// Columns only need to cover one viewport plus the drift distance, so a
+// handful of repeats is enough regardless of how long the page is.
+const REPEATS = 7;
 const leftCode = Array(REPEATS).fill(`${SNIPPETS.schema}\n\n${SNIPPETS.posts}`).join('\n\n');
 const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).join('\n\n');
 ---
@@ -24,30 +29,55 @@ const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).
   <div class="cg-col cg-col--left"><GutterCode code={leftCode} /></div>
   <div class="cg-col cg-col--right"><GutterCode code={rightCode} /></div>
 
-  {/* Fixed, non-scrolling fog in the page background color. Code scrolls
-      behind it and fades in and out through the soft gaps. */}
+  {/* Fog stays put while the code drifts behind it. */}
   <div class="cg-fog cg-fog--left"></div>
   <div class="cg-fog cg-fog--right"></div>
 </div>
 
 <style>
   .code-gutters {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
     pointer-events: none;
-    overflow: hidden;
   }
 
   .cg-col {
-    position: absolute;
+    --cg-drift: 1200px;
+    position: fixed;
     top: 0;
-    bottom: 0;
     z-index: 0;
+    height: calc(100vh + var(--cg-drift));
     width: min(360px, max(0px, calc((100vw - 48rem) / 2)));
     overflow: hidden;
     user-select: none;
     opacity: 0.6;
+  }
+
+  /* Slower than the content: the column slides up by --cg-drift across the
+     page's entire scroll range. Gated so browsers without scroll-driven
+     animations keep calm, stationary columns. Longhands on purpose: the CSS
+     minifier folds animation-timeline into an animation shorthand, which is
+     invalid and makes the browser drop the whole declaration. */
+  @supports (animation-timeline: scroll()) {
+    .cg-col {
+      animation-name: cg-drift;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+    }
+  }
+
+  @keyframes cg-drift {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-1 * var(--cg-drift)));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cg-col {
+      animation: none;
+    }
   }
 
   :global(.dark) .cg-col {
@@ -67,8 +97,8 @@ const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).
     mask-image: linear-gradient(to left, #000 0%, #000 20%, transparent 92%);
   }
 
-  /* Fixed fog: stays put while the code columns scroll behind it. Same color
-     as the page background, with soft radial patches and transparent gaps. */
+  /* Fixed fog: the code drifts behind it. Same color as the page
+     background, with soft radial patches and transparent gaps. */
   .cg-fog {
     position: fixed;
     top: 0;

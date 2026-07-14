@@ -1,8 +1,8 @@
 /**
  * Shared pieces of the decorative code-in-the-margins effect: real (lightly
  * trimmed) excerpts of this site's own source, plus the tiny highlighter
- * that colors them. Used by CodeGutters.astro (desktop side columns),
- * CodeBand.astro (mobile horizontal bands), and the Hero side strips.
+ * that colors them. Used by CodeGutters.astro (desktop side columns) and
+ * the Hero side strips on mobile.
  *
  * The highlighter is deliberately minimal instead of Shiki: for these
  * short, repeated snippets it produces a fraction of the DOM nodes and raw
