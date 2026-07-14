@@ -160,9 +160,30 @@ const goatcounter =
         container.querySelector('[data-quote-author]')!.textContent = `— ${quote.author}`;
       }
 
+      // Same story for the hero's side code strips: pick a random pair of
+      // snippets from the pool Hero.astro inlines, so the code is different
+      // on every visit. The pool HTML is our own build-time output.
+      function showRandomHeroCode(doc: Document) {
+        const data = doc.querySelector('[data-hero-code-pool]');
+        if (!data?.textContent) return;
+        const pool: string[] = JSON.parse(data.textContent);
+        if (pool.length < 2) return;
+        const leftPre = doc.querySelector('[data-hero-code="left"] pre');
+        const rightPre = doc.querySelector('[data-hero-code="right"] pre');
+        if (!leftPre || !rightPre) return;
+        const left = Math.floor(Math.random() * pool.length);
+        let right = Math.floor(Math.random() * (pool.length - 1));
+        if (right >= left) right += 1;
+        leftPre.innerHTML = pool[left] ?? '';
+        rightPre.innerHTML = pool[right] ?? '';
+      }
+
       showRandomQuote(document);
+      showRandomHeroCode(document);
       document.addEventListener('astro:before-swap', (e) => {
-        showRandomQuote((e as Event & { newDocument: Document }).newDocument);
+        const doc = (e as Event & { newDocument: Document }).newDocument;
+        showRandomQuote(doc);
+        showRandomHeroCode(doc);
       });
     </script>
 

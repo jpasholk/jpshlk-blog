@@ -4,19 +4,26 @@ import avatar from '@/assets/josh.jpeg';
 import Button from '@/components/Button.astro';
 import GutterCode from '@/components/GutterCode.astro';
 import { AUTHOR } from '@/config';
-import { SNIPPETS } from '@/lib/gutter-code';
+import { highlight, SNIPPETS } from '@/lib/gutter-code';
+
+// Pool for the per-visit shuffle (see the hero-code script in
+// BaseLayout.astro): every snippet, pre-highlighted at build time.
+const heroCodePool = Object.values(SNIPPETS).map((code) => highlight(code));
 ---
 
 <section class="relative isolate flex flex-col-reverse items-center gap-8 pt-10 sm:flex-row sm:items-start sm:justify-between sm:pt-16">
   {/* Mobile/tablet slice of the code-in-the-margins effect: faint code
       peeking in from the hero's sides, masked hard toward the middle so it
-      never sits behind the text. Desktop (xl+) gets CodeGutters instead. */}
-  <div class="hero-code hero-code--left xl:hidden" aria-hidden="true" data-pagefind-ignore>
+      never sits behind the text. Desktop (xl+) gets CodeGutters instead.
+      The rendered snippets are only the no-JS default: a BaseLayout script
+      swaps in a random pair from the pool below on every visit. */}
+  <div class="hero-code hero-code--left xl:hidden" aria-hidden="true" data-pagefind-ignore data-hero-code="left">
     <GutterCode code={SNIPPETS.posts} />
   </div>
-  <div class="hero-code hero-code--right xl:hidden" aria-hidden="true" data-pagefind-ignore>
+  <div class="hero-code hero-code--right xl:hidden" aria-hidden="true" data-pagefind-ignore data-hero-code="right">
     <GutterCode code={SNIPPETS.theme} />
   </div>
+  <script type="application/json" data-hero-code-pool set:html={JSON.stringify(heroCodePool)} />
 
   <div class="max-w-xl text-center sm:text-left">
     <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
