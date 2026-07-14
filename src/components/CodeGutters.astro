@@ -1,13 +1,20 @@
 ---
 /**
- * Decorative desktop-only effect: faint columns of this site's own source
- * code in the left and right gutters, most visible at the window edges and
- * fading to nothing toward the reading column. Purely ornamental: hidden
- * from assistive tech and search, non-interactive, no client JS.
+ * Decorative desktop-only effect: columns of this site's own source code in
+ * the left and right gutters. The code scrolls with the page (full document
+ * height), while fixed "fog" patches in the page's background color sit on
+ * top of it. As you scroll, lines of code drift behind the stationary fog
+ * and fade in and out. Lightly syntax-highlighted with a VS Code-ish palette.
  *
- * The snippets below are real (lightly trimmed) excerpts from the codebase.
- * If those files change meaningfully, refresh these so the margins keep
- * telling the truth about how the site works.
+ * Highlighting is a tiny in-house tokenizer rather than Shiki: for these
+ * short, repeated snippets it produces a fraction of the DOM nodes and raw
+ * HTML (Shiki emits a dual-color inline style on nearly every token, which
+ * balloons the invisible markup shipped to mobile). It only wraps keywords,
+ * strings, comments, and numbers; everything else is plain text.
+ *
+ * Purely ornamental: hidden from assistive tech and search, non-interactive,
+ * no client JS. Shown only at xl and up. Snippets are real (lightly trimmed)
+ * excerpts; refresh them if those files change meaningfully.
  */
 
 // Left gutter: content model + post helpers.
@@ -64,78 +71,165 @@ export const postUrl = (post: Post) =>
   \`\${SITE.url}/blog/\${post.id}/\`;`,
 ];
 
-// Repeat each column's text so it fills tall viewports; overflow is clipped.
-const leftText = Array(3).fill(left.join('\n\n')).join('\n\n');
-const rightText = Array(3).fill(right.join('\n\n')).join('\n\n');
+const KEYWORDS =
+  'const|let|var|export|import|from|function|return|async|await|new|typeof|instanceof|if|else|for|of|in|default|class|extends|interface|type|true|false|null|undefined|void|this|Promise|Array|Math|Object|Boolean|String|Number';
+
+const TOKENS = new RegExp(
+  '(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)' + // 1: comment
+    '|(`(?:\\\\.|[^`\\\\])*`|\'(?:\\\\.|[^\'\\\\])*\'|"(?:\\\\.|[^"\\\\])*")' + // 2: string
+    '|\\b(' +
+    KEYWORDS +
+    ')\\b' + // 3: keyword
+    '|\\b(\\d+(?:\\.\\d+)?)\\b', // 4: number
+  'g',
+);
+
+const escapeHtml = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/** Minimal JS/TS highlighter. Escapes first, then wraps a few token kinds. */
+function highlight(code: string): string {
+  return escapeHtml(code).replace(TOKENS, (m, comment, str, kw, num) => {
+    if (comment) return `<i class=c>${comment}</i>`;
+    if (str) return `<i class=s>${str}</i>`;
+    if (kw) return `<i class=k>${kw}</i>`;
+    if (num) return `<i class=n>${num}</i>`;
+    return m;
+  });
+}
+
+// Repeat enough to cover tall pages; overflow is clipped, fog hides the ends.
+const REPEATS = 12;
+const leftHtml = highlight(Array(REPEATS).fill(left.join('\n\n')).join('\n\n'));
+const rightHtml = highlight(Array(REPEATS).fill(right.join('\n\n')).join('\n\n'));
 ---
 
 <div class="code-gutters hidden xl:block" aria-hidden="true" data-pagefind-ignore>
-  <div class="code-gutter code-gutter--left"><pre>{leftText}</pre></div>
-  <div class="code-gutter code-gutter--right"><pre>{rightText}</pre></div>
+  <div class="cg-col cg-col--left"><pre set:html={leftHtml} /></div>
+  <div class="cg-col cg-col--right"><pre set:html={rightHtml} /></div>
+
+  {/* Fixed, non-scrolling fog in the page background color. Code scrolls
+      behind it and fades in and out through the soft gaps. */}
+  <div class="cg-fog cg-fog--left"></div>
+  <div class="cg-fog cg-fog--right"></div>
 </div>
 
 <style>
-  .code-gutter {
-    position: fixed;
+  .code-gutters {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .cg-col {
+    position: absolute;
     top: 0;
     bottom: 0;
     z-index: 0;
     width: min(360px, max(0px, calc((100vw - 48rem) / 2)));
     overflow: hidden;
-    pointer-events: none;
     user-select: none;
-    /* Faint, primary-tinted code that reads as texture, not content. */
-    color: color-mix(in oklab, var(--color-primary-600) 22%, var(--color-zinc-300));
+    opacity: 0.6;
   }
 
-  :global(.dark) .code-gutter {
-    color: color-mix(in oklab, var(--color-primary-400) 22%, var(--color-zinc-700));
+  :global(.dark) .cg-col {
+    opacity: 0.5;
   }
 
-  .code-gutter pre {
+  .cg-col pre {
     margin: 0;
-    padding: 2.5rem 1.25rem;
+    padding: 0.55rem 1.25rem;
     font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
     font-size: 0.72rem;
     line-height: 1.55;
     white-space: pre;
     tab-size: 2;
+    /* VS Code default editor foreground (light / dark). */
+    color: #1f2328;
   }
 
-  .code-gutter--left {
+  :global(.dark) .cg-col pre {
+    color: #d4d4d4;
+  }
+
+  /* VS Code-ish token palette (light-plus / dark-plus). <i> is unstyled
+     otherwise, so no italics leak in. */
+  .cg-col :global(i) {
+    font-style: normal;
+  }
+  .cg-col :global(i.k) {
+    color: #0000ff;
+  }
+  .cg-col :global(i.s) {
+    color: #a31515;
+  }
+  .cg-col :global(i.c) {
+    color: #008000;
+  }
+  .cg-col :global(i.n) {
+    color: #098658;
+  }
+  :global(.dark) .cg-col :global(i.k) {
+    color: #569cd6;
+  }
+  :global(.dark) .cg-col :global(i.s) {
+    color: #ce9178;
+  }
+  :global(.dark) .cg-col :global(i.c) {
+    color: #6a9955;
+  }
+  :global(.dark) .cg-col :global(i.n) {
+    color: #b5cea8;
+  }
+
+  .cg-col--left {
     left: 0;
+    /* Fade toward the reading column (inner/right edge). */
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 20%, transparent 92%);
+    mask-image: linear-gradient(to right, #000 0%, #000 20%, transparent 92%);
   }
 
-  .code-gutter--right {
+  .cg-col--right {
     right: 0;
+    -webkit-mask-image: linear-gradient(to left, #000 0%, #000 20%, transparent 92%);
+    mask-image: linear-gradient(to left, #000 0%, #000 20%, transparent 92%);
   }
 
-  /* Push the right column's code toward the outer (opaque) edge. */
-  .code-gutter--right pre {
-    text-align: right;
+  /* Fixed fog: stays put while the code columns scroll behind it. Same color
+     as the page background, with soft radial patches and transparent gaps. */
+  .cg-fog {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+    width: min(360px, max(0px, calc((100vw - 48rem) / 2)));
+    --fog: var(--color-white);
   }
 
-  /* Fade toward the reading column (inner edge), with a soft top/bottom
-     falloff so the columns melt into the page instead of hard-cropping. */
-  .code-gutter--left {
-    -webkit-mask-image:
-      linear-gradient(to right, #000 0%, #000 22%, transparent 90%),
-      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(to right, #000 0%, #000 22%, transparent 90%),
-      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
-    mask-composite: intersect;
+  :global(.dark) .cg-fog {
+    --fog: var(--color-zinc-950);
   }
 
-  .code-gutter--right {
-    -webkit-mask-image:
-      linear-gradient(to left, #000 0%, #000 22%, transparent 90%),
-      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(to left, #000 0%, #000 22%, transparent 90%),
-      linear-gradient(to bottom, transparent, #000 12%, #000 85%, transparent);
-    mask-composite: intersect;
+  .cg-fog--left {
+    left: 0;
+    background:
+      radial-gradient(135% 13% at 42% 6%, var(--fog) 0%, var(--fog) 42%, transparent 74%),
+      radial-gradient(135% 18% at 58% 27%, var(--fog) 0%, var(--fog) 45%, transparent 78%),
+      radial-gradient(135% 11% at 32% 48%, var(--fog) 0%, var(--fog) 40%, transparent 72%),
+      radial-gradient(135% 19% at 60% 70%, var(--fog) 0%, var(--fog) 46%, transparent 80%),
+      radial-gradient(135% 14% at 36% 92%, var(--fog) 0%, var(--fog) 42%, transparent 76%);
+  }
+
+  .cg-fog--right {
+    right: 0;
+    background:
+      radial-gradient(135% 12% at 55% 10%, var(--fog) 0%, var(--fog) 40%, transparent 72%),
+      radial-gradient(135% 17% at 40% 33%, var(--fog) 0%, var(--fog) 45%, transparent 78%),
+      radial-gradient(135% 13% at 62% 55%, var(--fog) 0%, var(--fog) 42%, transparent 74%),
+      radial-gradient(135% 18% at 38% 76%, var(--fog) 0%, var(--fog) 46%, transparent 80%),
+      radial-gradient(135% 12% at 58% 96%, var(--fog) 0%, var(--fog) 40%, transparent 72%);
   }
 </style>
