@@ -4,109 +4,25 @@
  * the left and right gutters. The code scrolls with the page (full document
  * height), while fixed "fog" patches in the page's background color sit on
  * top of it. As you scroll, lines of code drift behind the stationary fog
- * and fade in and out. Lightly syntax-highlighted with a VS Code-ish palette.
- *
- * Highlighting is a tiny in-house tokenizer rather than Shiki: for these
- * short, repeated snippets it produces a fraction of the DOM nodes and raw
- * HTML (Shiki emits a dual-color inline style on nearly every token, which
- * balloons the invisible markup shipped to mobile). It only wraps keywords,
- * strings, comments, and numbers; everything else is plain text.
+ * and fade in and out.
  *
  * Purely ornamental: hidden from assistive tech and search, non-interactive,
- * no client JS. Shown only at xl and up. Snippets are real (lightly trimmed)
- * excerpts; refresh them if those files change meaningfully.
+ * no client JS. Shown only at xl and up, where the centered max-w-3xl column
+ * leaves room; below that, CodeBand.astro and the Hero side strips carry the
+ * effect instead. Snippets and highlighter live in src/lib/gutter-code.ts.
  */
-
-// Left gutter: content model + post helpers.
-const left = [
-  `const blog = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }),
-  schema: ({ image }) =>
-    z.object({
-      title: z.string(),
-      date: z.coerce.date(),
-      tags: z.array(reference('tags')).default([]),
-      draft: z.boolean().default(false),
-      summary: z.string().optional(),
-      related: z.array(reference('blog')).default([]),
-    }),
-});`,
-  `export async function getPublishedPosts(): Promise<Post[]> {
-  const posts = await getCollection('blog', ({ data }) =>
-    import.meta.env.DEV ? true : !data.draft,
-  );
-  return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-}
-
-/** Whole minutes at ~200 words per minute, never less than 1. */
-export function readingTime(post: Post): number {
-  const words = (post.body ?? '').split(/\\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 200));
-}`,
-];
-
-// Right gutter: the theme pre-paint script + schema graph.
-const right = [
-  `// Apply the theme before first paint, and again after every
-// ClientRouter swap (the new document arrives without the class).
-const apply = () => {
-  const stored = localStorage.getItem('theme');
-  const dark = stored
-    ? stored === 'dark'
-    : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.classList.toggle('dark', dark);
-};
-apply();
-document.addEventListener('astro:after-swap', apply);`,
-  `export const person = buildPiece({
-  '@id': ids.person,
-  '@type': 'Person',
-  name: AUTHOR.name,
-  url: \`\${SITE.url}/\`,
-  jobTitle: AUTHOR.occupation,
-  sameAs: Object.values(SOCIALS),
-});
-
-export const postUrl = (post: Post) =>
-  \`\${SITE.url}/blog/\${post.id}/\`;`,
-];
-
-const KEYWORDS =
-  'const|let|var|export|import|from|function|return|async|await|new|typeof|instanceof|if|else|for|of|in|default|class|extends|interface|type|true|false|null|undefined|void|this|Promise|Array|Math|Object|Boolean|String|Number';
-
-const TOKENS = new RegExp(
-  '(\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/)' + // 1: comment
-    '|(`(?:\\\\.|[^`\\\\])*`|\'(?:\\\\.|[^\'\\\\])*\'|"(?:\\\\.|[^"\\\\])*")' + // 2: string
-    '|\\b(' +
-    KEYWORDS +
-    ')\\b' + // 3: keyword
-    '|\\b(\\d+(?:\\.\\d+)?)\\b', // 4: number
-  'g',
-);
-
-const escapeHtml = (s: string) =>
-  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-/** Minimal JS/TS highlighter. Escapes first, then wraps a few token kinds. */
-function highlight(code: string): string {
-  return escapeHtml(code).replace(TOKENS, (m, comment, str, kw, num) => {
-    if (comment) return `<i class=c>${comment}</i>`;
-    if (str) return `<i class=s>${str}</i>`;
-    if (kw) return `<i class=k>${kw}</i>`;
-    if (num) return `<i class=n>${num}</i>`;
-    return m;
-  });
-}
+import GutterCode from '@/components/GutterCode.astro';
+import { SNIPPETS } from '@/lib/gutter-code';
 
 // Repeat enough to cover tall pages; overflow is clipped, fog hides the ends.
 const REPEATS = 12;
-const leftHtml = highlight(Array(REPEATS).fill(left.join('\n\n')).join('\n\n'));
-const rightHtml = highlight(Array(REPEATS).fill(right.join('\n\n')).join('\n\n'));
+const leftCode = Array(REPEATS).fill(`${SNIPPETS.schema}\n\n${SNIPPETS.posts}`).join('\n\n');
+const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).join('\n\n');
 ---
 
 <div class="code-gutters hidden xl:block" aria-hidden="true" data-pagefind-ignore>
-  <div class="cg-col cg-col--left"><pre set:html={leftHtml} /></div>
-  <div class="cg-col cg-col--right"><pre set:html={rightHtml} /></div>
+  <div class="cg-col cg-col--left"><GutterCode code={leftCode} /></div>
+  <div class="cg-col cg-col--right"><GutterCode code={rightCode} /></div>
 
   {/* Fixed, non-scrolling fog in the page background color. Code scrolls
       behind it and fades in and out through the soft gaps. */}
@@ -136,52 +52,6 @@ const rightHtml = highlight(Array(REPEATS).fill(right.join('\n\n')).join('\n\n')
 
   :global(.dark) .cg-col {
     opacity: 0.5;
-  }
-
-  .cg-col pre {
-    margin: 0;
-    padding: 0.55rem 1.25rem;
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-    font-size: 0.72rem;
-    line-height: 1.55;
-    white-space: pre;
-    tab-size: 2;
-    /* VS Code default editor foreground (light / dark). */
-    color: #1f2328;
-  }
-
-  :global(.dark) .cg-col pre {
-    color: #d4d4d4;
-  }
-
-  /* VS Code-ish token palette (light-plus / dark-plus). <i> is unstyled
-     otherwise, so no italics leak in. */
-  .cg-col :global(i) {
-    font-style: normal;
-  }
-  .cg-col :global(i.k) {
-    color: #0000ff;
-  }
-  .cg-col :global(i.s) {
-    color: #a31515;
-  }
-  .cg-col :global(i.c) {
-    color: #008000;
-  }
-  .cg-col :global(i.n) {
-    color: #098658;
-  }
-  :global(.dark) .cg-col :global(i.k) {
-    color: #569cd6;
-  }
-  :global(.dark) .cg-col :global(i.s) {
-    color: #ce9178;
-  }
-  :global(.dark) .cg-col :global(i.c) {
-    color: #6a9955;
-  }
-  :global(.dark) .cg-col :global(i.n) {
-    color: #b5cea8;
   }
 
   .cg-col--left {

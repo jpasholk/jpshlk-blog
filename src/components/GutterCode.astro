@@ -1,0 +1,65 @@
+---
+/**
+ * One lightly highlighted block of the site's own source, for the
+ * decorative code-in-the-margins effect. Carries the shared monospace
+ * styling and the VS Code-ish token palette (light-plus / dark-plus);
+ * the wrapping component handles placement, masking, and opacity.
+ */
+import { highlight } from '@/lib/gutter-code';
+
+interface Props {
+  code: string;
+  class?: string;
+}
+
+const { code, class: className } = Astro.props;
+---
+
+<pre class:list={[className]} set:html={highlight(code)} />
+
+<style>
+  pre {
+    margin: 0;
+    padding: 0.55rem 1.25rem;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    line-height: 1.55;
+    white-space: pre;
+    tab-size: 2;
+    /* VS Code default editor foreground (light / dark). */
+    color: #1f2328;
+  }
+
+  :global(.dark) pre {
+    color: #d4d4d4;
+  }
+
+  /* Token palette. <i> is otherwise unstyled, so no italics leak in. */
+  pre :global(i) {
+    font-style: normal;
+  }
+  pre :global(i.k) {
+    color: #0000ff;
+  }
+  pre :global(i.s) {
+    color: #a31515;
+  }
+  pre :global(i.c) {
+    color: #008000;
+  }
+  pre :global(i.n) {
+    color: #098658;
+  }
+  :global(.dark) pre :global(i.k) {
+    color: #569cd6;
+  }
+  :global(.dark) pre :global(i.s) {
+    color: #ce9178;
+  }
+  :global(.dark) pre :global(i.c) {
+    color: #6a9955;
+  }
+  :global(.dark) pre :global(i.n) {
+    color: #b5cea8;
+  }
+</style>

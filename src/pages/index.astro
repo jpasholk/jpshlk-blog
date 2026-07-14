@@ -1,10 +1,12 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import CodeBand from '@/components/CodeBand.astro';
 import Hero from '@/components/home/Hero.astro';
 import LatestPosts from '@/components/home/LatestPosts.astro';
 import RandomQuote from '@/components/home/RandomQuote.astro';
 import WorkSection from '@/components/home/WorkSection.astro';
 import { AUTHOR, SITE } from '@/config';
+import { SNIPPETS } from '@/lib/gutter-code';
 import { pageGraph } from '@/lib/schema';
 ---
 
@@ -17,6 +19,8 @@ import { pageGraph } from '@/lib/schema';
     <Hero />
     <WorkSection />
   </div>
+  {/* Mobile/tablet slice of the code-in-the-margins effect. */}
+  <CodeBand code={SNIPPETS.schema} class="-mx-4 mt-6 -mb-4 sm:-mx-6" />
   <LatestPosts />
   <RandomQuote />
 </BaseLayout>

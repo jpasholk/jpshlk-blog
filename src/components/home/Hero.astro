@@ -2,10 +2,22 @@
 import { Image } from 'astro:assets';
 import avatar from '@/assets/josh.jpeg';
 import Button from '@/components/Button.astro';
+import GutterCode from '@/components/GutterCode.astro';
 import { AUTHOR } from '@/config';
+import { SNIPPETS } from '@/lib/gutter-code';
 ---
 
-<section class="flex flex-col-reverse items-center gap-8 pt-10 sm:flex-row sm:items-start sm:justify-between sm:pt-16">
+<section class="relative isolate flex flex-col-reverse items-center gap-8 pt-10 sm:flex-row sm:items-start sm:justify-between sm:pt-16">
+  {/* Mobile/tablet slice of the code-in-the-margins effect: faint code
+      peeking in from the hero's sides, masked hard toward the middle so it
+      never sits behind the text. Desktop (xl+) gets CodeGutters instead. */}
+  <div class="hero-code hero-code--left xl:hidden" aria-hidden="true" data-pagefind-ignore>
+    <GutterCode code={SNIPPETS.posts} />
+  </div>
+  <div class="hero-code hero-code--right xl:hidden" aria-hidden="true" data-pagefind-ignore>
+    <GutterCode code={SNIPPETS.theme} />
+  </div>
+
   <div class="max-w-xl text-center sm:text-left">
     <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">
       👋 I'm Josh
@@ -32,3 +44,59 @@ import { AUTHOR } from '@/config';
     class="size-36 rounded-full object-cover ring-4 ring-primary-500/20 sm:size-40"
   />
 </section>
+
+<style>
+  .hero-code {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    width: 8.5rem;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.55;
+  }
+
+  :global(.dark) .hero-code {
+    opacity: 0.45;
+  }
+
+  /* Bleed through main's padding to the viewport edge. */
+  .hero-code--left {
+    left: -1rem;
+    -webkit-mask-image:
+      linear-gradient(to right, #000 0%, transparent 82%),
+      linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, #000 0%, transparent 82%),
+      linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+    mask-composite: intersect;
+  }
+
+  .hero-code--right {
+    right: -1rem;
+    -webkit-mask-image:
+      linear-gradient(to left, #000 0%, transparent 82%),
+      linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to left, #000 0%, transparent 82%),
+      linear-gradient(to bottom, transparent, #000 15%, #000 85%, transparent);
+    mask-composite: intersect;
+  }
+
+  .hero-code--right :global(pre) {
+    text-align: right;
+  }
+
+  @media (min-width: 640px) {
+    .hero-code--left {
+      left: -1.5rem;
+    }
+    .hero-code--right {
+      right: -1.5rem;
+    }
+  }
+</style>
