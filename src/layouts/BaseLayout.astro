@@ -2,6 +2,7 @@
 import '@/styles/global.css';
 import { ClientRouter, fade } from 'astro:transitions';
 import Seo from '@jdevalk/astro-seo-graph/Seo.astro';
+import CodeGutters from '@/components/CodeGutters.astro';
 import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.astro';
 import { GOATCOUNTER, SITE, SOCIALS } from '@/config';
@@ -126,18 +127,21 @@ const goatcounter =
 
     <ClientRouter />
   </head>
-  <body class="flex min-h-screen flex-col">
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white"
-    >
-      Skip to content
-    </a>
-    <Header />
-    <main id="main" class="mx-auto w-full max-w-3xl grow px-4 sm:px-6">
-      <slot />
-    </main>
-    <Footer />
+  <body class="relative">
+    <CodeGutters />
+    <div class="relative z-10 flex min-h-screen flex-col">
+      <a
+        href="#main"
+        class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white"
+      >
+        Skip to content
+      </a>
+      <Header />
+      <main id="main" class="mx-auto w-full max-w-3xl grow px-4 sm:px-6">
+        <slot />
+      </main>
+      <Footer />
+    </div>
 
     <script>
       // Fills the home page's RandomQuote. Lives here instead of in the
@@ -156,9 +160,30 @@ const goatcounter =
         container.querySelector('[data-quote-author]')!.textContent = `— ${quote.author}`;
       }
 
+      // Same story for the hero's side code strips: pick a random pair of
+      // snippets from the pool Hero.astro inlines, so the code is different
+      // on every visit. The pool HTML is our own build-time output.
+      function showRandomHeroCode(doc: Document) {
+        const data = doc.querySelector('[data-hero-code-pool]');
+        if (!data?.textContent) return;
+        const pool: string[] = JSON.parse(data.textContent);
+        if (pool.length < 2) return;
+        const leftPre = doc.querySelector('[data-hero-code="left"] pre');
+        const rightPre = doc.querySelector('[data-hero-code="right"] pre');
+        if (!leftPre || !rightPre) return;
+        const left = Math.floor(Math.random() * pool.length);
+        let right = Math.floor(Math.random() * (pool.length - 1));
+        if (right >= left) right += 1;
+        leftPre.innerHTML = pool[left] ?? '';
+        rightPre.innerHTML = pool[right] ?? '';
+      }
+
       showRandomQuote(document);
+      showRandomHeroCode(document);
       document.addEventListener('astro:before-swap', (e) => {
-        showRandomQuote((e as Event & { newDocument: Document }).newDocument);
+        const doc = (e as Event & { newDocument: Document }).newDocument;
+        showRandomQuote(doc);
+        showRandomHeroCode(doc);
       });
     </script>
 
