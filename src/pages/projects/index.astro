@@ -16,8 +16,8 @@ const projects = (await getCollection('projects')).sort(
 >
   <div data-pagefind-body>
     <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Projects</h1>
-    <div class="mt-8 grid gap-4 sm:grid-cols-2">
-      {projects.map((project) => <ProjectCard project={project} />)}
+    <div class="mt-8 flex flex-col gap-4">
+      {projects.map((project) => <ProjectCard project={project} imageWidth={700} layout="horizontal" />)}
     </div>
   </div>
 </BaseLayout>
