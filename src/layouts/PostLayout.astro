@@ -1,5 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CodeCopy from '@/components/CodeCopy.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
@@ -56,6 +56,19 @@ const ogImage = ogSource
   graph={postGraph(post)}
 >
   <article class="pt-10" data-pagefind-body>
+    {
+      featureImage && (
+        <Image
+          src={featureImage.src}
+          alt={featureImage.alt ?? title}
+          width={1400}
+          class="mb-8 rounded-xl"
+          loading="eager"
+          transition:name={`post-image-${post.id}`}
+          transition:animate="initial"
+        />
+      )
+    }
     <header class="border-b border-zinc-200 pb-8 text-center dark:border-zinc-800">
       <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400" data-pagefind-ignore>
         <FormattedDate date={date} />
