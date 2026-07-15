@@ -2,7 +2,7 @@
 title: iOS Shortcuts
 description: 'Automations for iPhone and Mac built with the Shortcuts app: utilities, toolkits, and experiments published on RoutineHub.'
 url: https://routinehub.co/user/jpasholk
-linkLabel: RoutineHub profile
+linkLabel: RoutineHub
 image: ../../assets/scsetings-hero.png
 imageAlt: 'A hand holding an iPhone that shows the SCSettings shortcut menu of system toggles, with a blurred iced coffee in the background.'
 featured: true
