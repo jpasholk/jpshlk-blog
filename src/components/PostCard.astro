@@ -1,4 +1,11 @@
 ---
+/**
+ * Post entry for the blog index and the homepage latest-posts list.
+ * Posts with a featureImage show it beside the text, matching the
+ * project cards' horizontal layout; posts without one keep the
+ * text-only row.
+ */
+import { Image } from 'astro:assets';
 import FormattedDate from '@/components/FormattedDate.astro';
 import TagPill from '@/components/TagPill.astro';
 import { readingTime, type Post } from '@/lib/posts';
@@ -8,44 +15,62 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, date, summary, tags } = post.data;
+const { title, date, summary, tags, featureImage } = post.data;
 ---
 
-<article class="py-8">
-  <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-    <FormattedDate date={date} />
-    <span aria-hidden="true"> · </span>{readingTime(post)} min read
-  </p>
-  <h3 class="mt-1 text-xl font-bold tracking-tight">
-    <a
-      href={`/blog/${post.id}/`}
-      class="hover:text-primary-600 dark:hover:text-primary-400"
-      transition:name={`post-title-${post.id}`}
-    >
-      {title}
-    </a>
-  </h3>
+<article class="flex flex-col gap-6 py-8 sm:flex-row sm:items-center">
   {
-    tags.length > 0 && (
-      <p class="mt-1">
-        {tags.map((tag) => (
-          <TagPill slug={tag.id} />
-        ))}
-      </p>
+    featureImage && (
+      <a
+        href={`/blog/${post.id}/`}
+        aria-label={`Read "${title}"`}
+        class="block sm:w-2/5 sm:flex-none"
+      >
+        <Image
+          src={featureImage.src}
+          alt={featureImage.alt ?? title}
+          width={700}
+          class="rounded-lg"
+        />
+      </a>
     )
   }
-  {
-    summary && (
-      <p class="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">{summary}</p>
-    )
-  }
-  <p class="mt-3">
-    <a
-      href={`/blog/${post.id}/`}
-      aria-label={`Read "${title}"`}
-      class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
-    >
-      Read more &rarr;
-    </a>
-  </p>
+  <div class="min-w-0">
+    <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+      <FormattedDate date={date} />
+      <span aria-hidden="true"> · </span>{readingTime(post)} min read
+    </p>
+    <h3 class="mt-1 text-xl font-bold tracking-tight">
+      <a
+        href={`/blog/${post.id}/`}
+        class="hover:text-primary-600 dark:hover:text-primary-400"
+        transition:name={`post-title-${post.id}`}
+      >
+        {title}
+      </a>
+    </h3>
+    {
+      tags.length > 0 && (
+        <p class="mt-1">
+          {tags.map((tag) => (
+            <TagPill slug={tag.id} />
+          ))}
+        </p>
+      )
+    }
+    {
+      summary && (
+        <p class="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">{summary}</p>
+      )
+    }
+    <p class="mt-3">
+      <a
+        href={`/blog/${post.id}/`}
+        aria-label={`Read "${title}"`}
+        class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400"
+      >
+        Read more &rarr;
+      </a>
+    </p>
+  </div>
 </article>
