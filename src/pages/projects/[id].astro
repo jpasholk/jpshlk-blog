@@ -18,7 +18,7 @@ export const getStaticPaths = (async () => {
 
 const { project } = Astro.props;
 const { id } = project;
-const { title, description, url, linkLabel, image, imageAlt } = project.data;
+const { title, description, url, linkLabel, repo, image, imageAlt } = project.data;
 const { Content } = await render(project);
 
 // Share image is generated at build time from the project image.
@@ -64,9 +64,14 @@ const ogImage = image
       {description}
     </p>
     <div class="mt-6 flex flex-wrap gap-3">
-      <Button href={url} variant="primary" target="_blank" rel="noopener noreferrer">
-        {linkLabel}
-      </Button>
+      <Button href={url} variant="primary">{linkLabel}</Button>
+      {
+        repo && (
+          <Button href={repo} variant="ghost">
+            Source on GitHub
+          </Button>
+        )
+      }
       <Button href="/projects/" variant="ghost">All projects</Button>
     </div>
     <div class="mt-8">
