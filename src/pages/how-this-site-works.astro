@@ -8,7 +8,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { pageGraph } from '@/lib/schema';
 
 const description =
-  "A visual tour of how this site's Astro components, layouts, and slots fit together, from build time to the browser.";
+  'A beginner-friendly tour of how this site works: Astro components and slots, the writing workflow, search, analytics, and the trip from git push to your screen.';
 
 // Diagram vocabulary, shared across all six sections.
 const box = 'rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900';
@@ -35,9 +35,10 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
   <header class="pt-10">
     <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">How this site works</h1>
     <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
-      Six diagrams of this site's anatomy: what runs at build time, how layouts
-      and slots compose pages, where the data comes from, and the little bit of
-      JavaScript that runs in your browser right now.
+      A guided tour of this site's anatomy, no web dev background needed:
+      what runs at build time, how pages compose, how a post gets written,
+      where images, search, and analytics fit, and the full trip from my
+      laptop to your screen.
     </p>
     <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-zinc-200 pt-4 text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
       <span class="inline-flex items-center gap-2">
@@ -86,6 +87,7 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
             <p class={leaf}><span class={filePath}>index.html, blog/&hellip;/index.html</span></p>
             <p class={leaf}><span class={filePath}>rss.xml, sitemap, llms.txt</span></p>
             <p class={leaf}><span class={filePath}>optimized images + one CSS file</span></p>
+            <p class={leaf}><span class={filePath}>pagefind/ (the search index, see 8)</span></p>
           </div>
         </div>
       </div>
@@ -121,7 +123,6 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
         </p>
         <pre class={pre}>&lt;BaseLayout title="Josh Pasholk"&gt;
   <span class="font-semibold text-primary-700 dark:text-primary-300">&lt;Hero /&gt;
-  &lt;About /&gt;
   &lt;WorkSection /&gt;
   &lt;LatestPosts /&gt;
   &lt;RandomQuote /&gt;</span> <span class="text-zinc-500">&larr; all of this lands
@@ -149,16 +150,16 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
             <span class={chip}>theme script (is:inline)</span>
             <span class={chip}>&lt;Seo /&gt; meta + JSON-LD</span>
             <span class={chip}>&lt;ClientRouter /&gt;</span>
+            <span class={chip}>Pagefind loader script</span>
           </p>
           <p class={leaf}>
             <span class={boxLabel}>Header</span>
-            <span class={filePath}> nav + ThemeToggle + mobile menu</span>
+            <span class={filePath}> nav + search button and modal + ThemeToggle + mobile menu</span>
           </p>
           <div class={slotBox}>
             <span class={slotTag}>&lt;slot /&gt; : filled by src/pages/index.astro</span>
             <div class="flex flex-col gap-2">
               <p class={leaf}><span class={boxLabel}>Hero</span> <span class={filePath}>components/home/Hero.astro</span></p>
-              <p class={leaf}><span class={boxLabel}>About</span> <span class={filePath}>components/home/About.astro</span></p>
               <p class={leaf}><span class={boxLabel}>WorkSection</span> <span class={filePath}>reads the projects collection</span></p>
               <div class="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
                 <p class={boxLabel}>LatestPosts</p>
@@ -278,8 +279,183 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
     </p>
   </section>
 
-  <section class="mb-16">
-    <h2 class={h2}><span class={num}>6</span>The browser layer: what happens on a click</h2>
+  <section>
+    <h2 class={h2}><span class={num}>6</span>How a post gets written</h2>
+    <p class={caption}>
+      Every post is one file: Markdown for the writing, plus a small settings
+      block at the top called frontmatter. That block is data, not prose, and
+      it drives everything the site knows about the post.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+          The settings block (frontmatter)
+        </p>
+        <pre class={pre}>---
+title: My Great Post
+date: '2026-07-11'
+summary: 'One or two sentences.'
+tags: ['astro', 'apps']
+<span class="font-semibold text-primary-700 dark:text-primary-300">draft: true</span>  <span class="text-zinc-500">&larr; hides it from the live site</span>
+---
+
+The actual writing starts here.</pre>
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+          What each line feeds
+        </p>
+        <div class="flex flex-col gap-2">
+          <p class={leaf}><span class={filePath}>title &rarr; the h1, the browser tab, search results</span></p>
+          <p class={leaf}><span class={filePath}>date &rarr; sorting, the archive, the RSS feed</span></p>
+          <p class={leaf}><span class={filePath}>summary &rarr; post cards and link previews</span></p>
+          <p class={leaf}><span class={filePath}>tags &rarr; must match a real tag page, checked at build</span></p>
+          <p class={leaf}><span class={filePath}>draft &rarr; true renders in dev only</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">The spell-checker:</strong> a schema in <code class="font-mono text-xs">src/content.config.ts</code> validates every settings block at build time. A misspelled tag, a bad date, a missing title: the build fails and tells me which file, before anything reaches the internet.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Publishing</strong> is deleting one line. Drafts render on my machine in <code class="font-mono text-xs">npm run dev</code> so I can preview them; remove <code class="font-mono text-xs">draft: true</code>, push, and the post is live a few minutes later (section 13 covers that trip).
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>7</span>Images: three jobs, one build</h2>
+    <p class={caption}>
+      There are 36 original images in <code class="font-mono text-sm">src/assets/</code>,
+      and posts reference them with plain markdown. Nobody resizes anything by
+      hand; the build does all three image jobs.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-140 items-center">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Originals</p>
+          <p class={`${filePath} mb-3`}>src/assets/</p>
+          <div class="flex flex-col gap-2">
+            <p class={leaf}><span class={filePath}>full-size photos + screenshots</span></p>
+            <p class={leaf}><span class={filePath}>referenced by 22 posts and Hero.astro</span></p>
+          </div>
+        </div>
+        <div class={arrow}>
+          <span class={arrowLabel}>astro build</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Optimized copies</p>
+          <p class={`${filePath} mb-3`}>dist/_astro/</p>
+          <div class="flex flex-col gap-2">
+            <p class={leaf}><span class={filePath}>resized, compressed, hashed filenames</span></p>
+            <p class={leaf}><span class={filePath}>share images: one per post, for link previews</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Job one, content images:</strong> a markdown <code class="font-mono text-xs">![alt](../../assets/photo.jpg)</code> in a post (or the <code class="font-mono text-xs">&lt;Image /&gt;</code> component in Hero) comes out the other side compressed and cache-friendly, automatically.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Job two, share images:</strong> PostLayout renders each post's feature image to a link-preview version at build time: capped at 1200px wide, never upscaled, and kept as PNG or JPEG because some link crawlers still choke on modern formats.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Job three, the passthrough bucket:</strong> <code class="font-mono text-xs">public/</code> is for files that must not be touched: favicons, <code class="font-mono text-xs">robots.txt</code>, the redirects file, and the default share image. They are copied into <code class="font-mono text-xs">dist/</code> exactly as-is.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>8</span>Search: no server, and a second kind of component</h2>
+    <p class={caption}>
+      The search button in the header (Cmd+K works too) and the{' '}
+      <a href="/search/" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">/search/</a> page
+      run on <a href="https://pagefind.app" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">Pagefind</a>, which indexes the finished HTML right after the build.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-180 items-center">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Built pages</p>
+          <p class={`${filePath} mb-3`}>dist/**/*.html</p>
+          <p class={leaf}><span class={filePath}>only pages marked data-pagefind-body: posts, home, /about/, /projects/</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>pagefind --site dist</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Search index</p>
+          <p class={`${filePath} mb-3`}>dist/pagefind/</p>
+          <p class={leaf}><span class={filePath}>index chunks + the UI bundle, all static files</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>your query</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Your browser</p>
+          <p class={`${filePath} mb-3`}>no API, no server</p>
+          <p class={leaf}><span class={filePath}>downloads only the tiny chunks that match</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">A second kind of component:</strong> everything in sections 2 through 4 was Astro components, which run at build time and disappear. The search UI is the opposite: <em>web components</em>, custom HTML tags that a script brings to life in your browser. The header renders just this:
+    </p>
+    <pre class={`${pre} mt-3`}>&lt;pagefind-modal-trigger instance="modal" compact&gt;&lt;/pagefind-modal-trigger&gt;
+&lt;pagefind-modal instance="modal" reset-on-close&gt;&lt;/pagefind-modal&gt;</pre>
+    <p class={note}>
+      The empty <code class="font-mono text-xs">&lt;pagefind-modal&gt;</code> builds its own input, results, and keyboard hints once the loader script (that chip in section 3's diagram) fetches the bundle. In dev there is no index yet, so a CSS rule hides the undefined tags and the search page shows a fallback note instead.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>9</span>Dark mode in three moving parts</h2>
+    <p class={caption}>
+      The theme toggle looks like one button, but making it flicker-free
+      takes three pieces working together.
+    </p>
+    <ol class="relative flex flex-col gap-6 border-l-2 border-zinc-200 pl-6 dark:border-zinc-800">
+      <li class="relative">
+        <span class="absolute top-1.5 -left-[31px] size-3.5 rounded-full border-[3px] border-primary-500 bg-white dark:bg-zinc-950" aria-hidden="true"></span>
+        <p class="font-semibold">One class rules everything</p>
+        <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
+          Dark mode is just a <code class="font-mono text-xs">dark</code> class on the page's root element. Every dark style
+          in the CSS keys off that single class, so adding or removing it
+          re-themes the whole page instantly. No reload, no per-element logic.
+        </p>
+      </li>
+      <li class="relative">
+        <span class="absolute top-1.5 -left-[31px] size-3.5 rounded-full border-[3px] border-primary-500 bg-white dark:bg-zinc-950" aria-hidden="true"></span>
+        <p class="font-semibold">The no-flash trick</p>
+        <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
+          A tiny script at the very top of the page reads your saved choice
+          (or your system preference) and sets the class <em>before the first
+          pixel renders</em>. Without it, dark mode users would see a white
+          flash on every visit. It re-runs after each page swap too, because
+          the incoming page arrives without the class.
+        </p>
+      </li>
+      <li class="relative">
+        <span class="absolute top-1.5 -left-[31px] size-3.5 rounded-full border-[3px] border-primary-500 bg-white dark:bg-zinc-950" aria-hidden="true"></span>
+        <p class="font-semibold">The toggle remembers</p>
+        <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
+          Clicking the sun/moon flips the class and saves your choice in the
+          browser's <code class="font-mono text-xs">localStorage</code>, so it sticks across visits. It also stamps a
+          <code class="font-mono text-xs">data-pf-theme</code> attribute that the search UI (section 8) reads to
+          switch its own dark scheme.
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>10</span>The browser layer: what happens on a click</h2>
     <p class={caption}>
       Almost everything above ran at build time. Here is the small amount of
       JavaScript that actually runs for you, the visitor, in order, when you
@@ -318,12 +494,138 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           ThemeToggle and the mobile menu re-bind their click handlers to the
           fresh DOM, RandomQuote picks a new quote, and the GitHub buttons
-          script re-runs on posts that need it.
+          script re-runs on posts that need it. The Pagefind loader also runs
+          here: it fetches the search components once per visit and prunes
+          anything from their registry that the swap just removed, so the
+          search button never points at a dead modal.
         </p>
       </li>
     </ol>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">The house rule that keeps all this working:</strong> on a view-transitions site, any JavaScript that touches the page must run on <code class="font-mono text-xs">astro:page-load</code>, not just once at startup.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>11</span>Analytics that do not follow you</h2>
+    <p class={caption}>
+      I want to know if anyone reads this site, not who you are. Pageviews are
+      counted by <a href="https://www.goatcounter.com" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">GoatCounter</a>,
+      an open source, privacy-first counter. That is why there is no cookie
+      banner here: there is nothing to consent to.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class={box}>
+        <p class={boxLabel}>What it sees</p>
+        <div class="mt-3 flex flex-col gap-2">
+          <p class={leaf}><span class={filePath}>which page was viewed</span></p>
+          <p class={leaf}><span class={filePath}>which site linked here (the referrer)</span></p>
+          <p class={leaf}><span class={filePath}>rough totals, on a public-style dashboard</span></p>
+        </div>
+      </div>
+      <div class={box}>
+        <p class={boxLabel}>What it never does</p>
+        <div class="mt-3 flex flex-col gap-2">
+          <p class={leaf}><span class={filePath}>no cookies, so nothing to accept</span></p>
+          <p class={leaf}><span class={filePath}>no fingerprinting, no ad networks</span></p>
+          <p class={leaf}><span class={filePath}>no following you to other sites</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Only in production:</strong> the script renders only on real production deploys. Local dev and preview deploys ship literally zero analytics bytes, not a disabled script, no script at all.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">One view transitions wrinkle:</strong> page swaps are not real page loads, so automatic counting is off and each swap is counted once on <code class="font-mono text-xs">astro:page-load</code> (the same event from section 10). Otherwise reading five posts would count as one view, or one view as ten.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>12</span>Pages for robots</h2>
+    <p class={caption}>
+      Humans get the HTML pages. The same build also writes files meant only
+      for machines, and hires a few robots to proofread my work.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class={`${box} min-w-130`}>
+        <p class={boxLabel}>Machine-readable outputs in dist/</p>
+        <p class={`${filePath} mb-3`}>generated fresh on every build</p>
+        <div class="flex flex-col gap-2">
+          <p class={leaf}>
+            <span class={boxLabel}>rss.xml</span>
+            <span class={filePath}> the whole post in the feed, not a teaser, so feed readers get everything</span>
+          </p>
+          <p class={leaf}>
+            <span class={boxLabel}>sitemap</span>
+            <span class={filePath}> a map of every page, for search engine crawlers</span>
+          </p>
+          <p class={leaf}>
+            <span class={boxLabel}>JSON-LD in every head</span>
+            <span class={filePath}> schema.org data describing the page, the site, and me, all agreeing with each other</span>
+          </p>
+          <p class={leaf}>
+            <span class={boxLabel}>llms.txt</span>
+            <span class={filePath}> a curated text index of the real content, for AI tools that read sites</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">The proofreading robots:</strong> validators run during every build and FAIL it on a missing h1, a dead internal link, or a page title or description that is too long or too short. A broken link cannot reach the live site because the build that contains it never finishes.
+    </p>
+  </section>
+
+  <section class="mb-16">
+    <h2 class={h2}><span class={num}>13</span>From my laptop to your screen</h2>
+    <p class={caption}>
+      Nothing here uploads files to a server by hand. The whole publish flow
+      is: change something, commit it, push. Everything after that is
+      automatic.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-180 items-center">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>My laptop</p>
+          <p class={`${filePath} mb-3`}>(or an AI session)</p>
+          <p class={leaf}><span class={filePath}>edit, commit, git push</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>push</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>GitHub</p>
+          <p class={`${filePath} mb-3`}>the code's home</p>
+          <p class={leaf}><span class={filePath}>keeps history, notifies Netlify</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>webhook</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Netlify</p>
+          <p class={`${filePath} mb-3`}>npm run build</p>
+          <p class={leaf}><span class={filePath}>Astro builds, Pagefind indexes, validators check</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>publish dist/</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>A CDN near you</p>
+          <p class={`${filePath} mb-3`}>jpshlk.com</p>
+          <p class={leaf}><span class={filePath}>static files, served fast, worldwide</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Safe experiments:</strong> only the <code class="font-mono text-xs">main</code> branch publishes to jpshlk.com. Work happens on other branches, and each one gets its own private preview URL built exactly the same way, so every change is reviewed on a real deploy before it merges. This very page was checked on a preview URL before you ever saw it.
     </p>
     <p class={note}>
       One last thing: this page is itself a box in the section 3 diagram. You

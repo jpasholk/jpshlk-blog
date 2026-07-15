@@ -6,6 +6,7 @@ import FormattedDate from '@/components/FormattedDate.astro';
 import Prose from '@/components/Prose.astro';
 import RelatedPosts from '@/components/RelatedPosts.astro';
 import TagPill from '@/components/TagPill.astro';
+import type { MarkdownHeading } from 'astro';
 import { readingTime, type Post } from '@/lib/posts';
 import { postDateModified, postGraph } from '@/lib/schema';
 import { assetBase } from '@/lib/urls';
@@ -14,9 +15,15 @@ interface Props {
   post: Post;
   prev?: Post;
   next?: Post;
+  headings?: MarkdownHeading[];
 }
 
-const { post, prev, next } = Astro.props;
+const { post, prev, next, headings = [] } = Astro.props;
+
+// "On this page" only earns its space on longer posts: three or more
+// h2 sections. h3s render nested under their h2.
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = tocHeadings.filter((h) => h.depth === 2).length >= 3;
 const { title, date, lastmod, summary, tags, seo, featureImage, canonicalUrl } = post.data;
 
 // Share images are generated at build time from one full-size source.
@@ -48,9 +55,9 @@ const ogImage = ogSource
   }}
   graph={postGraph(post)}
 >
-  <article class="pt-10">
+  <article class="pt-10" data-pagefind-body>
     <header class="border-b border-zinc-200 pb-8 text-center dark:border-zinc-800">
-      <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+      <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400" data-pagefind-ignore>
         <FormattedDate date={date} />
         <span aria-hidden="true"> · </span>{readingTime(post)} min read
         {
@@ -78,6 +85,29 @@ const ogImage = ogSource
         )
       }
     </header>
+
+    {
+      showToc && (
+        <details
+          class="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+          data-pagefind-ignore
+        >
+          <summary class="cursor-pointer text-sm font-semibold">On this page</summary>
+          <ul class="mt-2 flex flex-col gap-1 text-sm">
+            {tocHeadings.map((heading) => (
+              <li class={heading.depth === 3 ? 'pl-4' : ''}>
+                <a
+                  href={`#${heading.slug}`}
+                  class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400"
+                >
+                  {heading.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )
+    }
 
     <div class="py-8">
       <Prose>

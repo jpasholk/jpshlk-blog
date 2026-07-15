@@ -41,7 +41,7 @@ const ogImage = image
   ogImageHeight={ogImage?.attributes.height}
   graph={pageGraph(title, `/projects/${id}/`, description)}
 >
-  <article class="pt-10">
+  <article class="pt-10" data-pagefind-body>
     {
       image && (
         <Image

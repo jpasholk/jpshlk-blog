@@ -41,6 +41,8 @@
       button.addEventListener('click', () => {
         const dark = !document.documentElement.classList.contains('dark');
         document.documentElement.classList.toggle('dark', dark);
+        // Pagefind's Component UI keys its dark scheme off this attribute.
+        document.documentElement.dataset.pfTheme = dark ? 'dark' : 'light';
         localStorage.setItem('theme', dark ? 'dark' : 'light');
       });
     }

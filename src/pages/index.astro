@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import About from '@/components/home/About.astro';
 import Hero from '@/components/home/Hero.astro';
 import LatestPosts from '@/components/home/LatestPosts.astro';
 import RandomQuote from '@/components/home/RandomQuote.astro';
@@ -14,9 +13,10 @@ import { pageGraph } from '@/lib/schema';
   description={SITE.description}
   graph={pageGraph(SITE.title, '/', SITE.description)}
 >
-  <Hero />
-  <About />
-  <WorkSection />
+  <div data-pagefind-body data-pagefind-meta="title:Home">
+    <Hero />
+    <WorkSection />
+  </div>
   <LatestPosts />
   <RandomQuote />
 </BaseLayout>

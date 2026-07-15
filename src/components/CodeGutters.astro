@@ -1,0 +1,167 @@
+---
+/**
+ * Decorative desktop-only effect: columns of this site's own source code in
+ * the left and right gutters, drifting with a parallax feel. The columns
+ * are fixed to the viewport and a scroll listener slides them up at a
+ * constant fraction of the content's scroll speed (--cg-speed), so the
+ * code always reads as clearly slower than the page. On very long pages
+ * the total slide is capped at --cg-max-drift (the ratio eases down so
+ * the columns never run out). Fixed "fog" patches in the page background
+ * color sit on top; as the code drifts behind them, lines fade in and
+ * out through the soft gaps.
+ *
+ * The drift is driven by JS in every browser on purpose. A CSS
+ * scroll-driven animation looked ideal and worked in Chrome, but Safari
+ * passes the animation-timeline feature check without reliably animating
+ * fixed, masked elements, so feature detection picks the broken path
+ * (and the CSS minifier folds animation-timeline into an invalid
+ * animation shorthand that kills the declaration outright). One tiny
+ * scroll listener behaves identically everywhere.
+ *
+ * Purely ornamental: hidden from assistive tech and search,
+ * non-interactive, static without JS or under reduced motion. Shown only
+ * at xl and up; below that, the Hero side strips carry the effect
+ * instead. Snippets and highlighter live in src/lib/gutter-code.ts.
+ */
+import GutterCode from '@/components/GutterCode.astro';
+import { SNIPPETS } from '@/lib/gutter-code';
+
+// Columns only need to cover one viewport plus the maximum drift, so a
+// handful of repeats is enough regardless of how long the page is.
+const REPEATS = 9;
+const leftCode = Array(REPEATS).fill(`${SNIPPETS.schema}\n\n${SNIPPETS.posts}`).join('\n\n');
+const rightCode = Array(REPEATS).fill(`${SNIPPETS.theme}\n\n${SNIPPETS.graph}`).join('\n\n');
+---
+
+<div class="code-gutters hidden xl:block" aria-hidden="true" data-pagefind-ignore>
+  <div class="cg-col cg-col--left"><GutterCode code={leftCode} /></div>
+  <div class="cg-col cg-col--right"><GutterCode code={rightCode} /></div>
+
+  {/* Fog stays put while the code drifts behind it. */}
+  <div class="cg-fog cg-fog--left"></div>
+  <div class="cg-fog cg-fog--right"></div>
+</div>
+
+<style>
+  .code-gutters {
+    pointer-events: none;
+  }
+
+  .cg-col {
+    /* Code speed as a fraction of content speed, and the cap on how far
+       the columns may slide in total (which also sizes them). */
+    --cg-speed: 0.35;
+    --cg-max-drift: 2400px;
+    position: fixed;
+    top: 0;
+    z-index: 0;
+    height: calc(100vh + var(--cg-max-drift));
+    width: min(360px, max(0px, calc((100vw - 48rem) / 2)));
+    overflow: hidden;
+    user-select: none;
+    opacity: 0.6;
+    will-change: transform;
+  }
+
+  :global(.dark) .cg-col {
+    opacity: 0.5;
+  }
+
+  .cg-col--left {
+    left: 0;
+    /* Fade toward the reading column (inner/right edge). */
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 20%, transparent 92%);
+    mask-image: linear-gradient(to right, #000 0%, #000 20%, transparent 92%);
+  }
+
+  .cg-col--right {
+    right: 0;
+    -webkit-mask-image: linear-gradient(to left, #000 0%, #000 20%, transparent 92%);
+    mask-image: linear-gradient(to left, #000 0%, #000 20%, transparent 92%);
+  }
+
+  /* Fixed fog: the code drifts behind it. Same color as the page
+     background. Blob sizes, positions, and edge softness are deliberately
+     irregular so the fog reads as natural drift instead of even bands,
+     but each blob is large and wispy so reveals fade gently during
+     scrolling instead of flickering. */
+  .cg-fog {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+    width: min(360px, max(0px, calc((100vw - 48rem) / 2)));
+    --fog: var(--color-white);
+  }
+
+  :global(.dark) .cg-fog {
+    --fog: var(--color-zinc-950);
+  }
+
+  .cg-fog--left {
+    left: 0;
+    background:
+      radial-gradient(160% 16% at 35% 5%, var(--fog) 0%, var(--fog) 30%, transparent 85%),
+      radial-gradient(120% 22% at 65% 22%, var(--fog) 0%, var(--fog) 35%, transparent 88%),
+      radial-gradient(170% 14% at 28% 42%, var(--fog) 0%, var(--fog) 28%, transparent 82%),
+      radial-gradient(110% 20% at 70% 58%, var(--fog) 0%, var(--fog) 34%, transparent 86%),
+      radial-gradient(150% 15% at 40% 76%, var(--fog) 0%, var(--fog) 30%, transparent 84%),
+      radial-gradient(130% 18% at 60% 95%, var(--fog) 0%, var(--fog) 32%, transparent 86%);
+  }
+
+  .cg-fog--right {
+    right: 0;
+    background:
+      radial-gradient(140% 18% at 60% 8%, var(--fog) 0%, var(--fog) 32%, transparent 86%),
+      radial-gradient(165% 13% at 30% 27%, var(--fog) 0%, var(--fog) 28%, transparent 82%),
+      radial-gradient(115% 21% at 68% 45%, var(--fog) 0%, var(--fog) 35%, transparent 88%),
+      radial-gradient(155% 14% at 35% 63%, var(--fog) 0%, var(--fog) 30%, transparent 84%),
+      radial-gradient(125% 19% at 65% 80%, var(--fog) 0%, var(--fog) 33%, transparent 86%),
+      radial-gradient(145% 15% at 42% 97%, var(--fog) 0%, var(--fog) 30%, transparent 84%);
+  }
+</style>
+
+<script>
+  // Drives the drift (see the component comment for why this is JS in
+  // every browser). The code moves at --cg-speed of the content's speed;
+  // on pages long enough that full-speed drift would exceed
+  // --cg-max-drift, the ratio eases down so the columns never run out.
+  // The listeners live on the persistent window and document, so they
+  // survive ClientRouter swaps; astro:page-load re-reads the config and
+  // re-syncs each new page (fresh columns, restored scroll position).
+  // The transform is written directly in the scroll handler (two cheap
+  // style writes) so it tracks the scroll position without rAF lag.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktop = window.matchMedia('(min-width: 80rem)'); // Tailwind xl
+
+  let speed = 0.35;
+  let maxDrift = 2400;
+
+  function apply() {
+    if (reduceMotion.matches || !desktop.matches) return;
+    const cols = document.querySelectorAll<HTMLElement>('.cg-col');
+    if (!cols.length) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio = max > 0 ? Math.min(speed, maxDrift / max) : 0;
+    const y = Math.min(maxDrift, Math.max(0, ratio * window.scrollY));
+    for (const col of cols) {
+      col.style.transform = `translateY(${-y}px)`;
+    }
+  }
+
+  function sync() {
+    const col = document.querySelector('.cg-col');
+    if (col) {
+      const styles = getComputedStyle(col);
+      speed = parseFloat(styles.getPropertyValue('--cg-speed')) || speed;
+      maxDrift = parseFloat(styles.getPropertyValue('--cg-max-drift')) || maxDrift;
+    }
+    apply();
+  }
+
+  window.addEventListener('scroll', apply, { passive: true });
+  window.addEventListener('resize', sync, { passive: true });
+  document.addEventListener('astro:page-load', sync);
+  sync();
+</script>
