@@ -1,0 +1,53 @@
+<!-- Source for public/og-default.png. Regenerate after edits with:
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --force-device-scale-factor=1 --window-size=1200,630 --screenshot=public/og-default.png "file://$PWD/docs/og-banner.html"
+  (Fix the font src path below to node_modules/@fontsource-variable/inter/... relative to your checkout.) --><!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face {
+    font-family: 'Inter Variable';
+    src: url('file:///Users/josh_work/Documents/GitHub/jpshlk-blog/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2-variations');
+    font-weight: 100 900;
+  }
+  * { margin: 0; padding: 0; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: #0d0d0f;
+    font-family: 'Inter Variable', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: #38bdf8;
+  }
+  h1 {
+    color: #ffffff;
+    font-size: 120px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  h1 .dot { color: #38bdf8; }
+  p {
+    margin-top: 18px;
+    color: #9ca3af;
+    font-size: 44px;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+  <div class="bar"></div>
+  <h1>jpshlk<span class="dot">.</span>com</h1>
+  <p>Digital Duct Tape</p>
+</body>
+</html>
