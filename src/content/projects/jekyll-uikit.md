@@ -2,7 +2,7 @@
 title: Jekyll UiKit
 description: 'A Jekyll theme built on the UIkit front-end framework: a clean starter for static sites with UIkit components wired in.'
 url: https://github.com/jpasholk/jekyll-uikit
-linkLabel: View on GitHub
+linkLabel: GitHub
 image: ../../assets/jekyll-uikit-screenshot.png
 imageAlt: 'The Jekyll UiKit theme homepage in a browser, with a hero reading "A Simple, Elegant Jekyll Theme" over a misty lake with wooden boats.'
 featured: false
