@@ -31,6 +31,8 @@ const { title, date, summary, tags, featureImage } = post.data;
           alt={featureImage.alt ?? title}
           width={700}
           class="rounded-lg"
+          transition:name={`post-image-${post.id}`}
+          transition:animate="initial"
         />
       </a>
     )
