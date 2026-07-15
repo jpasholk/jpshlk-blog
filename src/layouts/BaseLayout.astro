@@ -2,6 +2,7 @@
 import '@/styles/global.css';
 import { ClientRouter, fade } from 'astro:transitions';
 import Seo from '@jdevalk/astro-seo-graph/Seo.astro';
+import CodeGutters from '@/components/CodeGutters.astro';
 import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.astro';
 import { GOATCOUNTER, SITE, SOCIALS } from '@/config';
@@ -62,6 +63,8 @@ const goatcounter =
             ? stored === 'dark'
             : window.matchMedia('(prefers-color-scheme: dark)').matches;
           document.documentElement.classList.toggle('dark', dark);
+          // Pagefind's Component UI keys its dark scheme off this attribute.
+          document.documentElement.dataset.pfTheme = dark ? 'dark' : 'light';
         };
         apply();
         document.addEventListener('astro:after-swap', apply);
@@ -120,20 +123,25 @@ const goatcounter =
       ]}
     />
 
+    <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css" />
+
     <ClientRouter />
   </head>
-  <body class="flex min-h-screen flex-col">
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white"
-    >
-      Skip to content
-    </a>
-    <Header />
-    <main id="main" class="mx-auto w-full max-w-3xl grow px-4 sm:px-6">
-      <slot />
-    </main>
-    <Footer />
+  <body class="relative">
+    <CodeGutters />
+    <div class="relative z-10 flex min-h-screen flex-col">
+      <a
+        href="#main"
+        class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white"
+      >
+        Skip to content
+      </a>
+      <Header />
+      <main id="main" class="mx-auto w-full max-w-3xl grow px-4 sm:px-6">
+        <slot />
+      </main>
+      <Footer />
+    </div>
 
     <script>
       // Fills the home page's RandomQuote. Lives here instead of in the
@@ -152,9 +160,93 @@ const goatcounter =
         container.querySelector('[data-quote-author]')!.textContent = `— ${quote.author}`;
       }
 
+      // Same story for the hero's side code strips: pick a random pair of
+      // snippets from the pool Hero.astro inlines, so the code is different
+      // on every visit. The pool HTML is our own build-time output.
+      function showRandomHeroCode(doc: Document) {
+        const data = doc.querySelector('[data-hero-code-pool]');
+        if (!data?.textContent) return;
+        const pool: string[] = JSON.parse(data.textContent);
+        if (pool.length < 2) return;
+        const leftPre = doc.querySelector('[data-hero-code="left"] pre');
+        const rightPre = doc.querySelector('[data-hero-code="right"] pre');
+        if (!leftPre || !rightPre) return;
+        const left = Math.floor(Math.random() * pool.length);
+        let right = Math.floor(Math.random() * (pool.length - 1));
+        if (right >= left) right += 1;
+        leftPre.innerHTML = pool[left] ?? '';
+        rightPre.innerHTML = pool[right] ?? '';
+      }
+
       showRandomQuote(document);
+      showRandomHeroCode(document);
       document.addEventListener('astro:before-swap', (e) => {
-        showRandomQuote((e as Event & { newDocument: Document }).newDocument);
+        const doc = (e as Event & { newDocument: Document }).newDocument;
+        showRandomQuote(doc);
+        showRandomHeroCode(doc);
+      });
+    </script>
+
+    <script>
+      // Loads Pagefind's Component UI once per browsing session. The
+      // custom elements self-register and auto-mount whenever they
+      // appear in the DOM (including after ClientRouter swaps), so no
+      // init call is needed. The bundle only exists in the built site
+      // (dist/pagefind/); in dev the load fails, the flag is set, and
+      // the search page reveals its fallback message. Until (or unless)
+      // the elements are defined, CSS hides them entirely.
+      async function loadPagefindComponents() {
+        const w = window as any;
+        if (w.PagefindComponents || w.__pagefindFailed) return;
+        try {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = '/pagefind/pagefind-component-ui.js';
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.append(s);
+          });
+        } catch {
+          w.__pagefindFailed = true;
+          document.dispatchEvent(new CustomEvent('pagefind:failed'));
+        }
+      }
+
+      // Pagefind's instance registry lives on window and survives
+      // ClientRouter swaps, but it never drops components that leave
+      // the DOM. Without this pruning, the header's modal trigger
+      // keeps opening the PREVIOUS page's dead modal ("The element is
+      // not in a Document"). Drop every registration and hook whose
+      // element is no longer connected; the swapped-in elements have
+      // already re-registered by the time astro:page-load fires.
+      function prunePagefindRegistry() {
+        const manager = (window as any).PagefindComponents?.getInstanceManager?.();
+        if (!manager?.getInstance) return;
+        const live = (c: unknown) => !(c instanceof Element) || c.isConnected;
+        for (const name of ['default', 'modal']) {
+          const instance = manager.getInstance(name);
+          if (!instance) continue;
+          if (Array.isArray(instance.components)) {
+            instance.components = instance.components.filter(live);
+          }
+          for (const type of Object.keys(instance.componentsByType ?? {})) {
+            if (Array.isArray(instance.componentsByType[type])) {
+              instance.componentsByType[type] = instance.componentsByType[type].filter(live);
+            }
+          }
+          for (const event of Object.keys(instance.__hooks__ ?? {})) {
+            if (Array.isArray(instance.__hooks__[event])) {
+              instance.__hooks__[event] = instance.__hooks__[event].filter(
+                (entry: { owner?: unknown }) => typeof entry === 'function' || live(entry?.owner),
+              );
+            }
+          }
+        }
+      }
+
+      document.addEventListener('astro:page-load', () => {
+        prunePagefindRegistry();
+        loadPagefindComponents();
       });
     </script>
   </body>

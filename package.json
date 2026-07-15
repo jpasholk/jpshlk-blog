@@ -5,9 +5,10 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
+    "check:links": "linkinator ./dist --recurse --timeout 10000",
     "astro": "astro"
   },
   "dependencies": {
@@ -23,6 +24,9 @@
     "@astrojs/check": "^0.9.6",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.2",
+    "linkinator": "^7.6.1",
+    "pagefind": "^1.5.2",
+    "rehype-autolink-headings": "^7.1.0",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.8.0"
   }

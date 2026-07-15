@@ -1,0 +1,63 @@
+---
+/**
+ * The /archive page: every published post, grouped by year, newest
+ * first. A flat greatest-hits view next to the paginated /blog/.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { getPublishedPosts } from '@/lib/posts';
+import { pageGraph } from '@/lib/schema';
+
+const description =
+  'Every post on this blog on one page, grouped by year. The fast way to skim a decade of apps, Shortcuts, and web tinkering.';
+
+const posts = await getPublishedPosts();
+
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.date.getFullYear();
+  byYear.set(year, [...(byYear.get(year) ?? []), post]);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="Archive" description={description} graph={pageGraph('Archive', '/archive/', description)}>
+  <header class="pt-10">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Archive</h1>
+    <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
+      All {posts.length} posts on one page, newest first.
+    </p>
+  </header>
+
+  {
+    years.map((year) => (
+      <section>
+        <h2 class="mt-12 flex items-baseline gap-3 text-2xl font-bold tracking-tight">
+          {year}
+          <span class="text-sm font-normal text-zinc-500 dark:text-zinc-400">
+            {byYear.get(year)!.length} {byYear.get(year)!.length === 1 ? 'post' : 'posts'}
+          </span>
+        </h2>
+        <ul class="mt-4 flex flex-col gap-3">
+          {byYear.get(year)!.map((post) => (
+            <li class="flex flex-col gap-x-4 sm:flex-row sm:items-baseline">
+              <span class="w-24 flex-none font-mono text-xs text-zinc-500 dark:text-zinc-400">
+                <FormattedDate date={post.data.date} />
+              </span>
+              <a
+                href={`/blog/${post.id}/`}
+                class="font-medium text-primary-600 underline-offset-2 hover:underline dark:text-primary-400"
+              >
+                {post.data.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+
+  <p class="mt-14 mb-4 max-w-prose text-zinc-600 dark:text-zinc-400">
+    Prefer summaries and feature images? The <a href="/blog/" class="font-medium text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">blog</a> has those. In a hurry? <a href="/search/" class="font-medium text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">Search</a> instead.
+  </p>
+</BaseLayout>

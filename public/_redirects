@@ -1,7 +1,11 @@
-# Landing page absorbed the old About page(s).
+# /about absorbed the old homepage About section plus the /now and
+# /uses pages; those URLs land on their sections. /aboutme is an old
+# About URL still linked from a post body.
 # The ! forces the redirect even though Astro emits static meta-refresh
 # pages at these paths (which would otherwise shadow the 301).
-/about    /   301!
-/about/   /   301!
-/aboutme  /   301!
-/aboutme/ /   301!
+/aboutme  /about/       301!
+/aboutme/ /about/       301!
+/uses     /about/#uses  301!
+/uses/    /about/#uses  301!
+/now      /about/#now   301!
+/now/     /about/#now   301!
