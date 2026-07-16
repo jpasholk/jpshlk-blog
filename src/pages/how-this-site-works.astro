@@ -476,8 +476,11 @@ The actual writing starts here.</pre>
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           <code class="font-mono text-xs">&lt;ClientRouter /&gt;</code> intercepts
           it, fetches the next page's HTML, and swaps the document instead of
-          doing a full reload. This is what enables the title morph animation
-          between the blog list and a post.
+          doing a full reload. This is what enables the image and title morph
+          between a card and its post or project page. The morph names are
+          applied just in time by a script in the layout (only when one side
+          is a detail page), so list-to-list navigations stay a clean
+          crossfade instead of morphing every card at once.
         </p>
       </li>
       <li class="relative">

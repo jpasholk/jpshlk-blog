@@ -31,8 +31,7 @@ const { title, date, summary, tags, featureImage } = post.data;
           alt={featureImage.alt ?? title}
           width={700}
           class="rounded-lg"
-          transition:name={`post-image-${post.id}`}
-          transition:animate="initial"
+          data-vt-name={`post-image-${post.id}`}
         />
       </a>
     )
@@ -46,7 +45,7 @@ const { title, date, summary, tags, featureImage } = post.data;
       <a
         href={`/blog/${post.id}/`}
         class="hover:text-primary-600 dark:hover:text-primary-400"
-        transition:name={`post-title-${post.id}`}
+        data-vt-name={`post-title-${post.id}`}
       >
         {title}
       </a>
