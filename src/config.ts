@@ -45,4 +45,19 @@ export const GOATCOUNTER = {
   enabled: process.env.CONTEXT === 'production',
 } as const;
 
+/**
+ * Giscus comments (GitHub Discussions). Both IDs are public: they only
+ * name the repo and discussion category, so they live here instead of
+ * env vars. The Comments component renders nothing until both IDs are
+ * filled in, so an empty categoryId disables the feature entirely.
+ * Values come from https://giscus.app after picking the repo and the
+ * "Comments" announcements category.
+ */
+export const GISCUS = {
+  repo: 'jpasholk/jpshlk-blog',
+  repoId: 'R_kgDOKxOpVw',
+  category: 'Comments',
+  categoryId: '', // placeholder until the category exists on GitHub
+} as const;
+
 export const POSTS_PER_PAGE = 5;

@@ -1,0 +1,86 @@
+---
+/**
+ * Giscus comments, backed by GitHub Discussions. Renders nothing until
+ * both IDs in the GISCUS config block are set. The script tag is NOT
+ * baked into the HTML: the client script below creates it fresh on
+ * every astro:page-load so the widget survives ClientRouter swaps and
+ * mounts with the visitor's actual theme (a build-time tag could only
+ * guess at prefers-color-scheme and would miss the manual toggle).
+ */
+import { GISCUS } from '@/config';
+
+const enabled = Boolean(GISCUS.repoId && GISCUS.categoryId);
+---
+
+{
+  enabled && (
+    <section
+      aria-label="Comments"
+      class="mt-10 border-t border-zinc-200 pt-6 dark:border-zinc-800"
+      data-pagefind-ignore
+    >
+      <h2 class="text-sm font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+        Comments
+      </h2>
+      <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+        Powered by GitHub Discussions. Sign in with GitHub to join in.
+      </p>
+      <div
+        class="mt-4"
+        data-giscus
+        data-repo={GISCUS.repo}
+        data-repo-id={GISCUS.repoId}
+        data-category={GISCUS.category}
+        data-category-id={GISCUS.categoryId}
+        data-mapping="pathname"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-lang="en"
+        data-loading="lazy"
+      />
+    </section>
+  )
+}
+
+<script>
+  // Config is read off the mount div instead of importing '@/config':
+  // that module touches process.env, which has no business in the
+  // browser bundle.
+  function currentTheme() {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  }
+
+  function mountGiscus() {
+    const container = document.querySelector<HTMLElement>('[data-giscus]');
+    if (!container) return; // not a post page
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.async = true;
+    script.crossOrigin = 'anonymous';
+    for (const { name, value } of Array.from(container.attributes)) {
+      if (name.startsWith('data-') && name !== 'data-giscus') script.setAttribute(name, value);
+    }
+    script.dataset.theme = currentTheme();
+    // replaceChildren drops any stale script or iframe from a previous
+    // visit to this page via history navigation, so mounts never stack.
+    container.replaceChildren(script);
+  }
+
+  // Fires on first load and after every ClientRouter swap. The listener
+  // survives swaps because the document object is never replaced (the
+  // GoatCounter pattern), so no data-astro-rerun and no re-registration.
+  document.addEventListener('astro:page-load', mountGiscus);
+
+  // Live theme sync, decoupled from ThemeToggle: watch the html class
+  // that the toggle (and the BaseLayout head script) already flips and
+  // tell the iframe. Redundant same-theme messages are harmless.
+  new MutationObserver(() => {
+    const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+    iframe?.contentWindow?.postMessage(
+      { giscus: { setConfig: { theme: currentTheme() } } },
+      'https://giscus.app',
+    );
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+</script>

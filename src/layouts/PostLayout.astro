@@ -2,6 +2,7 @@
 import { getImage, Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CodeCopy from '@/components/CodeCopy.astro';
+import Comments from '@/components/Comments.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import Prose from '@/components/Prose.astro';
 import RelatedPosts from '@/components/RelatedPosts.astro';
@@ -158,6 +159,8 @@ const ogImage = ogSource
       </nav>
     )
   }
+
+  {post.data.comments && <Comments />}
 
   <CodeCopy />
 
