@@ -20,12 +20,20 @@ const isActive = (href: string) =>
             href={href}
             aria-current={isActive(href) ? 'page' : undefined}
             class:list={[
-              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              'relative isolate rounded-md px-3 py-2 text-sm font-medium transition-colors',
               isActive(href)
                 ? 'text-primary-600 dark:text-primary-400'
                 : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
             ]}
           >
+            {/* The shared transition:name makes the pill slide between nav items on navigation. */}
+            {isActive(href) && (
+              <span
+                class="absolute inset-0 -z-10 rounded-md bg-zinc-100 dark:bg-zinc-800"
+                transition:name="active-nav-pill"
+                aria-hidden="true"
+              />
+            )}
             {title}
           </a>
         ))
