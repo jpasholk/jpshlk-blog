@@ -188,6 +188,66 @@ const goatcounter =
     </script>
 
     <script>
+      // Just-in-time view transition names. Cards and detail heroes
+      // carry inert data-vt-name attributes instead of static
+      // transition:name: static names on every card made list-to-list
+      // navigations (home, /blog/, /projects/ share cards) morph ~10
+      // groups at once, which rendered as a visible flash, and leaving
+      // a list page ghosted unmatched card snapshots over the new page.
+      // Here, names are applied as inline styles only when the outgoing
+      // and incoming documents share a data-vt-name AND one side is a
+      // detail hero (data-vt-detail). That allows exactly the morphs we
+      // want (card to hero and back, from clicks or history traversal)
+      // and structurally rules out list-to-list mass morphs. Every
+      // other navigation is the plain 0.2s crossfade.
+      import type {
+        TransitionBeforePreparationEvent,
+        TransitionBeforeSwapEvent,
+      } from 'astro:transitions/client';
+
+      const NAMED = '[data-vt-name]';
+
+      function clearNames() {
+        for (const el of document.querySelectorAll<HTMLElement>(NAMED)) {
+          el.style.viewTransitionName = '';
+        }
+      }
+
+      document.addEventListener('astro:before-preparation', (event) => {
+        const e = event as TransitionBeforePreparationEvent;
+        const originalLoader = e.loader;
+        // Wrapping the loader lets us run after the incoming document
+        // is parsed (e.newDocument) but before the old page's snapshot
+        // is taken, which is the only window where both sides can
+        // still be named.
+        e.loader = async () => {
+          await originalLoader();
+          const incoming = new Map<string, HTMLElement>();
+          for (const el of e.newDocument.querySelectorAll<HTMLElement>(NAMED)) {
+            incoming.set(el.dataset.vtName!, el);
+          }
+          for (const el of document.querySelectorAll<HTMLElement>(NAMED)) {
+            const name = el.dataset.vtName!;
+            const match = incoming.get(name);
+            if (!match) continue;
+            if (!('vtDetail' in el.dataset) && !('vtDetail' in match.dataset)) continue;
+            el.style.viewTransitionName = name;
+            match.style.viewTransitionName = name;
+          }
+        };
+      });
+
+      // Clear the inline names once the animation finishes; clearing
+      // any earlier (astro:page-load fires mid-animation) cuts the
+      // morph short, and leaving them set would make the next
+      // navigation's old snapshot ghost the hero across the new page.
+      document.addEventListener('astro:before-swap', (event) => {
+        const e = event as TransitionBeforeSwapEvent;
+        e.viewTransition.finished.catch(() => {}).finally(clearNames);
+      });
+    </script>
+
+    <script>
       // Loads Pagefind's Component UI once per browsing session. The
       // custom elements self-register and auto-mount whenever they
       // appear in the DOM (including after ClientRouter swaps), so no

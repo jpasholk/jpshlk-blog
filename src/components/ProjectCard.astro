@@ -2,8 +2,9 @@
 /**
  * Project card for the /projects/ index (stacked) and the homepage
  * work section (horizontal: image beside text on wider screens).
- * The image and title carry the transition names that morph into the
- * detail page's hero and h1.
+ * The image and title carry data-vt-name attributes; the just-in-time
+ * naming script in BaseLayout.astro turns them into view transition
+ * names only for the navigation that needs the morph.
  */
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
@@ -39,8 +40,7 @@ const horizontal = layout === 'horizontal';
           alt={imageAlt ?? `A preview of ${title}`}
           width={imageWidth}
           class="rounded-lg"
-          transition:name={`project-image-${id}`}
-          transition:animate="initial"
+          data-vt-name={`project-image-${id}`}
         />
       </a>
     )
@@ -50,7 +50,7 @@ const horizontal = layout === 'horizontal';
       <a
         href={href}
         class="hover:text-primary-600 dark:hover:text-primary-400"
-        transition:name={`project-title-${id}`}
+        data-vt-name={`project-title-${id}`}
       >
         {title}
       </a>

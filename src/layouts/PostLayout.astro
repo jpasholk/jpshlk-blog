@@ -65,8 +65,8 @@ const ogImage = ogSource
           width={1400}
           class="mb-8 rounded-xl"
           loading="eager"
-          transition:name={`post-image-${post.id}`}
-          transition:animate="initial"
+          data-vt-name={`post-image-${post.id}`}
+          data-vt-detail
         />
       )
     }
@@ -85,7 +85,8 @@ const ogImage = ogSource
       </p>
       <h1
         class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl"
-        transition:name={`post-title-${post.id}`}
+        data-vt-name={`post-title-${post.id}`}
+        data-vt-detail
       >
         {title}
       </h1>
