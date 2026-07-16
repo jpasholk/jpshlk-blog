@@ -1,0 +1,144 @@
+---
+title: Don't Keep Your Git Repos in iCloud
+date: '2026-07-19'
+draft: true
+summary: 'Duplicate posts, a git index that wiped itself, and a pull that died with mmap failed. Three weird bugs, one cause: my repo lived in iCloud Drive.'
+tags: ['git', 'web-development', 'mac', 'bugs']
+---
+
+Today my site's repo found three completely different ways to ruin my afternoon. It took me an embarrassingly long time to notice they were all the same bug wearing different hats.
+
+The culprit: my code lived in `~/Documents`, and `~/Documents` syncs to iCloud.
+
+If you keep git repos in iCloud Drive (or Dropbox, or Google Drive), this one's for you. 🤙
+
+## Bug 1: my blog grew duplicate posts
+
+First symptom: my blog list had posts showing up twice. Not a rendering bug, actual duplicates.
+
+The cause was sitting in my repo:
+
+```
+src/content/blog/static-site-search-with-pagefind 2.mdx
+src/content/blog/web-development-am-i-an-imposter 2.mdx
+src/components/ProjectCard 2.astro
+```
+
+That ` 2` suffix is iCloud's conflict resolution. When it thinks a file changed in two places, it doesn't ask, it just quietly makes a copy with a number on the end. There were 21 of them, every single one byte-for-byte identical to its original.
+
+My blog builds its post list by globbing `src/content/blog/*.mdx`. So Astro found `pagefind.mdx` and `pagefind 2.mdx`, and dutifully built both. iCloud invented content for my site. 😜
+
+## Bug 2: git said I deleted my entire website
+
+Next, `git status` told me I had deleted basically everything:
+
+```
+deleted:    src/content/blog/rebuilding-my-blog-with-ai.mdx
+deleted:    astro.config.ts
+deleted:    package.json
+... 200 more
+```
+
+Except every one of those files was sitting right there on disk. I could open them.
+
+Here's what happened. Git keeps a file at `.git/index` that tracks everything in your repo (it's what `git add` writes to, the staging area). Mine was **gone**. Deleted. In its place was a leftover `.git/index.lock`, the temporary file git writes to before swapping it into place.
+
+So some git process had started writing a new index, and something killed it mid-write. Git compared "nothing in the index" against "202 files in the last commit" and concluded I'd nuked my site.
+
+The fix was gentler than it looked, because the working files and the commit history were both fine:
+
+```sh
+rm -f .git/index.lock
+git reset
+```
+
+`git reset` (no `--hard`, never `--hard` here) rebuilds the index from your last commit and touches nothing else. 202 files came right back. Nothing was ever actually lost.
+
+## Bug 3: fatal: mmap failed
+
+Then `git pull` started doing this:
+
+```
+fatal: mmap failed: Operation timed out
+```
+
+This one is a great clue, because it rules things out. It's not a network problem: a pull moments earlier had said "Already up to date," so GitHub was reachable. `mmap` is memory-mapping, which is how git reads its bigger files by pointing at them on disk instead of loading them into memory. It's a purely **local** file operation.
+
+Git was trying to read a file on my own hard drive, and my own hard drive timed out.
+
+## One cause behind all three
+
+Everything clicked when I ran `brctl status`, the command line tool for iCloud Drive:
+
+```
+Client Truth Unclean Items:
+Under /Documents/GitHub/jpshlk-blog/.git/objects/49
+```
+
+There it is. iCloud was actively syncing the inside of my `.git` folder.
+
+That's all three bugs at once:
+
+- It made conflict copies of my posts (the ` 2` files).
+- It was writing to git's internals while git was writing to them, which is how an index gets destroyed mid-write.
+- It had **evicted** some files to the cloud, replacing the local copy with a stub, so when git tried to `mmap` a file, macOS had to go download it first. That download stalled, and git got a timeout.
+
+## Git and file sync can't share a folder
+
+The realization that should have come to me hours earlier: **git already is your sync.** That's the entire point of it. Layering iCloud on top isn't belt and suspenders, it's two systems fighting over the same files.
+
+And `.git` is the worst possible thing to hand a file syncer. It's thousands of tiny files that change constantly, get rewritten in place, and depend on exact timing (write a temp file, then atomically swap it in). iCloud sees churn and tries to helpfully sync every step. Git sees its files moving under it and falls over.
+
+Cloud sync is built for documents you edit occasionally. A git repo is the opposite of that.
+
+## Getting out was worse than getting in
+
+Fine, I thought. I'll just move the folder out of `~/Documents`. This took the rest of the afternoon.
+
+**Finder stalled.** Dragging the folder did nothing, forever, because Finder waits on iCloud's sync engine, and the sync engine was stuck.
+
+**`cp` stalled.** It's also silent, so you can't tell if it's working or hung. (Tip I wish I'd known sooner: press **Ctrl-T** during a running `cp` and it prints the file it's on. It was fine, just grinding through `node_modules`.)
+
+**`rsync` got further,** because it's the better tool here: it can skip stuff (`--exclude='node_modules'`) and it resumes where it left off if it dies. But it kept dying:
+
+```
+rsync: Bug-Daddy/launch-site/.git/HEAD: mmap: Operation canceled
+```
+
+Same `mmap` error, now on a `.git/HEAD` that iCloud would not cough up. I wrapped rsync in a retry loop and came back an hour later to find it still failing on the same file. (Bonus lesson: a `until ... done` loop swallows Ctrl-C, since each press only kills the current command and the loop starts the next one. Just close the terminal window.)
+
+I checked "Optimize Mac Storage," the setting that lets iCloud evict local files to save space. It was **already off**. iCloud was evicting my files anyway.
+
+At that point I stopped trying to reason with it.
+
+## What actually worked
+
+The answer was sitting there the whole time: **GitHub already had a perfect copy of my repo.**
+
+I didn't need to rescue those local files at all. I needed the repo, and the repo lives on GitHub. So:
+
+```sh
+git clone https://github.com/jpasholk/jpshlk-blog.git ~/Developer/GitHub/jpshlk-blog
+cd ~/Developer/GitHub/jpshlk-blog
+npm install
+```
+
+Ten seconds. A clean, complete, iCloud-free repo, and I was back to work.
+
+That's the quiet upside of pushing your work: when your local copy gets held hostage, you can just walk away from it. The only thing a fresh clone can't recover is work you never committed, which is its own argument for committing more often.
+
+## Where repos belong
+
+Anywhere that isn't `~/Documents` or `~/Desktop`, since those are the two folders iCloud syncs. I moved mine to:
+
+```
+~/Developer
+```
+
+Apple gives that folder a little hammer icon and Xcode expects it, so it may as well be the standard. `~/code` or `~/Projects` work exactly as well. The only rule is to stay out of any folder a sync service is watching.
+
+If you're reading this from a repo in your Documents folder: it's working *right now*, sure. It was working for me too, for months. Then one afternoon it made duplicate blog posts, deleted its own index, and refused to read its own files.
+
+Move it. It takes ten seconds and it'll save your afternoon. 💪
+
+Thanks for reading and have a good one! 🤙
