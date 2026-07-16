@@ -8,7 +8,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { pageGraph } from '@/lib/schema';
 
 const description =
-  'A beginner-friendly tour of how this site works: Astro components and slots, the writing workflow, search, analytics, and the trip from git push to your screen.';
+  'A beginner-friendly tour of how this site works: Astro components and slots, the writing workflow, search, comments, analytics, and the trip from git push to your screen.';
 
 // Diagram vocabulary, shared across all six sections.
 const box = 'rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900';
@@ -37,8 +37,8 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
     <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
       A guided tour of this site's anatomy, no web dev background needed:
       what runs at build time, how pages compose, how a post gets written,
-      where images, search, and analytics fit, and the full trip from my
-      laptop to your screen.
+      where images, search, comments, and analytics fit, and the full trip
+      from my laptop to your screen.
     </p>
     <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-zinc-200 pt-4 text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
       <span class="inline-flex items-center gap-2">
@@ -493,11 +493,12 @@ The actual writing starts here.</pre>
         <p class="font-semibold"><code class="font-mono">astro:page-load</code> fires</p>
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           ThemeToggle and the mobile menu re-bind their click handlers to the
-          fresh DOM, RandomQuote picks a new quote, and the GitHub buttons
-          script re-runs on posts that need it. The Pagefind loader also runs
-          here: it fetches the search components once per visit and prunes
-          anything from their registry that the swap just removed, so the
-          search button never points at a dead modal.
+          fresh DOM, RandomQuote picks a new quote, the comments widget
+          re-mounts on posts, and the GitHub buttons script re-runs on posts
+          that need it. The Pagefind loader also runs here: it fetches the
+          search components once per visit and prunes anything from their
+          registry that the swap just removed, so the search button never
+          points at a dead modal.
         </p>
       </li>
     </ol>
@@ -541,7 +542,42 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>12</span>Pages for robots</h2>
+    <h2 class={h2}><span class={num}>12</span>Comments via GitHub Discussions</h2>
+    <p class={caption}>
+      There is no comment database here either. Each post's comments live in a
+      GitHub Discussion on this site's repo, and a small open source widget
+      called <a href="https://giscus.app" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">giscus</a> shows
+      that discussion under the post. Reading costs nothing; replying takes a
+      GitHub sign in, which handles spam and moderation for me.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class={box}>
+        <p class={boxLabel}>How a comment gets there</p>
+        <div class="mt-3 flex flex-col gap-2">
+          <p class={leaf}><span class={filePath}>you sign in with GitHub inside the widget</span></p>
+          <p class={leaf}><span class={filePath}>your comment lands in a Discussion named after the post's URL</span></p>
+          <p class={leaf}><span class={filePath}>the first comment on a post creates its Discussion automatically</span></p>
+        </div>
+      </div>
+      <div class={box}>
+        <p class={boxLabel}>What the page pays for it</p>
+        <div class="mt-3 flex flex-col gap-2">
+          <p class={leaf}><span class={filePath}>nothing until you scroll near the comments (lazy loading)</span></p>
+          <p class={leaf}><span class={filePath}>then one iframe from giscus.app, sandboxed like any other</span></p>
+          <p class={leaf}><span class={filePath}>no tracking scripts, no ads, no cookies from this site</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">The same view transitions wrinkle as analytics:</strong> a swapped-in page never runs scripts baked into its HTML, so the widget is created fresh on <code class="font-mono text-xs">astro:page-load</code> (section 10 again) for every post you visit.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Dark mode reaches into the iframe:</strong> the widget mounts with whatever theme the page has, and when you flip the toggle, a tiny observer notices the class change and messages the iframe so the comments flip with it.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2}><span class={num}>13</span>Pages for robots</h2>
     <p class={caption}>
       Humans get the HTML pages. The same build also writes files meant only
       for machines, and hires a few robots to proofread my work.
@@ -576,7 +612,7 @@ The actual writing starts here.</pre>
   </section>
 
   <section class="mb-16">
-    <h2 class={h2}><span class={num}>13</span>From my laptop to your screen</h2>
+    <h2 class={h2}><span class={num}>14</span>From my laptop to your screen</h2>
     <p class={caption}>
       Nothing here uploads files to a server by hand. The whole publish flow
       is: change something, commit it, push. Everything after that is
