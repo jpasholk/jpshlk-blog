@@ -1,0 +1,70 @@
+---
+title: Adding Comments With Giscus and GitHub Discussions
+date: '2026-10-07'
+draft: true
+summary: 'The blog has comments now, powered by Giscus and GitHub Discussions. How I picked it over Mastodon and Bluesky replies, plus the usual view transitions homework.'
+tags: ['astro', 'web-development', 'rebuild']
+related: ['privacy-friendly-analytics-with-goatcounter', 'related-posts-with-no-database']
+---
+
+This site is a pile of static files. No server, no database, nothing that can accept a comment at two in the morning and remember it. So for most of the rebuild, comments sat on the roadmap with a big question mark next to them: where would they even live?
+
+## The contenders
+
+I looked at a bunch of options, and they all boil down to "someone else holds the comments and the page borrows them."
+
+**Mastodon or Bluesky replies.** Post a link on social, then fetch the replies to that post and show them under the article. I genuinely like this idea, and my Mastodon account is already wired into the site. But every post needs me to manually link a toot before anyone can say anything, and I decided I did not want homework attached to publishing.
+
+**Hosted comment widgets.** Things like Cusdis and Hyvor Talk, which let anyone comment without an account. Nice, but they add a vendor, and the free tiers come with ceilings.
+
+**A DIY build.** Netlify Forms catching submissions, me approving them, comments committed to the repo as files. Extremely on brand for this site (see [related posts with no database](/blog/related-posts-with-no-database/)), and I may still build it someday. But it is real work, and comments only appear after a rebuild.
+
+**Giscus.** Comments live in a GitHub Discussion attached to each post, rendered by a small open source widget. My old site ran this, so I already knew it works. First comment on a post creates its Discussion automatically, threading and markdown come for free, and moderation is just GitHub. The catch: commenting requires a GitHub account.
+
+I went back and forth on that last point, because a login wall filters out plenty of readers. But this blog leans technical, the people most likely to comment already have GitHub accounts, and every alternative traded that one cost for a different one I liked less. Giscus it is, at least for now. 🤙
+
+## The view transitions wrinkle, again
+
+If you read the [GoatCounter post](/blog/privacy-friendly-analytics-with-goatcounter/), you already know this song. This site uses Astro's view transitions, so clicking between pages swaps content with JavaScript instead of doing real page loads, and scripts baked into the incoming HTML never run. A naive Giscus install shows comments on the first post you visit and then plays dead for the rest of your stay.
+
+The fix is the house pattern: create the script fresh on `astro:page-load`, which fires on the first load and after every swap.
+
+```ts
+function mountGiscus() {
+  const container = document.querySelector('[data-giscus]');
+  if (!container) return; // not a post page
+  const script = document.createElement('script');
+  script.src = 'https://giscus.app/client.js';
+  script.async = true;
+  script.crossOrigin = 'anonymous';
+  for (const { name, value } of Array.from(container.attributes)) {
+    if (name.startsWith('data-') && name !== 'data-giscus') script.setAttribute(name, value);
+  }
+  script.dataset.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  container.replaceChildren(script);
+}
+
+document.addEventListener('astro:page-load', mountGiscus);
+```
+
+All the Giscus settings live as data attributes on an empty div in the component, and the script copies them over when it mounts. Building the tag in JavaScript instead of baking it into the HTML has a second payoff: I get to stamp the theme at mount time, reading the actual `dark` class on the page instead of guessing from system settings.
+
+## Dark mode reaches into the iframe
+
+The widget is an iframe (a page inside the page, walled off from my CSS), so my dark mode class means nothing to it. Giscus accepts theme changes via `postMessage`, and rather than teach my theme toggle about comments, I let a `MutationObserver` watch the `dark` class it already flips:
+
+```ts
+new MutationObserver(() => {
+  const iframe = document.querySelector('iframe.giscus-frame');
+  const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  iframe?.contentWindow?.postMessage({ giscus: { setConfig: { theme } } }, 'https://giscus.app');
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+```
+
+The toggle never learns Giscus exists, and the comments still flip colors the instant the rest of the page does.
+
+## Keeping the zero JavaScript promise (mostly)
+
+One thing I did not want: every reader paying for an iframe from GitHub whether they care about comments or not. Giscus has a lazy loading mode, so nothing loads until you actually scroll near the comments section. Skim a post and leave, and this feature cost you zero bytes. Scroll to the end, and you were probably curious what people said anyway.
+
+So that's the trade. A login wall I can live with, in exchange for comments with no database, no vendor bill, no per-post homework, and moderation I already know how to use. If you have thoughts about that trade, well, there's a comment box down there now. 😜

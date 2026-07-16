@@ -11,6 +11,7 @@ const blog = defineCollection({
       tags: z.array(reference('tags')).default([]),
       lastmod: z.coerce.date().optional(),
       draft: z.boolean().default(false),
+      comments: z.boolean().default(true),
       summary: z.string().optional(),
       canonicalUrl: z.string().optional(),
       related: z.array(reference('blog')).default([]),
