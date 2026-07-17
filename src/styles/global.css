@@ -119,6 +119,24 @@ pagefind-results:not(:defined) {
   display: none;
 }
 
+/* Card-to-hero view transition morph. The just-in-time naming script in
+   BaseLayout.astro tags each morphing pair with view-transition-class
+   "vt-morph"; this gives that morph a deliberate easing and duration
+   instead of the browser default, on all four pseudo-element types so
+   the box morph and the old/new cross-fade stay in sync. Unlayered like
+   the other view-transition-adjacent rules. Reduced motion is already
+   covered: Astro injects an !important rule disabling every
+   ::view-transition-* animation under prefers-reduced-motion, so this
+   no-preference block never applies for those users. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(.vt-morph),
+  ::view-transition-old(.vt-morph),
+  ::view-transition-new(.vt-morph) {
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

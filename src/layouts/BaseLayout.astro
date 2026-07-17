@@ -206,10 +206,15 @@ const goatcounter =
       } from 'astro:transitions/client';
 
       const NAMED = '[data-vt-name]';
+      // Shared view-transition-class on every card/hero morph pair, so
+      // global.css can retime just these morphs (the names are per-id,
+      // so a static ::view-transition-group(name) selector is out).
+      const MORPH_CLASS = 'vt-morph';
 
       function clearNames() {
         for (const el of document.querySelectorAll<HTMLElement>(NAMED)) {
           el.style.viewTransitionName = '';
+          el.style.removeProperty('view-transition-class');
         }
       }
 
@@ -233,6 +238,10 @@ const goatcounter =
             if (!('vtDetail' in el.dataset) && !('vtDetail' in match.dataset)) continue;
             el.style.viewTransitionName = name;
             match.style.viewTransitionName = name;
+            // setProperty, not el.style.viewTransitionClass: the camelCase
+            // property is missing from the TS DOM lib and would fail check.
+            el.style.setProperty('view-transition-class', MORPH_CLASS);
+            match.style.setProperty('view-transition-class', MORPH_CLASS);
           }
         };
       });
