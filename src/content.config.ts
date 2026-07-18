@@ -29,7 +29,7 @@ const tags = defineCollection({
 });
 
 const projects = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),
