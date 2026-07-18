@@ -1,9 +1,13 @@
 ---
 title: Don't Keep Your Git Repos in iCloud
-date: '2026-07-19'
+date: 2026-07-19
+tags:
+- git
+- web-development
+- mac
+- bugs
 draft: true
 summary: 'Duplicate posts, a git index that wiped itself, and a pull that died with mmap failed. Three weird bugs, one cause: my repo lived in iCloud Drive.'
-tags: ['git', 'web-development', 'mac', 'bugs']
 ---
 
 Today my site's repo found three completely different ways to ruin my afternoon. It took me an embarrassingly long time to notice they were all the same bug wearing different hats.
@@ -26,7 +30,7 @@ src/components/ProjectCard 2.astro
 
 That ` 2` suffix is iCloud's conflict resolution. When it thinks a file changed in two places, it doesn't ask, it just quietly makes a copy with a number on the end. There were 21 of them, every single one byte-for-byte identical to its original.
 
-My blog builds its post list by globbing `src/content/blog/*.mdx`. So Astro found `pagefind.mdx` and `pagefind 2.mdx`, and dutifully built both. iCloud invented content for my site. 😜
+My blog builds its post list by globbing `src/content/blog/*.mdx`. So Astro found `pagefind.mdx` and `pagefind 2.mdx`, and dutifully built both. iCloud invented content for my site.
 
 ## Bug 2: git said I deleted my entire website
 
@@ -139,6 +143,6 @@ Apple gives that folder a little hammer icon and Xcode expects it, so it may as 
 
 If you're reading this from a repo in your Documents folder: it's working *right now*, sure. It was working for me too, for months. Then one afternoon it made duplicate blog posts, deleted its own index, and refused to read its own files.
 
-Move it. It takes ten seconds and it'll save your afternoon. 💪
+Move it. It takes ten seconds and it'll save your afternoon.
 
 Thanks for reading and have a good one! 🤙
