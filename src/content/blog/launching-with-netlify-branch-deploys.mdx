@@ -6,6 +6,8 @@ summary: 'My rebuilt site went live on a sandbox URL next to production, a Disco
 tags: ['rebuild', 'web-development', 'git']
 ---
 
+import Link from "../../components/Link.astro";
+
 *This is part 8 of my [rebuild series](/tags/rebuild/). In [part 7](/blog/agent-ready-seo-with-the-yoast-founders-tools/) I wired up the SEO layer.*
 
 The original plan for this rebuild ended with a move to Cloudflare. Spoiler: I'm still on Netlify, the launch plan got *simpler*, and testing the new site in public exposed my first real production bug before production even existed. Let me walk through all three.
@@ -68,7 +70,7 @@ Then the smoke test, each item a URL to check on the live domain:
 - `/blog/learning-astr`: typo on purpose; the fuzzy 404 should auto-correct it
 - The share card: paste a link in Discord and see the real image this time
 
-Slower burns after that: submit the sitemap in Google Search Console, validate a post at [validator.schema.org](https://validator.schema.org/), and do the two-step IndexNow key dance from part 7.
+Slower burns after that: submit the sitemap in Google Search Console, validate a post at <Link href="https://validator.schema.org/">validator.schema.org</Link>, and do the two-step IndexNow key dance from part 7.
 
 ## How merge day actually went
 

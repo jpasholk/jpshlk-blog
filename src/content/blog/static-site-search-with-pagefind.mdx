@@ -6,9 +6,11 @@ summary: 'The site finally has search: a /search page and a Cmd+K modal on every
 tags: ['astro', 'web-development', 'rebuild']
 ---
 
+import Link from "../../components/Link.astro";
+
 The site has search now. There's a proper [/search/](/search/) page, and a little magnifying glass in the header that opens a search modal from any page. Press Cmd+K (or Ctrl+K) and it pops up wherever you are. This was a roadmap item in [the rebuild story](/blog/rebuilding-my-blog-with-ai/), and it's the feature I was most curious about, because this site has no server. It's static files on a CDN. Where does search even run?
 
-In your browser, it turns out. [Pagefind](https://pagefind.app) runs after the site builds, reads the finished HTML, and writes a search index into the output as a pile of small static files. When you search, the browser downloads only the tiny chunks of the index it needs for your query. No API, no database, no monthly bill. For a blog this size, a search costs about as much bandwidth as a small image.
+In your browser, it turns out. <Link href="https://pagefind.app">Pagefind</Link> runs after the site builds, reads the finished HTML, and writes a search index into the output as a pile of small static files. When you search, the browser downloads only the tiny chunks of the index it needs for your query. No API, no database, no monthly bill. For a blog this size, a search costs about as much bandwidth as a small image.
 
 ## One build step and one attribute
 
