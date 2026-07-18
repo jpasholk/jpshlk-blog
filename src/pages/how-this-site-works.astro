@@ -1,17 +1,18 @@
 ---
 /**
- * Living documentation: visual diagrams of how this site's Astro
- * components, layouts, and slots compose. Update alongside structural
- * changes to the site.
+ * Living documentation: a from-zero tour of how this site works, starting
+ * at "what is a browser" and ending at the deploy pipeline, with visual
+ * diagrams of how the Astro components, layouts, and slots compose.
+ * Update alongside structural changes to the site.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Link from '@/components/Link.astro';
 import { pageGraph } from '@/lib/schema';
 
 const description =
-  'A beginner-friendly tour of how this site works: Astro components and slots, the writing workflow, search, comments, analytics, and the trip from git push to your screen.';
+  'A from-zero tour of how this site works: browsers, HTML, CSS, and JavaScript, what Astro builds, and the full trip from git push to your screen.';
 
-// Diagram vocabulary, shared across all six sections.
+// Diagram vocabulary, shared across all sections.
 const box = 'rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900';
 const leaf = 'rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950';
 const slotBox = 'rounded-xl border-2 border-dashed border-primary-500 bg-primary-500/10 p-4';
@@ -21,11 +22,15 @@ const boxLabel = 'text-sm font-semibold';
 const filePath = 'font-mono text-xs text-zinc-500 dark:text-zinc-400';
 const caption = 'mt-2 mb-6 max-w-prose text-zinc-600 dark:text-zinc-400';
 const note = 'mt-5 max-w-prose text-sm text-zinc-600 dark:text-zinc-400';
-const h2 = 'mt-14 text-2xl font-bold tracking-tight';
+const h2 = 'mt-14 scroll-mt-6 text-2xl font-bold tracking-tight';
 const num = 'mr-2 text-primary-600 dark:text-primary-400';
 const pre = 'overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-100 p-4 font-mono text-xs leading-relaxed dark:border-zinc-800 dark:bg-zinc-900';
 const arrow = 'flex flex-none flex-col items-center px-2 text-primary-500';
 const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500 dark:text-zinc-400';
+const colLabel = 'mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400';
+// Links: external (goes through <Link />, gets the new-tab icon) and internal anchors.
+const xlink = 'text-primary-600 dark:text-primary-400';
+const ilink = 'text-primary-600 underline-offset-2 hover:underline dark:text-primary-400';
 ---
 
 <BaseLayout
@@ -36,10 +41,11 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
   <header class="pt-10">
     <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">How this site works</h1>
     <p class="mt-3 max-w-prose text-lg text-zinc-600 dark:text-zinc-400">
-      A guided tour of this site's anatomy, no web dev background needed:
-      what runs at build time, how pages compose, how a post gets written,
-      where images, search, comments, and analytics fit, and the full trip
-      from my laptop to your screen.
+      A guided tour of this site's anatomy that starts from zero. If you are
+      not quite sure what a browser even does, start at section 1 and read
+      straight down: every idea is explained the first time it shows up. If
+      you build websites for a living, skim the table of contents and jump
+      to the parts about this site. Either way, no web dev background needed.
     </p>
     <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-zinc-200 pt-4 text-sm text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
       <span class="inline-flex items-center gap-2">
@@ -55,14 +61,230 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
         script or head element
       </span>
     </div>
+    <nav aria-label="Table of contents" class="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <p class="mb-3 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">On this page</p>
+      <p class="mb-2 text-sm font-semibold">The foundations (start here if the web is new to you)</p>
+      <ol class="mb-4 flex list-decimal flex-col gap-1.5 pl-5 text-sm">
+        <li><a class={ilink} href="#what-is-a-website">What a website actually is</a></li>
+        <li><a class={ilink} href="#visiting">What happens when you visit jpshlk.com</a></li>
+        <li><a class={ilink} href="#toolbox">The toolbox on my side</a></li>
+      </ol>
+      <p class="mb-2 text-sm font-semibold">This site</p>
+      <ol start="4" class="list-decimal gap-x-10 pl-5 text-sm sm:columns-2">
+        <li class="mb-1.5"><a class={ilink} href="#build-time">The big picture: build time</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#slots">Slots in sixty seconds</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#homepage">The homepage, as nested boxes</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#blog-post">A blog post: layouts nest</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#data">Where the data comes from</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#writing">How a post gets written</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#images">Images: three jobs, one build</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#styling">How it looks: Tailwind</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#search">Search without a server</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#dark-mode">Dark mode in three parts</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#browser">What happens on a click</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#analytics">Analytics that do not follow you</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#comments">Comments via GitHub Discussions</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#robots">Pages for robots</a></li>
+        <li class="mb-1.5"><a class={ilink} href="#deploy">From my laptop to your screen</a></li>
+      </ol>
+    </nav>
   </header>
 
   <section>
-    <h2 class={h2}><span class={num}>1</span>The big picture: it all happens at build time</h2>
+    <h2 class={h2} id="what-is-a-website"><span class={num}>1</span>What a website actually is</h2>
     <p class={caption}>
-      Astro components are not shipped to visitors. They run once, on my machine
-      or Netlify's, at build time. What comes out is plain HTML files. That is
-      why the site is fast: your browser gets finished pages.
+      Your browser (Safari, Chrome, Firefox) is a program with one job:
+      download files of plain text from other computers and turn them into
+      the pages you see. Nearly every page on the internet, this one
+      included, is written in three languages, and each one has exactly one
+      job. Here is the same tiny page in all three.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-3">
+      <div>
+        <p class={colLabel}>HTML: structure + words</p>
+        <pre class={pre}>&lt;h1&gt;Hi, I'm Josh&lt;/h1&gt;
+&lt;p&gt;Welcome to my site.&lt;/p&gt;
+&lt;button&gt;Say hi&lt;/button&gt;</pre>
+        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          Tags label what each piece <em>is</em>: a heading, a paragraph, a
+          button. No styling, no behavior, just meaning.
+        </p>
+      </div>
+      <div>
+        <p class={colLabel}>CSS: how it looks</p>
+        <pre class={pre}>h1 &#123; color: seagreen; &#125;
+p &#123; max-width: 60ch; &#125;
+button &#123;
+  border-radius: 8px;
+&#125;</pre>
+        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          Rules that point at the HTML and describe its appearance: colors,
+          sizes, spacing, rounded corners.
+        </p>
+      </div>
+      <div>
+        <p class={colLabel}>JavaScript: what it does</p>
+        <pre class={pre}>const btn = document
+  .querySelector('button');
+btn.addEventListener('click',
+  () =&gt; &#123;
+    alert('Hi! 🤙');
+  &#125;);</pre>
+        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          A real programming language the browser runs, for anything that
+          reacts or changes after the page appears.
+        </p>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Want to go deeper?</strong>{' '}
+      <Link href="https://developer.mozilla.org/en-US/docs/Learn_web_development" class={xlink}>MDN Web Docs</Link> is
+      the closest thing the web has to an official manual, and it is free. Its
+      reference pages for <Link href="https://developer.mozilla.org/en-US/docs/Web/HTML" class={xlink}>HTML</Link>,{' '}
+      <Link href="https://developer.mozilla.org/en-US/docs/Web/CSS" class={xlink}>CSS</Link>, and{' '}
+      <Link href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" class={xlink}>JavaScript</Link> back
+      up everything on this page.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2} id="visiting"><span class={num}>2</span>What happens when you visit jpshlk.com</h2>
+    <p class={caption}>
+      Typing an address and seeing a page feels instant, but there is a
+      round trip hiding in there. Here it is in order; the whole thing
+      usually takes a fraction of a second.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="flex min-w-215 items-center">
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>Your browser</p>
+          <p class={`${filePath} mb-3`}>you type jpshlk.com</p>
+          <p class={leaf}><span class={filePath}>first stop: find out where that name actually lives</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>who is jpshlk.com?</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>DNS</p>
+          <p class={`${filePath} mb-3`}>the internet's phone book</p>
+          <p class={leaf}><span class={filePath}>turns the name into a machine address (an IP address)</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>ask that address</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>A server</p>
+          <p class={`${filePath} mb-3`}>a computer that answers requests</p>
+          <p class={leaf}><span class={filePath}>sends back the HTML, then the CSS, images, and scripts it mentions</span></p>
+        </div>
+        <div class={`${arrow} self-center`}>
+          <span class={arrowLabel}>files arrive</span>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class={`${box} flex-1`}>
+          <p class={boxLabel}>The page you see</p>
+          <p class={`${filePath} mb-3`}>rendered by your browser</p>
+          <p class={leaf}><span class={filePath}>HTML parsed, CSS applied, scripts run: section 1's three jobs</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">A server is not special hardware:</strong> it
+      is any computer whose job is answering requests. Many sites make theirs
+      assemble each page fresh, on demand, for every visitor. This site did
+      all that work ahead of time (<a class={ilink} href="#build-time">section 4</a>),
+      so its "server" is really a CDN, a delivery network that just hands over
+      finished files from a data center near you (<a class={ilink} href="#deploy">section 18</a>).
+      That is most of why it feels fast.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Want to go deeper?</strong> MDN
+      explains <Link href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Web_standards/How_the_web_works" class={xlink}>how the web works</Link> and{' '}
+      <Link href="https://developer.mozilla.org/en-US/docs/Glossary/DNS" class={xlink}>what DNS is</Link> in
+      beginner terms.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2} id="toolbox"><span class={num}>3</span>The toolbox on my side</h2>
+    <p class={caption}>
+      Everything from here on mentions tools that run on <em>my</em> computer,
+      not yours. Four of them do almost all the work, so here is the one-line
+      version of each. You will recognize them for the rest of the tour.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class={box}>
+        <p class={boxLabel}>The terminal</p>
+        <p class={`${filePath} mb-2`}>typing commands instead of clicking</p>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400">
+          A window where you run programs by typing their names. Nothing
+          magic: every command on this page, like <code class="font-mono text-xs">npm run build</code>,
+          is typed here.
+        </p>
+      </div>
+      <div class={box}>
+        <p class={boxLabel}>Node</p>
+        <p class={`${filePath} mb-2`}>JavaScript, outside the browser</p>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400">
+          JavaScript was born inside browsers. <Link href="https://nodejs.org" class={xlink}>Node</Link> lets
+          it run on any computer, which is how most website build tools
+          (Astro included) are written.
+        </p>
+      </div>
+      <div class={box}>
+        <p class={boxLabel}>npm</p>
+        <p class={`${filePath} mb-2`}>an app store for shared code</p>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400">
+          <Link href="https://docs.npmjs.com/about-npm" class={xlink}>npm</Link> installs
+          the open source packages this site depends on, and runs named
+          commands: <code class="font-mono text-xs">npm run build</code> just
+          means "npm, run the command I named <em>build</em>".
+        </p>
+      </div>
+      <div class={box}>
+        <p class={boxLabel}>Git</p>
+        <p class={`${filePath} mb-2`}>save points for a whole folder</p>
+        <p class="text-sm text-zinc-600 dark:text-zinc-400">
+          <Link href="https://git-scm.com" class={xlink}>Git</Link> records
+          named snapshots of every file in a project, forever, so nothing is
+          ever lost and any change can be undone. Its full story is in{' '}
+          <a class={ilink} href="#deploy">section 18</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class={h2} id="build-time"><span class={num}>4</span>The big picture: it all happens at build time</h2>
+    <p class={caption}>
+      Two definitions first. A <em>framework</em> is a kit of pre-solved
+      problems: instead of every site owner hand-writing the machinery for
+      layouts, navigation, image resizing, and feeds, the framework supplies
+      the machinery and you supply the content. This site's framework
+      is <Link href="https://astro.build" class={xlink}>Astro</Link>.
+    </p>
+    <p class={caption}>
+      Astro exists because of a bet about <em>timing</em>. Many modern
+      frameworks ship a JavaScript app to your browser, which then assembles
+      the page in front of you. That is work done at <em>runtime</em>: while
+      you watch, on your device. <Link href="https://docs.astro.build/en/concepts/why-astro/" class={xlink}>Astro's bet</Link> is
+      the opposite: do all the assembling once, ahead of time, and ship the
+      finished result. That ahead-of-time step is the <em>build</em>, and
+      "build time" just means "while that step is running".
+    </p>
+    <p class={caption}>
+      So the Astro components you will meet below are never sent to
+      visitors. They run once, on my machine or Netlify's, at build time.
+      What comes out is plain HTML files. That is why the site is fast: your
+      browser gets finished pages.
     </p>
     <div class="overflow-x-auto p-1">
       <div class="flex min-w-140 items-center">
@@ -88,23 +310,33 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
             <p class={leaf}><span class={filePath}>index.html, blog/&hellip;/index.html</span></p>
             <p class={leaf}><span class={filePath}>rss.xml, sitemap, llms.txt</span></p>
             <p class={leaf}><span class={filePath}>optimized images + one CSS file</span></p>
-            <p class={leaf}><span class={filePath}>pagefind/ (the search index, see 8)</span></p>
+            <p class={leaf}><span class={filePath}>pagefind/ (the search index, <a class={ilink} href="#search">see 12</a>)</span></p>
           </div>
         </div>
       </div>
     </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">The trade-off, honestly stated:</strong> a
+      build-time site cannot show you a shopping cart or a personalized feed,
+      because every visitor gets the same files. For a blog, that is no
+      trade-off at all: the content is the same for everyone anyway.
+    </p>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>2</span>Slots in sixty seconds</h2>
+    <h2 class={h2} id="slots"><span class={num}>5</span>Slots in sixty seconds</h2>
     <p class={caption}>
-      A <code class="font-mono text-sm">&lt;slot /&gt;</code> is a hole. Whatever
-      you write between a component's opening and closing tags falls through
-      into that hole. That is the entire trick that makes layouts work.
+      This whole site is assembled from <em>components</em>: named, reusable
+      chunks of page that you use like custom HTML tags
+      (<code class="font-mono text-sm">&lt;Header /&gt;</code>, <code class="font-mono text-sm">&lt;PostCard /&gt;</code>).
+      And the trick that makes layouts work is
+      the <code class="font-mono text-sm">&lt;slot /&gt;</code>: a hole.
+      Whatever you write between a component's opening and closing tags
+      falls through into that hole. That is the entire trick.
     </p>
     <div class="grid gap-4 sm:grid-cols-2">
       <div>
-        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+        <p class={colLabel}>
           BaseLayout.astro declares the hole
         </p>
         <pre class={pre}>&lt;html&gt;
@@ -119,7 +351,7 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
 &lt;/html&gt;</pre>
       </div>
       <div>
-        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+        <p class={colLabel}>
           index.astro fills the hole
         </p>
         <pre class={pre}>&lt;BaseLayout title="Josh Pasholk"&gt;
@@ -132,12 +364,14 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
       </div>
     </div>
     <p class={note}>
-      So every page gets the same head, header, and footer for free, and only has to bring the middle. Change <code class="font-mono text-xs">BaseLayout.astro</code> once and every page on the site changes.
+      So every page gets the same head, header, and footer for free, and only has to bring the middle. Change <code class="font-mono text-xs">BaseLayout.astro</code> once and every page on the site changes. Astro's own{' '}
+      <Link href="https://docs.astro.build/en/basics/astro-components/" class={xlink}>components guide</Link> covers
+      this in full.
     </p>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>3</span>The homepage, as nested boxes</h2>
+    <h2 class={h2} id="homepage"><span class={num}>6</span>The homepage, as nested boxes</h2>
     <p class={caption}>
       Boxes inside boxes literally is the architecture. Solid boxes are
       components; the dashed region is BaseLayout's slot, filled by whatever <code class="font-mono text-sm">index.astro</code> put between its tags.
@@ -183,7 +417,7 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>4</span>A blog post: layouts nest, so slots nest</h2>
+    <h2 class={h2} id="blog-post"><span class={num}>7</span>A blog post: layouts nest, so slots nest</h2>
     <p class={caption}>
       A post page uses two layouts. PostLayout sits inside BaseLayout's slot,
       and declares a slot of its own, which is where the actual writing (the
@@ -231,11 +465,13 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>5</span>Where the data comes from: props go down</h2>
+    <h2 class={h2} id="data"><span class={num}>8</span>Where the data comes from: props go down</h2>
     <p class={caption}>
-      Components never go looking for data. Data is loaded once, then handed
-      down the tree as props (function arguments for components). One-way
-      traffic.
+      Components never go looking for data. Data (post titles, dates, tags)
+      is loaded once, then handed down the tree as <em>props</em>: the values
+      a component receives when you use it, like arguments to a function.
+      Writing <code class="font-mono text-sm">&lt;PostCard post=&#123;post&#125; /&gt;</code> hands
+      PostCard one post to render. One-way traffic, top to bottom.
     </p>
     <div class="overflow-x-auto p-1">
       <div class="flex min-w-215 items-stretch">
@@ -278,18 +514,32 @@ const arrowLabel = 'mb-0.5 whitespace-nowrap font-mono text-[10px] text-zinc-500
       landing page's LatestPosts, and the SEO schema endpoints. One source of
       truth, many consumers.
     </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">The TypeScript aside:</strong> this
+      site is written in <Link href="https://www.typescriptlang.org" class={xlink}>TypeScript</Link>,
+      which is JavaScript plus <em>types</em>: labels describing what shape
+      data must have ("a post has a title, and it is text"). The "schema
+      validates" arrow above is that idea applied to content, so a typo gets
+      caught while I am writing, not after publishing. Astro calls this whole
+      pipeline <Link href="https://docs.astro.build/en/guides/content-collections/" class={xlink}>content collections</Link>.
+    </p>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>6</span>How a post gets written</h2>
+    <h2 class={h2} id="writing"><span class={num}>9</span>How a post gets written</h2>
     <p class={caption}>
-      Every post is one file: Markdown for the writing, plus a small settings
-      block at the top called frontmatter. That block is data, not prose, and
-      it drives everything the site knows about the post.
+      Every post is one file, written in <Link href="https://commonmark.org/help/" class={xlink}>Markdown</Link>:
+      a way of writing formatted text with punctuation instead of buttons
+      (<code class="font-mono text-sm">#</code> makes a heading, <code class="font-mono text-sm">**bold**</code> makes
+      bold). Strictly speaking the files are <Link href="https://mdxjs.com" class={xlink}>MDX</Link>,
+      which is Markdown that is also allowed to use the components
+      from <a class={ilink} href="#slots">section 5</a>. On top of the writing
+      sits a small settings block called frontmatter. That block is data,
+      not prose, and it drives everything the site knows about the post.
     </p>
     <div class="grid gap-4 sm:grid-cols-2">
       <div>
-        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+        <p class={colLabel}>
           The settings block (frontmatter)
         </p>
         <pre class={pre}>---
@@ -303,7 +553,7 @@ tags: ['astro', 'apps']
 The actual writing starts here.</pre>
       </div>
       <div>
-        <p class="mb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+        <p class={colLabel}>
           What each line feeds
         </p>
         <div class="flex flex-col gap-2">
@@ -319,16 +569,21 @@ The actual writing starts here.</pre>
       <strong class="text-zinc-800 dark:text-zinc-200">The spell-checker:</strong> a schema in <code class="font-mono text-xs">src/content.config.ts</code> validates every settings block at build time. A misspelled tag, a bad date, a missing title: the build fails and tells me which file, before anything reaches the internet.
     </p>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">Publishing</strong> is deleting one line. Drafts render on my machine in <code class="font-mono text-xs">npm run dev</code> so I can preview them; remove <code class="font-mono text-xs">draft: true</code>, push, and the post is live a few minutes later (section 13 covers that trip).
+      <strong class="text-zinc-800 dark:text-zinc-200">Publishing</strong> is deleting one line. Drafts render on my machine in <code class="font-mono text-xs">npm run dev</code> so I can preview them; remove <code class="font-mono text-xs">draft: true</code>, push, and the post is live a few minutes later (<a class={ilink} href="#deploy">section 18</a> covers that trip).
     </p>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>7</span>Images: three jobs, one build</h2>
+    <h2 class={h2} id="images"><span class={num}>10</span>Images: three jobs, one build</h2>
     <p class={caption}>
       There are 36 original images in <code class="font-mono text-sm">src/assets/</code>,
-      and posts reference them with plain markdown. Nobody resizes anything by
-      hand; the build does all three image jobs.
+      and posts reference them with plain markdown. Nobody resizes anything
+      by hand; the build does all three image jobs. Why bother? Because
+      images are the heaviest thing on most pages, and a phone on cell data
+      should not have to download a four megabyte original to fill a small
+      column of text. Shrinking them is the single biggest{' '}
+      <Link href="https://developer.mozilla.org/en-US/docs/Web/Performance" class={xlink}>web performance</Link> win
+      there is.
     </p>
     <div class="overflow-x-auto p-1">
       <div class="flex min-w-140 items-center">
@@ -368,11 +623,68 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>8</span>Search: no server, and a second kind of component</h2>
+    <h2 class={h2} id="styling"><span class={num}>11</span>How it looks: Tailwind and one CSS file</h2>
+    <p class={caption}>
+      <a class={ilink} href="#what-is-a-website">Section 1</a> said CSS is the
+      looks. This site writes almost none of it by hand. Instead it
+      uses <Link href="https://tailwindcss.com" class={xlink}>Tailwind CSS</Link>:
+      a big box of tiny pre-made class names, each doing exactly one thing,
+      composed right in the markup instead of in separate stylesheets. Here
+      is a real one, the pill-shaped chip used in the diagrams on this page.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <p class={colLabel}>
+          The markup on this very page
+        </p>
+        <pre class={pre}>&lt;span class="rounded-full
+  border bg-primary-50
+  px-2.5 py-0.5
+  font-mono text-xs
+  text-primary-700"&gt;
+  theme script
+&lt;/span&gt;</pre>
+        <p class="mt-3"><span class={chip}>theme script (is:inline)</span> <span class="text-sm text-zinc-500 dark:text-zinc-400">&larr; the result</span></p>
+      </div>
+      <div>
+        <p class={colLabel}>
+          What each class means
+        </p>
+        <div class="flex flex-col gap-2">
+          <p class={leaf}><span class={filePath}>rounded-full &rarr; fully round corners (the pill shape)</span></p>
+          <p class={leaf}><span class={filePath}>bg-primary-50 &rarr; the palest tint of the site's green</span></p>
+          <p class={leaf}><span class={filePath}>px-2.5 py-0.5 &rarr; a little padding, sideways and vertical</span></p>
+          <p class={leaf}><span class={filePath}>font-mono text-xs &rarr; small monospace type</span></p>
+          <p class={leaf}><span class={filePath}>text-primary-700 &rarr; darker green ink on top</span></p>
+        </div>
+      </div>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">One small file:</strong> at
+      build time (<a class={ilink} href="#build-time">section 4</a> again)
+      Tailwind scans the whole codebase for class names it recognizes and
+      writes a single CSS file containing only the ones actually used.
+      Styles nobody uses never ship, and the whole site's look arrives in
+      one small download.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Dark mode hooks in here:</strong> any
+      class can be prefixed with <code class="font-mono text-xs">dark:</code>, as
+      in <code class="font-mono text-xs">dark:bg-zinc-900</code>, to apply only
+      when dark mode is on. What flips that switch is the next section. The
+      site's design tokens live in <code class="font-mono text-xs">src/styles/global.css</code>:
+      Tailwind v4 is configured in CSS itself, no separate config file.
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2} id="search"><span class={num}>12</span>Search: no server, and a second kind of component</h2>
     <p class={caption}>
       The search button in the header (Cmd+K works too) and the{' '}
-      <a href="/search/" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">/search/</a> page
-      run on <Link href="https://pagefind.app" class="text-primary-600 dark:text-primary-400">Pagefind</Link>, which indexes the finished HTML right after the build.
+      <a href="/search/" class={ilink}>/search/</a> page
+      run on <Link href="https://pagefind.app" class={xlink}>Pagefind</Link>, which indexes the finished HTML right after the build. An index is a pre-built map
+      from words to the pages containing them, like the one in the back of a
+      book: that is what makes search instant with no server involved.
     </p>
     <div class="overflow-x-auto p-1">
       <div class="flex min-w-180 items-center">
@@ -406,17 +718,21 @@ The actual writing starts here.</pre>
       </div>
     </div>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">A second kind of component:</strong> everything in sections 2 through 4 was Astro components, which run at build time and disappear. The search UI is the opposite: <em>web components</em>, custom HTML tags that a script brings to life in your browser. The header renders just this:
+      <strong class="text-zinc-800 dark:text-zinc-200">A second kind of component:</strong> everything
+      in <a class={ilink} href="#slots">sections 5</a> through <a class={ilink} href="#blog-post">7</a> was
+      Astro components, which run at build time and disappear. The search UI
+      is the opposite: <em>web components</em>, custom HTML tags that a
+      script brings to life in your browser. The header renders just this:
     </p>
     <pre class={`${pre} mt-3`}>&lt;pagefind-modal-trigger instance="modal" compact&gt;&lt;/pagefind-modal-trigger&gt;
 &lt;pagefind-modal instance="modal" reset-on-close&gt;&lt;/pagefind-modal&gt;</pre>
     <p class={note}>
-      The empty <code class="font-mono text-xs">&lt;pagefind-modal&gt;</code> builds its own input, results, and keyboard hints once the loader script (that chip in section 3's diagram) fetches the bundle. In dev there is no index yet, so a CSS rule hides the undefined tags and the search page shows a fallback note instead.
+      The empty <code class="font-mono text-xs">&lt;pagefind-modal&gt;</code> builds its own input, results, and keyboard hints once the loader script (that chip in <a class={ilink} href="#homepage">section 6</a>'s diagram) fetches the bundle. In dev there is no index yet, so a CSS rule hides the undefined tags and the search page shows a fallback note instead.
     </p>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>9</span>Dark mode in three moving parts</h2>
+    <h2 class={h2} id="dark-mode"><span class={num}>13</span>Dark mode in three moving parts</h2>
     <p class={caption}>
       The theme toggle looks like one button, but making it flicker-free
       takes three pieces working together.
@@ -427,7 +743,7 @@ The actual writing starts here.</pre>
         <p class="font-semibold">One class rules everything</p>
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           Dark mode is just a <code class="font-mono text-xs">dark</code> class on the page's root element. Every dark style
-          in the CSS keys off that single class, so adding or removing it
+          in the CSS (those <code class="font-mono text-xs">dark:</code> variants from <a class={ilink} href="#styling">section 11</a>) keys off that single class, so adding or removing it
           re-themes the whole page instantly. No reload, no per-element logic.
         </p>
       </li>
@@ -447,8 +763,8 @@ The actual writing starts here.</pre>
         <p class="font-semibold">The toggle remembers</p>
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           Clicking the sun/moon flips the class and saves your choice in the
-          browser's <code class="font-mono text-xs">localStorage</code>, so it sticks across visits. It also stamps a
-          <code class="font-mono text-xs">data-pf-theme</code> attribute that the search UI (section 8) reads to
+          browser's <Link href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" class={xlink}><code class="font-mono text-xs">localStorage</code></Link> (a little notepad each site gets in your browser), so it sticks across visits. It also stamps a
+          <code class="font-mono text-xs">data-pf-theme</code> attribute that the search UI (<a class={ilink} href="#search">section 12</a>) reads to
           switch its own dark scheme.
         </p>
       </li>
@@ -456,10 +772,15 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>10</span>The browser layer: what happens on a click</h2>
+    <h2 class={h2} id="browser"><span class={num}>14</span>The browser layer: what happens on a click</h2>
     <p class={caption}>
       Almost everything above ran at build time. Here is the small amount of
-      JavaScript that actually runs for you, the visitor, in order, when you
+      JavaScript that actually runs for you, the visitor. One idea first:
+      normally, clicking a link throws the whole page away and rebuilds the
+      next one from scratch. This site uses Astro's{' '}
+      <Link href="https://docs.astro.build/en/guides/view-transitions/" class={xlink}>view transitions</Link> instead:
+      it swaps just the content and animates the difference, which is why
+      moving around feels smooth. Here is the sequence, in order, when you
       click a link on this site.
     </p>
     <ol class="relative flex flex-col gap-6 border-l-2 border-zinc-200 pl-6 dark:border-zinc-800">
@@ -512,10 +833,14 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>11</span>Analytics that do not follow you</h2>
+    <h2 class={h2} id="analytics"><span class={num}>15</span>Analytics that do not follow you</h2>
     <p class={caption}>
-      I want to know if anyone reads this site, not who you are. Pageviews are
-      counted by <Link href="https://www.goatcounter.com" class="text-primary-600 dark:text-primary-400">GoatCounter</Link>,
+      Analytics means counting visits. Most sites do it
+      with <Link href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies" class={xlink}>cookies</Link> (small
+      ID tags a site stores in your browser so it can recognize you later)
+      and scripts that follow you across the web. I want to know if anyone
+      reads this site, not who you are. Pageviews are counted
+      by <Link href="https://www.goatcounter.com" class={xlink}>GoatCounter</Link>,
       an open source, privacy-first counter. That is why there is no cookie
       banner here: there is nothing to consent to.
     </p>
@@ -541,18 +866,20 @@ The actual writing starts here.</pre>
       <strong class="text-zinc-800 dark:text-zinc-200">Only in production:</strong> the script renders only on real production deploys. Local dev and preview deploys ship literally zero analytics bytes, not a disabled script, no script at all.
     </p>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">One view transitions wrinkle:</strong> page swaps are not real page loads, so automatic counting is off and each swap is counted once on <code class="font-mono text-xs">astro:page-load</code> (the same event from section 10). Otherwise reading five posts would count as one view, or one view as ten.
+      <strong class="text-zinc-800 dark:text-zinc-200">One view transitions wrinkle:</strong> page swaps are not real page loads, so automatic counting is off and each swap is counted once on <code class="font-mono text-xs">astro:page-load</code> (the same event from <a class={ilink} href="#browser">section 14</a>). Otherwise reading five posts would count as one view, or one view as ten.
     </p>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>12</span>Comments via GitHub Discussions</h2>
+    <h2 class={h2} id="comments"><span class={num}>16</span>Comments via GitHub Discussions</h2>
     <p class={caption}>
       There is no comment database here either. Each post's comments live in a
       GitHub Discussion on this site's repo, and a small open source widget
-      called <Link href="https://giscus.app" class="text-primary-600 dark:text-primary-400">giscus</Link> shows
-      that discussion under the post. Reading costs nothing; replying takes a
-      GitHub sign in, which handles spam and moderation for me.
+      called <Link href="https://giscus.app" class={xlink}>giscus</Link> shows
+      that discussion under the post, inside an iframe: a sandboxed little
+      window onto another website, embedded in this page. Reading costs
+      nothing; replying takes a GitHub sign in, which handles spam and
+      moderation for me.
     </p>
     <div class="grid gap-4 sm:grid-cols-2">
       <div class={box}>
@@ -573,7 +900,7 @@ The actual writing starts here.</pre>
       </div>
     </div>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">The same view transitions wrinkle as analytics:</strong> a swapped-in page never runs scripts baked into its HTML, so the widget is created fresh on <code class="font-mono text-xs">astro:page-load</code> (section 10 again) for every post you visit.
+      <strong class="text-zinc-800 dark:text-zinc-200">The same view transitions wrinkle as analytics:</strong> a swapped-in page never runs scripts baked into its HTML, so the widget is created fresh on <code class="font-mono text-xs">astro:page-load</code> (<a class={ilink} href="#browser">section 14</a> again) for every post you visit.
     </p>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">Dark mode reaches into the iframe:</strong> the widget mounts with whatever theme the page has, and when you flip the toggle, a tiny observer notices the class change and messages the iframe so the comments flip with it.
@@ -581,7 +908,7 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2}><span class={num}>13</span>Pages for robots</h2>
+    <h2 class={h2} id="robots"><span class={num}>17</span>Pages for robots</h2>
     <p class={caption}>
       Humans get the HTML pages. The same build also writes files meant only
       for machines, and hires a few robots to proofread my work.
@@ -611,16 +938,28 @@ The actual writing starts here.</pre>
       </div>
     </div>
     <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Never heard of RSS?</strong> It
+      is the old, still-great way to follow sites without an algorithm in
+      between: a feed reader app checks each site's feed file for you and
+      shows new posts in order, like podcast subscriptions but for
+      reading. <Link href="https://aboutfeeds.com" class={xlink}>About Feeds</Link> is
+      a lovely five minute introduction. The JSON-LD blocks speak{' '}
+      <Link href="https://schema.org" class={xlink}>schema.org</Link>, the
+      shared vocabulary search engines use to understand pages.
+    </p>
+    <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">The proofreading robots:</strong> validators run during every build and FAIL it on a missing h1, a dead internal link, or a page title or description that is too long or too short. A broken link cannot reach the live site because the build that contains it never finishes.
     </p>
   </section>
 
   <section class="mb-16">
-    <h2 class={h2}><span class={num}>14</span>From my laptop to your screen</h2>
+    <h2 class={h2} id="deploy"><span class={num}>18</span>From my laptop to your screen</h2>
     <p class={caption}>
       Nothing here uploads files to a server by hand. The whole publish flow
-      is: change something, commit it, push. Everything after that is
-      automatic.
+      is: change something, <em>commit</em> it (ask git for one of those
+      named snapshots from <a class={ilink} href="#toolbox">section 3</a>,
+      with a note saying what changed), and <em>push</em> (upload the new
+      snapshots to GitHub). Everything after that is automatic.
     </p>
     <div class="overflow-x-auto p-1">
       <div class="flex min-w-180 items-center">
@@ -665,11 +1004,24 @@ The actual writing starts here.</pre>
       </div>
     </div>
     <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">The cast:</strong>{' '}
+      <Link href="https://docs.github.com/en/get-started/start-your-journey/hello-world" class={xlink}>GitHub</Link> is
+      the website where the code and its entire history live; the arrow
+      labeled webhook is literally GitHub
+      tapping <Link href="https://www.netlify.com" class={xlink}>Netlify</Link> on
+      the shoulder to say something changed. Netlify then re-runs the build
+      from <a class={ilink} href="#build-time">section 4</a> on a fresh
+      computer and copies the result to
+      a <Link href="https://developer.mozilla.org/en-US/docs/Glossary/CDN" class={xlink}>CDN</Link>:
+      data centers around the world, each holding a copy of the finished
+      files, so the site loads from somewhere near you.
+    </p>
+    <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">Safe experiments:</strong> only the <code class="font-mono text-xs">main</code> branch publishes to jpshlk.com. Work happens on other branches, and each one gets its own private preview URL built exactly the same way, so every change is reviewed on a real deploy before it merges. This very page was checked on a preview URL before you ever saw it.
     </p>
     <p class={note}>
-      One last thing: this page is itself a box in the section 3 diagram. You
-      are reading it inside the very slot described in section 2. 🤙
+      One last thing: this page is itself a box in the <a class={ilink} href="#homepage">section 6</a> diagram. You
+      are reading it inside the very slot described in <a class={ilink} href="#slots">section 5</a>. 🤙
     </p>
   </section>
 </BaseLayout>
