@@ -5,6 +5,7 @@
  * changes to the site.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Link from '@/components/Link.astro';
 import { pageGraph } from '@/lib/schema';
 
 const description =
@@ -371,7 +372,7 @@ The actual writing starts here.</pre>
     <p class={caption}>
       The search button in the header (Cmd+K works too) and the{' '}
       <a href="/search/" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">/search/</a> page
-      run on <a href="https://pagefind.app" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">Pagefind</a>, which indexes the finished HTML right after the build.
+      run on <Link href="https://pagefind.app" class="text-primary-600 dark:text-primary-400">Pagefind</Link>, which indexes the finished HTML right after the build.
     </p>
     <div class="overflow-x-auto p-1">
       <div class="flex min-w-180 items-center">
@@ -514,7 +515,7 @@ The actual writing starts here.</pre>
     <h2 class={h2}><span class={num}>11</span>Analytics that do not follow you</h2>
     <p class={caption}>
       I want to know if anyone reads this site, not who you are. Pageviews are
-      counted by <a href="https://www.goatcounter.com" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">GoatCounter</a>,
+      counted by <Link href="https://www.goatcounter.com" class="text-primary-600 dark:text-primary-400">GoatCounter</Link>,
       an open source, privacy-first counter. That is why there is no cookie
       banner here: there is nothing to consent to.
     </p>
@@ -549,7 +550,7 @@ The actual writing starts here.</pre>
     <p class={caption}>
       There is no comment database here either. Each post's comments live in a
       GitHub Discussion on this site's repo, and a small open source widget
-      called <a href="https://giscus.app" class="text-primary-600 underline-offset-2 hover:underline dark:text-primary-400">giscus</a> shows
+      called <Link href="https://giscus.app" class="text-primary-600 dark:text-primary-400">giscus</Link> shows
       that discussion under the post. Reading costs nothing; replying takes a
       GitHub sign in, which handles spam and moderation for me.
     </p>
