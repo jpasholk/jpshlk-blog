@@ -1,0 +1,65 @@
+---
+title: My Posts Publish Themselves Now
+date: '2026-10-15'
+draft: true
+summary: 'The blog can finally publish a post while I sleep: a date filter at build time, a daily GitHub Action, and one Netlify build hook. No servers, still static.'
+tags: ['astro', 'web-development', 'rebuild']
+---
+
+import Link from "../../components/Link.astro";
+
+Most of the posts on this site were written in batches and pre-dated to drip out every few days. The publishing part, though, was manual: on the right morning, remember the post exists, delete its `draft: true` line, push, wait for the build. Forget for a day and the schedule quietly slides. What I actually wanted was to finish a post, give it a date, and never think about it again.
+
+The catch is that this is a fully static site. Every page is baked at build time, and a build only happens when something pushes to the repo. A post dated next Tuesday can sit in `main` all week, but nothing about Tuesday arriving causes a build. Calendars are not a git event. 😜
+
+So scheduled publishing took three small pieces: a filter, a robot, and a doorbell.
+
+## The filter
+
+Every page, feed, and sitemap on this site gets its posts from one helper, so hiding scheduled posts is one predicate:
+
+```ts
+// src/lib/posts.ts
+export function isPublished(data: Post['data']): boolean {
+  if (import.meta.env.DEV) return true;
+  if (data.draft) return false;
+  const isProduction = !process.env.CONTEXT || process.env.CONTEXT === 'production';
+  return !isProduction || data.date.valueOf() <= Date.now();
+}
+```
+
+That gives every post three possible states instead of two. A `draft: true` post is unfinished and renders only on my machine, same as always. A post with no draft flag and a future date is *scheduled*. And once its date arrives, it's just published.
+
+The `CONTEXT` check is the same trick my [analytics setup](/blog/privacy-friendly-analytics-with-goatcounter/) uses: Netlify tells the build whether it's producing the real site or a branch preview. Scheduled posts stay hidden on production but show up on branch deploys, so I can review exactly what will publish, on a real deploy, before its date comes around.
+
+## The robot
+
+The filter only matters if a build actually runs on the right day, and that's the robot's job: a <Link href="https://docs.github.com/en/actions">GitHub Actions</Link> workflow on a daily cron (a schedule that fires at a fixed time, 8:30 AM my time).
+
+I didn't want it blindly rebuilding the site every day, though, so first it answers a question: is anything actually due? The check is one small script with a nice property. It doesn't ask "is a post dated today?" It asks "is any post that *should* be live missing from the live site?"
+
+```js
+// scripts/pending-posts.mjs, the heart of it
+const feed = (await (await fetch('https://jpshlk.com/rss.xml')).text()).toLowerCase();
+const pending = eligible.filter(
+  (slug) => !feed.includes(`/blog/${slug.toLowerCase()}/`),
+);
+```
+
+My RSS feed already lists every published post, so it doubles as a free source of truth for "what's live." Comparing against it makes the whole thing self-healing: if a run ever fails or gets skipped, the post is still missing from the feed the next morning, so the next run publishes it. No state to store anywhere.
+
+## The doorbell
+
+When something is due, the workflow still can't build the site itself. Netlify builds the site, and Netlify normally only builds when GitHub tells it about a push. On publish day there is no push. The post has been sitting in `main` for weeks; the only thing that changed is the date.
+
+The answer is a <Link href="https://docs.netlify.com/build/configure-builds/build-hooks/">build hook</Link>: a private URL Netlify gives you that queues a production build when you POST to it. The workflow rings it with one line of curl and Netlify rebuilds `main`, and this time the filter lets the new post through.
+
+The hook URL is effectively a key (anyone holding it can trigger builds), so it lives in a GitHub Actions *secret*: encrypted storage on the repo that's write-only, injected into the workflow as an environment variable at run time, and scrubbed from logs if it ever gets printed. Even then the blast radius is comically small. The worst thing an attacker could ever do with my stolen build hook is rebuild my site from `main`, which produces... my site.
+
+## The two posts that fought back
+
+Testing surfaced two very on-brand bugs. The feed check originally compared slugs case-sensitively, and exactly one post on this site has capital letters in its filename, so the script eternally believed my Ice menu bar post was unpublished. And my date parsing expected zero-padded dates until it met two posts from 2015 with dates like `2015-6-25`, written back when the blog and I were both younger and less strict about schemas.
+
+Both fixes were one line. Both would have caused a phantom rebuild every single day, forever, and I would probably never have noticed. Test your cron jobs before you let them loose. 🤙
+
+As for this post: it was finished, de-drafted, and merged well before the date up top. Nobody pushed anything this morning. If you're reading it, the robot rang the doorbell all by itself.
