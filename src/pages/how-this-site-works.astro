@@ -99,38 +99,38 @@ const ilink = 'text-primary-600 underline-offset-2 hover:underline dark:text-pri
       included, is written in three languages, and each one has exactly one
       job. Here is the same tiny page in all three.
     </p>
-    <div class="grid gap-4 sm:grid-cols-3">
-      <div>
-        <p class={colLabel}>HTML: structure + words</p>
+    <div class="grid gap-4 sm:grid-cols-3 sm:gap-y-2">
+      <div class="sm:row-span-3 sm:grid sm:grid-rows-subgrid">
+        <p class={`${colLabel} sm:mb-0`}>HTML: structure + words</p>
         <pre class={pre}>&lt;h1&gt;Hi, I'm Josh&lt;/h1&gt;
 &lt;p&gt;Welcome to my site.&lt;/p&gt;
 &lt;button&gt;Say hi&lt;/button&gt;</pre>
-        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p class="mt-2 text-sm text-zinc-600 sm:mt-0 dark:text-zinc-400">
           Tags label what each piece <em>is</em>: a heading, a paragraph, a
           button. No styling, no behavior, just meaning.
         </p>
       </div>
-      <div>
-        <p class={colLabel}>CSS: how it looks</p>
+      <div class="sm:row-span-3 sm:grid sm:grid-rows-subgrid">
+        <p class={`${colLabel} sm:mb-0`}>CSS: how it looks</p>
         <pre class={pre}>h1 &#123; color: seagreen; &#125;
 p &#123; max-width: 60ch; &#125;
 button &#123;
   border-radius: 8px;
 &#125;</pre>
-        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p class="mt-2 text-sm text-zinc-600 sm:mt-0 dark:text-zinc-400">
           Rules that point at the HTML and describe its appearance: colors,
           sizes, spacing, rounded corners.
         </p>
       </div>
-      <div>
-        <p class={colLabel}>JavaScript: what it does</p>
+      <div class="sm:row-span-3 sm:grid sm:grid-rows-subgrid">
+        <p class={`${colLabel} sm:mb-0`}>JavaScript: what it does</p>
         <pre class={pre}>const btn = document
   .querySelector('button');
 btn.addEventListener('click',
   () =&gt; &#123;
     alert('Hi! 🤙');
   &#125;);</pre>
-        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p class="mt-2 text-sm text-zinc-600 sm:mt-0 dark:text-zinc-400">
           A real programming language the browser runs, for anything that
           reacts or changes after the page appears.
         </p>
