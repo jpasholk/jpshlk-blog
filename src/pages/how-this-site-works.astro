@@ -61,9 +61,9 @@ const ilink = 'text-primary-600 underline-offset-2 hover:underline dark:text-pri
         script or head element
       </span>
     </div>
-    <nav aria-label="Table of contents" class="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
-      <p class="mb-3 text-xs font-semibold tracking-wider text-zinc-500 uppercase dark:text-zinc-400">On this page</p>
-      <p class="mb-2 text-sm font-semibold">The foundations (start here if the web is new to you)</p>
+    <details class="mt-8 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+      <summary class="cursor-pointer text-sm font-semibold">On this page</summary>
+      <p class="mt-3 mb-2 text-sm font-semibold">The foundations (start here if the web is new to you)</p>
       <ol class="mb-4 flex list-decimal flex-col gap-1.5 pl-5 text-sm">
         <li><a class={ilink} href="#what-is-a-website">What a website actually is</a></li>
         <li><a class={ilink} href="#visiting">What happens when you visit jpshlk.com</a></li>
@@ -87,7 +87,7 @@ const ilink = 'text-primary-600 underline-offset-2 hover:underline dark:text-pri
         <li class="mb-1.5"><a class={ilink} href="#robots">Pages for robots</a></li>
         <li class="mb-1.5"><a class={ilink} href="#deploy">From my laptop to your screen</a></li>
       </ol>
-    </nav>
+    </details>
   </header>
 
   <section>
