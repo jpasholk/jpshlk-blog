@@ -569,7 +569,7 @@ The actual writing starts here.</pre>
       <strong class="text-zinc-800 dark:text-zinc-200">The spell-checker:</strong> a schema in <code class="font-mono text-xs">src/content.config.ts</code> validates every settings block at build time. A misspelled tag, a bad date, a missing title: the build fails and tells me which file, before anything reaches the internet.
     </p>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">Publishing</strong> is deleting one line. Drafts render on my machine in <code class="font-mono text-xs">npm run dev</code> so I can preview them; remove <code class="font-mono text-xs">draft: true</code>, push, and the post is live a few minutes later (<a class={ilink} href="#deploy">section 18</a> covers that trip).
+      <strong class="text-zinc-800 dark:text-zinc-200">Publishing</strong> is deleting one line. Drafts render on my machine in <code class="font-mono text-xs">npm run dev</code> so I can preview them; remove <code class="font-mono text-xs">draft: true</code>, push, and the post is on its way (<a class={ilink} href="#deploy">section 18</a> covers that trip). If its date has already arrived it goes live on the next build. If the date is still in the future the post is <em>scheduled</em>: it waits, invisible on the live site, and a small robot checks every morning and rebuilds the site the day it comes due.
     </p>
   </section>
 
@@ -1015,6 +1015,13 @@ The actual writing starts here.</pre>
       a <Link href="https://developer.mozilla.org/en-US/docs/Glossary/CDN" class={xlink}>CDN</Link>:
       data centers around the world, each holding a copy of the finished
       files, so the site loads from somewhere near you.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">A push is not the only trigger:</strong> every
+      morning a scheduled check (a GitHub Actions robot) looks for posts whose
+      publish date has arrived and, if one is due, pokes Netlify to rebuild.
+      That is how a finished post from <a class={ilink} href="#writing">section 9</a> can
+      go live on its planned date while I sleep in.
     </p>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">Safe experiments:</strong> only the <code class="font-mono text-xs">main</code> branch publishes to jpshlk.com. Work happens on other branches, and each one gets its own private preview URL built exactly the same way, so every change is reviewed on a real deploy before it merges. This very page was checked on a preview URL before you ever saw it.

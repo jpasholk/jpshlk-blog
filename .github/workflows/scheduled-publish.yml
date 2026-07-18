@@ -1,0 +1,30 @@
+# Publishes scheduled posts. A post with no draft flag becomes eligible
+# on its frontmatter date; production hides future-dated posts at build
+# time (src/lib/posts.ts), so all this job does is trigger a rebuild
+# when the live feed is missing an eligible post. 15:30 UTC is 8:30 AM
+# Pacific in summer (PDT) and 7:30 AM in winter (PST).
+name: Scheduled publish
+
+on:
+  schedule:
+    - cron: '30 15 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for posts due to publish
+        id: check
+        run: node scripts/pending-posts.mjs
+
+      - name: Trigger Netlify production build
+        if: steps.check.outputs.pending != '0'
+        run: curl -sf -X POST -o /dev/null "$NETLIFY_BUILD_HOOK"
+        env:
+          NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
