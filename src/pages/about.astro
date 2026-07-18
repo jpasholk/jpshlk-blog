@@ -25,7 +25,7 @@ interface UsesSection {
   items: UsesItem[];
 }
 
-const updated = new Date('2026-07-11');
+const updated = new Date('2026-07-17');
 
 const description =
   "Who I am, what I'm doing right now, and the hardware, apps, and tools I actually use. The whole me page, gathered in one place.";
@@ -72,7 +72,7 @@ const usesSections: UsesSection[] = [
     items: [
       {
         name: 'Apple Shortcuts',
-        blurb: 'Where most of my automation lives, on iPhone and Mac both.',
+        blurb: 'Still handy for quick iPhone and Mac automation, though I build with it less than I used to.',
       },
       {
         name: 'RoutineHub',
@@ -104,7 +104,7 @@ const usesSections: UsesSection[] = [
       {
         name: 'Obsidian',
         url: 'https://obsidian.md',
-        blurb: 'Plain Markdown notes. I am still early on this one, but it is sticking.',
+        blurb: 'Plain Markdown notes, over a year deep now, and lately the vault I am building Claude Code skills to work with.',
       },
     ],
   },
@@ -163,17 +163,19 @@ const postLink = 'font-medium text-primary-600 underline-offset-2 hover:underlin
         out with my lovely girlfriend, I can be found playing pool or disc golf.
       </p>
       <p>
-        At work I manage all of the web and marketing operations for our Amazon
-        and Shopify based business. Sometimes I'm creating marketing strategies,
-        others I'm helping develop new products. Then there's the times that
+        At work I run operations for our Amazon and Shopify based business. Some
+        days that's marketing strategy, others it's helping develop new products
+        or keeping the warehouse and logistics moving. Then there's the times
         I'll have to put out a fire because some online service doesn't want to
         work (I don't blame them, I really don't either). 😜
       </p>
       <p>
         In the free-ish time that I can find, I'm usually going deeper on AI:
-        learning to build <Link href="https://code.claude.com/docs/en/skills" class={inlineLink}>Claude Skills</Link>,
-        plugins, and agents. I organize my notes and ideas in <Link href="https://obsidian.md" class={inlineLink}>Obsidian</Link>,
-        and I'm building this very site with <Link href="https://astro.build" class={inlineLink}>Astro</Link>.
+        building <Link href="https://code.claude.com/docs/en/skills" class={inlineLink}>Claude Skills</Link>,
+        plugins, and agents. I've kept my notes in <Link href="https://obsidian.md" class={inlineLink}>Obsidian</Link> for
+        over a year now, and lately I wired Claude Code into the vault and
+        started building my own skills, some to work with my notes and some for
+        everything else. I'm also building this very site with <Link href="https://astro.build" class={inlineLink}>Astro</Link>.
       </p>
       <p>
         I love chatting about e-commerce, marketing, Shopify, and anything tech
@@ -190,29 +192,32 @@ const postLink = 'font-medium text-primary-600 underline-offset-2 hover:underlin
 
       <h3 class={h3}>Working on</h3>
       <p class={body}>
-        Web and marketing operations at Plantonix, keeping an Amazon and
-        Shopify based business humming. Same as always, never the same twice.
+        Running operations at Plantonix, keeping an Amazon and Shopify based
+        business humming. Same as always, never the same twice.
       </p>
       <p class={body}>
         And this site. I rebuilt the whole thing from scratch with an AI pair
         programmer, and I'm still riding that momentum: <a href="/blog/rebuilding-my-blog-with-ai/" class={postLink}>the rebuild series</a> is
         being written and published as I go, and new features keep landing
-        (site search being the latest, this page being the newest).
+        (smooth page transitions being the latest).
       </p>
 
       <h3 class={h3}>Playing with</h3>
       <p class={body}>
         <a href="https://claude.com/claude-code" class={postLink}>Claude Code</a> for
         basically everything on this site, and <a href="https://obsidian.md" class={postLink}>Obsidian</a> for
-        notes. Still early on the Obsidian habit, but it's sticking. There's
-        always an iOS Shortcut or two mid-build, too.
+        notes (over a year in now, and I recently wired Claude Code into the
+        vault). iOS Shortcuts are on the back burner these days, but they're
+        what first got me into programming.
       </p>
 
       <h3 class={h3}>Life lately</h3>
       <p class={body}>
-        Time with family, friends, and my lovely girlfriend. When I get a free
-        evening it usually goes to pool or disc golf, with hot coffee or cold
-        beer nearby depending on the hour.
+        Time with family, friends, and my girlfriend, who I just moved into a
+        new place with. We started a garden this year, which is a funny thing to
+        do for a living and then come home to. When I get a free evening it
+        usually goes to pool or disc golf, hot coffee or cold beer nearby
+        depending on the hour.
       </p>
     </section>
 
