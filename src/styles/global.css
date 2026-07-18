@@ -132,7 +132,7 @@ pagefind-results:not(:defined) {
   ::view-transition-group(.vt-morph),
   ::view-transition-old(.vt-morph),
   ::view-transition-new(.vt-morph) {
-    animation-duration: 0.3s;
+    animation-duration: 0.4s;
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
