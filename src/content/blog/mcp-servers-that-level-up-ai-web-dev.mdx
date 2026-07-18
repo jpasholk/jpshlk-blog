@@ -6,6 +6,8 @@ summary: 'AI coding tools are only as good as what they can see. MCP servers giv
 tags: ['rebuild', 'ai', 'web-development']
 ---
 
+import Link from "../../components/Link.astro";
+
 *This is part 10, the finale, of my [rebuild series](/tags/rebuild/). In [part 9](/blog/teaching-my-ai-to-write-like-me/) I taught the AI to write like me.*
 
 {/* TODO: revisit after you've actually used these for a while. Swap in your own impressions. */}
@@ -34,11 +36,11 @@ Free, remote (nothing to install), run by the Astro team, always current. If you
 claude mcp add --transport http astro-docs https://mcp.docs.astro.build/mcp
 ```
 
-Details at [mcp.docs.astro.build](https://mcp.docs.astro.build/) and Astro's [Build with AI guide](https://docs.astro.build/en/guides/build-with-ai/).
+Details at <Link href="https://mcp.docs.astro.build/">mcp.docs.astro.build</Link> and Astro's <Link href="https://docs.astro.build/en/guides/build-with-ai/">Build with AI guide</Link>.
 
 ### 2. Playwright: let the AI look at your site
 
-[Playwright's MCP server](https://github.com/microsoft/playwright-mcp) gives the AI a real browser: open pages, click buttons, take screenshots.
+<Link href="https://github.com/microsoft/playwright-mcp">Playwright's MCP server</Link> gives the AI a real browser: open pages, click buttons, take screenshots.
 
 This one earned its spot during the rebuild. The dark mode fix in part 4 wasn't declared done because the code looked right. The AI opened a browser with dark system settings, verified no flash, clicked the toggle, navigated five pages, and screenshotted the styleguide in both themes. The fuzzy 404 from part 7 was proven by literally visiting a typo'd URL and watching it redirect. "Does it look right?" is half of web dev, and this makes it something the AI can answer itself:
 
@@ -48,7 +50,7 @@ claude mcp add playwright -- npx @playwright/mcp@latest
 
 ### 3. Cloudflare's servers: for if I ever migrate
 
-Cloudflare runs [official MCP servers](https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/): a docs one (same story as Astro's), plus builds and observability servers that let the AI check *why a deploy failed* and read logs itself, instead of you playing copy-paste middleman with build output.
+Cloudflare runs <Link href="https://developers.cloudflare.com/agents/model-context-protocol/mcp-servers-for-cloudflare/">official MCP servers</Link>: a docs one (same story as Astro's), plus builds and observability servers that let the AI check *why a deploy failed* and read logs itself, instead of you playing copy-paste middleman with build output.
 
 ```sh
 claude mcp add --transport http cf-docs https://docs.mcp.cloudflare.com/mcp

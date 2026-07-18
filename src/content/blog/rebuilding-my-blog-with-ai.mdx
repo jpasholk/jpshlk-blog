@@ -8,6 +8,8 @@ featureImage:
   alt: 'Illustration of a house being rebuilt at night: a crane lowers dark code panels into the wooden framing on one side while the finished side glows with browser windows, and a small builder with a blueprint and coffee stands by the front door.'
 ---
 
+import Link from "../../components/Link.astro";
+
 *This is part 1 of my [rebuild series](/tags/rebuild/), where I document tearing this site down and rebuilding it from scratch.*
 
 If you're reading this, you're looking at a brand new website. Same posts, same me, but every single line of code under the hood was rewritten from scratch. And I'll be honest with you: I didn't write most of it. An AI did. I just told it what I wanted, made the decisions, and learned a ton along the way. 🤙
@@ -16,14 +18,14 @@ This post kicks off a series documenting the whole thing, in pieces simple enoug
 
 ## Why rebuild at all?
 
-The old version of this site was a port of a popular theme, [tailwind-nextjs-starter-blog](https://github.com/timlrx/tailwind-nextjs-starter-blog), adapted to [Astro](https://astro.build). It served me well while I was learning, but it had problems:
+The old version of this site was a port of a popular theme, <Link href="https://github.com/timlrx/tailwind-nextjs-starter-blog">tailwind-nextjs-starter-blog</Link>, adapted to <Link href="https://astro.build">Astro</Link>. It served me well while I was learning, but it had problems:
 
 - It was somebody else's design with my name on it.
 - It was stuck on Astro 3, several major versions behind.
 - The homepage was just a list of posts. I wanted a **landing page** (about me, my work, my hobbies) with the blog one click away.
 - The dark mode toggle was broken. (More on that in part 4. It was broken in a *really* educational way. 😜)
 
-I also wanted serious SEO, and it turns out the founder of Yoast (the WordPress SEO plugin that runs half the internet) has been building [SEO tools for Astro](https://joost.blog/astro-seo-complete-guide/). That sealed it.
+I also wanted serious SEO, and it turns out the founder of Yoast (the WordPress SEO plugin that runs half the internet) has been building <Link href="https://joost.blog/astro-seo-complete-guide/">SEO tools for Astro</Link>. That sealed it.
 
 ## How the AI part actually worked
 

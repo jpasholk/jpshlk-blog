@@ -6,9 +6,11 @@ summary: 'Joost de Valk built Yoast SEO for WordPress. Now he builds SEO tools f
 tags: ['rebuild', 'astro', 'ai', 'web-development']
 ---
 
+import Link from "../../components/Link.astro";
+
 *This is part 7 of my [rebuild series](/tags/rebuild/). In [part 6](/blog/migrating-22-posts-without-editing-a-single-one/) I migrated all my posts without editing them.*
 
-If you've ever touched WordPress, you've seen Yoast SEO, the plugin with the green/orange/red dots that runs on millions of sites. Its founder, [Joost de Valk](https://joost.blog/), has moved on from WordPress and now builds SEO tooling for Astro: the open-source [seo-graph suite](https://github.com/jdevalk/seo-graph). His [Astro SEO guide](https://joost.blog/astro-seo-complete-guide/) is the reference I worked from.
+If you've ever touched WordPress, you've seen Yoast SEO, the plugin with the green/orange/red dots that runs on millions of sites. Its founder, <Link href="https://joost.blog/">Joost de Valk</Link>, has moved on from WordPress and now builds SEO tooling for Astro: the open-source <Link href="https://github.com/jdevalk/seo-graph">seo-graph suite</Link>. His <Link href="https://joost.blog/astro-seo-complete-guide/">Astro SEO guide</Link> is the reference I worked from.
 
 This was the part of the rebuild I was most excited about, and it over-delivered, mostly by finding *my* mistakes.
 
@@ -18,7 +20,7 @@ This was the part of the rebuild I was most excited about, and it over-delivered
 
 **A schema.org JSON-LD graph.** This is structured data, a machine-readable description of each page embedded as JSON. Every post on this site now describes itself to crawlers as a connected graph: a `BlogPosting`, on a `WebPage`, part of this `WebSite`, written by a `Person` (me), with `BreadcrumbList` navigation. Same entity model Yoast made famous, rebuilt for Astro.
 
-**llms.txt.** Like `robots.txt`, but for AI: a [proposed standard](https://llmstxt.org) file summarizing your site for language models. Mine lists every real page with its description, auto-generated at build time.
+**llms.txt.** Like `robots.txt`, but for AI: a <Link href="https://llmstxt.org">proposed standard</Link> file summarizing your site for language models. Mine lists every real page with its description, auto-generated at build time.
 
 **Markdown alternates.** Every post is also served as plain markdown. Add `.md` to any post URL (like `/blog/learning-astro.md`) and you get the raw text, no HTML. Each page advertises this with a `<link rel="alternate" type="text/markdown">` tag so AI agents can find the clean version instead of scraping HTML. This is what "agent-ready" means: my content is *easier for machines to read correctly*.
 
