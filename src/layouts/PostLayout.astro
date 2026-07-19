@@ -45,10 +45,12 @@ const ogImage = ogSource
   description={seo?.description ?? summary}
   canonical={canonicalUrl}
   ogType="article"
-  ogImage={ogImage ? new URL(ogImage.src, assetBase).href : undefined}
-  ogImageAlt={ogSource ? (seo?.image?.alt ?? featureImage?.alt ?? title) : undefined}
-  ogImageWidth={ogImage?.attributes.width}
-  ogImageHeight={ogImage?.attributes.height}
+  ogImage={ogImage
+    ? new URL(ogImage.src, assetBase).href
+    : new URL(`/og/${post.id}.png`, assetBase).href}
+  ogImageAlt={ogSource ? (seo?.image?.alt ?? featureImage?.alt ?? title) : title}
+  ogImageWidth={ogImage?.attributes.width ?? 1200}
+  ogImageHeight={ogImage?.attributes.height ?? 630}
   article={{
     publishedTime: date,
     modifiedTime: postDateModified(post),
