@@ -22,11 +22,14 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
+    "@fontsource/inter": "^5.2.8",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.2",
     "linkinator": "^7.6.1",
     "pagefind": "^1.5.2",
     "rehype-autolink-headings": "^7.1.0",
+    "satori": "^0.28.0",
     "tailwindcss": "^4.3.2",
     "typescript": "^5.8.0"
   }

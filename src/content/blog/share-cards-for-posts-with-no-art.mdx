@@ -1,0 +1,50 @@
+---
+title: Share Cards for Posts With No Art
+date: '2026-10-19'
+draft: true
+summary: 'Most of my posts have no photo, so their link previews all showed the same generic card. Now the build draws each one a title card. Satori, two fonts, one bug.'
+tags: ['astro', 'web-development', 'rebuild']
+---
+
+import Link from "../../components/Link.astro";
+
+Back in August I wrote about [giving every post its own share image](/blog/give-every-post-its-own-share-image/): three lines of frontmatter promote a post's hero photo to its social card. Great system, one catch. It only works for posts that *have* a photo.
+
+Most of mine don't. This whole rebuild series is words and code blocks, and every single one of those posts was sharing the same generic fallback card. Paste two different posts into a chat and they looked like the same link. Not great. 😜
+
+So now the build makes art for the artless.
+
+## Resize vs. generate
+
+It helps to see these as two different jobs. The August system is a *resize* pipeline: a real photo exists, and the build just produces a properly sized copy for link previews. This new one is a *generate* pipeline: no photo exists, so the build draws one from scratch, using the only material every post is guaranteed to have. Its title and date.
+
+Posts with real art keep the resize path, untouched. Posts without it get a generated card: dark background, the site wordmark, the title nice and huge, the date at the bottom. Simple, legible at thumbnail size, and unmistakably this site.
+
+## How a build draws a picture
+
+The heavy lifting is a library called <Link href="https://github.com/vercel/satori">satori</Link>: you hand it a layout described like HTML elements with CSS styles, and it hands back an SVG of that layout. A second library rasterizes the SVG into a PNG. Both run inside the normal `npm run build`, in an Astro endpoint that spits out one `/og/<slug>.png` per imageless post:
+
+```ts
+export const getStaticPaths = (async () => {
+  const posts = await getPublishedPosts();
+  return posts
+    .filter((post) => !post.data.featureImage && !post.data.seo?.image)
+    .map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+```
+
+That filter is the whole policy. Has art? Not my department. No art? You get a card.
+
+A few things satori taught me the hard way: every element with multiple children needs an explicit `display: flex` (it doesn't assume block layout like a browser). It can't read the variable-weight font files the site actually uses, so the build carries two static Inter weights just for cards. And it has no color emoji font, so titles get their emoji stripped before rendering, which is why the card for a post titled with a 🤙 doesn't crash the build.
+
+## The one real bug
+
+My first sample card confidently displayed the wrong date. The post was dated July 19; the card said July 18.
+
+Dates like `2026-07-19` in frontmatter parse as midnight UTC, and formatting that moment in my Pacific timezone lands on the evening *before*. The site's date component solved this ages ago by always formatting in UTC, and the card code just had to do the same. One line. But it's a nice reminder that every place you format a date is another chance to be off by one. 🫠
+
+## The payoff
+
+Nothing about writing changes. A post with no art gets a card at build time, automatically, and if I ever add a real feature image to it, the generated card quietly stops existing on the next build. The 21 imageless posts in this series all picked up cards the day this shipped, including the one you might have arrived here through. If the link preview that brought you here was a dark card with a big title on it: that's the machine, doing its one job.
+
+Thanks for reading and have a good one! 🤙

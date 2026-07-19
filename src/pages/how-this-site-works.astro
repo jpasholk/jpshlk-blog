@@ -615,7 +615,7 @@ The actual writing starts here.</pre>
       <strong class="text-zinc-800 dark:text-zinc-200">Job one, content images:</strong> a markdown <code class="font-mono text-xs">![alt](../../assets/photo.jpg)</code> in a post (or the <code class="font-mono text-xs">&lt;Image /&gt;</code> component in Hero) comes out the other side compressed and cache-friendly, automatically.
     </p>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">Job two, share images:</strong> PostLayout renders each post's feature image to a link-preview version at build time: capped at 1200px wide, never upscaled, and kept as PNG or JPEG because some link crawlers still choke on modern formats.
+      <strong class="text-zinc-800 dark:text-zinc-200">Job two, share images:</strong> PostLayout renders each post's feature image to a link-preview version at build time: capped at 1200px wide, never upscaled, and kept as PNG or JPEG because some link crawlers still choke on modern formats. And a post with no art at all gets a card invented for it: the build draws a dark 1200 by 630 title card (site name, title, date) and wires it up as that post's link preview.
     </p>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">Job three, the passthrough bucket:</strong> <code class="font-mono text-xs">public/</code> is for files that must not be touched: favicons, <code class="font-mono text-xs">robots.txt</code>, the redirects file, and the default share image. They are copied into <code class="font-mono text-xs">dist/</code> exactly as-is.
