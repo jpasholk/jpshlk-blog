@@ -364,7 +364,9 @@ btn.addEventListener('click',
       </div>
     </div>
     <p class={note}>
-      So every page gets the same head, header, and footer for free, and only has to bring the middle. Change <code class="font-mono text-xs">BaseLayout.astro</code> once and every page on the site changes. Astro's own{' '}
+      So every page gets the same head, header, and footer for free, and only has to bring the middle. Change <code class="font-mono text-xs">BaseLayout.astro</code> once and every page on the site changes. There is one escape hatch: pass BaseLayout a{' '}
+      <code class="font-mono text-xs">chromeless</code> prop and it skips the header and footer while keeping the whole head intact. The{' '}
+      <a class={ilink} href="/links/">link-in-bio page</a> uses it to stand alone. Astro's own{' '}
       <Link href="https://docs.astro.build/en/basics/astro-components/" class={xlink}>components guide</Link> covers
       this in full.
     </p>
