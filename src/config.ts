@@ -20,6 +20,7 @@ export const AUTHOR = {
 export const SOCIALS = {
   mastodon: 'https://mastodon.social/@jpasholk',
   github: 'https://github.com/jpasholk',
+  bluesky: 'https://bsky.app/profile/jpshlk.com',
   linkedin: 'https://www.linkedin.com/in/joshpasholk',
   instagram: 'https://www.instagram.com/joshpasholk/',
   buymeacoffee: 'https://buymeacoffee.com/jpasholk',
