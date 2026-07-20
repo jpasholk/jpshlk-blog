@@ -16,7 +16,7 @@ The answer is Astro's **container API**: a way to spin up a tiny, self-contained
 
 ```ts
 // src/pages/rss.xml.ts (the interesting part)
-import { getContainerRenderer as getMDXRenderer } from '@astrojs/mdx';
+import { getContainerRenderer as getMDXRenderer } from '@astrojs/mdx/container-renderer';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
 import { render } from 'astro:content';
