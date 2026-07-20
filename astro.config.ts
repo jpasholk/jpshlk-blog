@@ -1,4 +1,4 @@
-import { rehypeHeadingIds } from '@astrojs/markdown-remark';
+import { rehypeHeadingIds, unified } from '@astrojs/markdown-remark';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import seoGraph, { indexNowOnBranch } from '@jdevalk/astro-seo-graph/integration';
@@ -37,22 +37,24 @@ export default defineConfig({
   // never consumes a prerendered page.)
   prefetch: { prefetchAll: true, defaultStrategy: 'viewport' },
   markdown: {
-    rehypePlugins: [
-      // Astro normally adds heading ids AFTER user plugins run, so the
-      // autolink plugin would see id-less headings and skip them all.
-      // Running the id plugin explicitly first fixes the order.
-      rehypeHeadingIds,
-      // Appends a hover anchor link (the # next to headings) to each
-      // heading that has an id.
-      [
-        rehypeAutolinkHeadings,
-        {
-          behavior: 'append',
-          properties: { className: ['heading-anchor'], ariaLabel: 'Link to this section' },
-          content: { type: 'text', value: '#' },
-        },
+    processor: unified({
+      rehypePlugins: [
+        // Astro normally adds heading ids AFTER user plugins run, so the
+        // autolink plugin would see id-less headings and skip them all.
+        // Running the id plugin explicitly first fixes the order.
+        rehypeHeadingIds,
+        // Appends a hover anchor link (the # next to headings) to each
+        // heading that has an id.
+        [
+          rehypeAutolinkHeadings,
+          {
+            behavior: 'append',
+            properties: { className: ['heading-anchor'], ariaLabel: 'Link to this section' },
+            content: { type: 'text', value: '#' },
+          },
+        ],
       ],
-    ],
+    }),
   },
   // /about is a real page again (it absorbed /now and /uses, whose
   // URLs now land on their sections). /aboutme is linked from an old
