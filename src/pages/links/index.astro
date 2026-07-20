@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import avatar from '@/assets/josh.jpeg';
+import LinkButton from '@/components/LinkButton.astro';
+import { AUTHOR, SOCIALS } from '@/config';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { profileGraph } from '@/lib/schema';
+
+const description =
+  'Josh Pasholk around the web: blog, projects, and every social profile in one place.';
+
+const links = [
+  { kind: 'link', label: 'Read the Blog', href: '/blog/' },
+  { kind: 'link', label: 'My Projects', href: '/projects/' },
+  { kind: 'link', label: 'About Me', href: '/about/' },
+  { kind: 'mastodon', label: 'Mastodon', href: SOCIALS.mastodon },
+  { kind: 'github', label: 'GitHub', href: SOCIALS.github },
+  { kind: 'linkedin', label: 'LinkedIn', href: SOCIALS.linkedin },
+  { kind: 'instagram', label: 'Instagram', href: SOCIALS.instagram },
+  { kind: 'buymeacoffee', label: 'Buy Me a Coffee', href: SOCIALS.buymeacoffee },
+  { kind: 'routinehub', label: 'RoutineHub', href: SOCIALS.routinehub },
+] as const;
+---
+
+<BaseLayout
+  title="Links"
+  description={description}
+  ogType="profile"
+  chromeless
+  graph={profileGraph('Links', '/links/', description)}
+>
+  <section class="mx-auto flex max-w-md flex-col items-center py-16 text-center">
+    <Image
+      src={avatar}
+      alt={`Portrait of ${AUTHOR.name}`}
+      width={224}
+      densities={[1, 2]}
+      loading="eager"
+      class="size-28 rounded-full object-cover ring-4 ring-primary-500/20"
+    />
+    <h1 class="mt-5 text-2xl font-bold tracking-tight">{AUTHOR.name}</h1>
+    <p class="mt-1 text-sm font-medium text-primary-600 dark:text-primary-400">
+      {AUTHOR.occupation} @ {AUTHOR.company}
+    </p>
+    <div class="mt-8 flex w-full flex-col gap-3">
+      {links.map((link) => <LinkButton kind={link.kind} href={link.href} label={link.label} />)}
+    </div>
+    <p class="mt-8 text-sm text-zinc-500 dark:text-zinc-400">
+      <a href="/" class="transition-colors hover:text-primary-500">jpshlk.com</a>
+    </p>
+  </section>
+</BaseLayout>

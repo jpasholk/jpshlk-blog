@@ -138,3 +138,32 @@ export function pageGraph(name: string, path: string, description?: string) {
     warnOnDanglingReferences: import.meta.env.DEV,
   });
 }
+
+/** ProfilePage graph for identity hub pages like /links/. */
+export function profileGraph(name: string, path: string, description?: string) {
+  const url = new URL(path, SITE.url).href;
+  return assembleGraph(
+    [
+      buildWebPage(
+        {
+          url,
+          name,
+          description,
+          isPartOf: { '@id': ids.website },
+          breadcrumb: { '@id': ids.breadcrumb(url) },
+          mainEntity: { '@id': ids.person },
+          inLanguage: SITE.locale,
+        },
+        ids,
+        'ProfilePage',
+      ),
+      buildBreadcrumbList(
+        { url, items: breadcrumbsFromUrl({ url, siteUrl: SITE.url, pageName: name }) },
+        ids,
+      ),
+      person,
+      website,
+    ],
+    { warnOnDanglingReferences: import.meta.env.DEV },
+  );
+}

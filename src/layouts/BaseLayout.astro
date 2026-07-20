@@ -24,6 +24,8 @@ interface Props {
     tags?: string[];
   };
   graph?: Record<string, unknown> | null;
+  /** Drop the header and footer for standalone pages like /links/. */
+  chromeless?: boolean;
 }
 
 const {
@@ -38,6 +40,7 @@ const {
   ogImageHeight = 630,
   article,
   graph,
+  chromeless = false,
 } = Astro.props;
 
 const goatcounter =
@@ -130,17 +133,23 @@ const goatcounter =
   <body class="relative">
     <CodeGutters />
     <div class="relative z-10 flex min-h-screen flex-col">
-      <a
-        href="#main"
-        class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white"
-      >
-        Skip to content
-      </a>
-      <Header />
+      {
+        !chromeless && (
+          <>
+            <a
+              href="#main"
+              class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-white"
+            >
+              Skip to content
+            </a>
+            <Header />
+          </>
+        )
+      }
       <main id="main" class="mx-auto w-full max-w-3xl grow px-4 sm:px-6">
         <slot />
       </main>
-      <Footer />
+      {!chromeless && <Footer />}
     </div>
 
     <script>
