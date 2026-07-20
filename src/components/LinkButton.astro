@@ -1,0 +1,47 @@
+---
+/**
+ * Full-width icon + label button row for the /links/ page. Imports the
+ * icon SVGs directly instead of going through social-icons/index.astro,
+ * which renders its own anchor (nested anchors are invalid HTML).
+ * External hrefs open in a new tab, mirroring Button.astro; the
+ * mastodon row gets rel="me" to match the head's identity link.
+ */
+import BuyMeACoffee from '@/components/social-icons/icons/BuyMeACoffee.astro';
+import Github from '@/components/social-icons/icons/Github.astro';
+import Instagram from '@/components/social-icons/icons/Instagram.astro';
+import LinkIcon from '@/components/social-icons/icons/Link-icon.astro';
+import Linkedin from '@/components/social-icons/icons/Linkedin.astro';
+import Mastodon from '@/components/social-icons/icons/Mastodon.astro';
+import RoutineHub from '@/components/social-icons/icons/RoutineHub.astro';
+
+const icons = {
+  link: LinkIcon,
+  mastodon: Mastodon,
+  github: Github,
+  linkedin: Linkedin,
+  instagram: Instagram,
+  buymeacoffee: BuyMeACoffee,
+  routinehub: RoutineHub,
+};
+
+interface Props {
+  kind: keyof typeof icons;
+  href: string;
+  label: string;
+}
+
+const { kind, href, label } = Astro.props;
+const Icon = icons[kind];
+
+const isExternal = !href.startsWith('/') && !href.startsWith('#');
+const rel = kind === 'mastodon' ? 'me noopener noreferrer' : 'noopener noreferrer';
+---
+
+<a
+  href={href}
+  class="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-300 px-4 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:border-primary-500 hover:text-primary-600 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-primary-400 dark:hover:text-primary-400"
+  {...(isExternal ? { target: '_blank', rel } : {})}
+>
+  <Icon class="size-5 fill-current" aria-hidden="true" />
+  {label}
+</a>
