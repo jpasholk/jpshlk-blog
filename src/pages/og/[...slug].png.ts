@@ -98,5 +98,7 @@ export const GET: APIRoute = async ({ props }) => {
   );
 
   const png = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng();
-  return new Response(png, { headers: { 'Content-Type': 'image/png' } });
+  // asPng() returns a Node Buffer, which the DOM Response type does not
+  // accept as BodyInit; a plain Uint8Array does.
+  return new Response(new Uint8Array(png), { headers: { 'Content-Type': 'image/png' } });
 };
