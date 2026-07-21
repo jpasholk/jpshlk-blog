@@ -23,11 +23,17 @@ const isExternal =
       {...rest}
     >
       <slot />
+      {/* width/height mirror size-4 (16px) for contexts without site
+          CSS, like feed readers; data-feed-strip lets rss.xml.ts drop
+          this icon from feed HTML without matching on class names. */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 20 20"
+        width="16"
+        height="16"
         fill="currentColor"
         aria-hidden="true"
+        data-feed-strip
         class="inline size-4 align-text-top"
       >
         <path
