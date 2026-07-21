@@ -4,14 +4,15 @@
  * navigations. Quotes are inlined at build time as JSON so no
  * client fetch is needed. The filling script lives in BaseLayout:
  * it must already be loaded on the page the visitor navigates FROM
- * (any page), or the quote pops in after the crossfade.
+ * (any page), or the quote pops in after the crossfade. Rendered by
+ * the footer, so every page with chrome shows one.
  */
 import quotesData from '@/data/quotes.json';
 ---
 
-<figure class="mx-auto mt-16 max-w-xl text-center" data-random-quote>
-  <blockquote class="text-lg text-zinc-600 italic dark:text-zinc-400" data-quote-text></blockquote>
-  <figcaption class="mt-2 text-sm text-zinc-500" data-quote-author></figcaption>
+<figure class="mx-auto max-w-xl text-center" data-random-quote>
+  <blockquote class="text-sm text-zinc-600 italic dark:text-zinc-400" data-quote-text></blockquote>
+  <figcaption class="mt-1 text-xs text-zinc-500" data-quote-author></figcaption>
 </figure>
 
 <script type="application/json" data-quotes set:html={JSON.stringify(quotesData.quotes)} />
