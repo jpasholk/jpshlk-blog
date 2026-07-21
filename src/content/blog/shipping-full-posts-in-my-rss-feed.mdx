@@ -35,7 +35,7 @@ Every post, components and all, becomes finished HTML at build time, and each fe
 
 ## The cleanup pass nobody warns you about
 
-Rendering was half the job. The HTML that comes out is written for *my site*, and a feed item lives in someone else's reader app, so two fixes run on every post:
+Rendering was half the job. The HTML that comes out is written for *my site*, and a feed item lives in someone else's reader app, so the first two fixes run on every post:
 
 ```ts
 html = html
@@ -46,8 +46,40 @@ html = html
 
 First, the container can prepend a doctype, which has no business inside a feed item. Second, and more importantly: my images and internal links are root-relative (`/_astro/photo.webp`, `/blog/other-post/`). In a feed reader there is no "root," so every relative URL must become absolute (`https://jpshlk.com/_astro/photo.webp`) or images simply won't load. This is the classic full-content-RSS bug, and you only find it by opening your own feed in a real reader.
 
+## The bugs only a real reader shows you
+
+With the feed built and shipped, I did the responsible thing and subscribed to my own site in Reeder. Three problems, instantly:
+
+- **Giant arrows everywhere.** External links on my site get a little arrow icon, an inline SVG that gets its size from a Tailwind class. Feed readers never load your stylesheet, and an SVG with no size of its own expands to fill the available width. So every outgoing link was followed by an arrow the size of a paragraph. 😜
+- **A stray `#` after every heading.** Those are my hover anchor links, the ones that let you copy a link to a section. On the site a line of CSS keeps them invisible until you hover. No CSS, no invisibility.
+- **No hero images.** The post page shows each post's feature image above the body, but the feed only rendered the body.
+
+All three are the same lesson: your feed HTML travels alone. Whatever your stylesheet was doing for you (sizing things, hiding things) simply stops happening in someone else's app.
+
+The fix was to treat chrome as chrome. Chrome is the decoration around your content: icons, anchors, UI garnish. The arrow icon now carries a `data-feed-strip` attribute in its markup, and the cleanup pass deletes anything tagged with it, along with the heading anchors:
+
+```ts
+html = html
+  .replace(/\s*<svg\b[^>]*\bdata-feed-strip\b[^>]*>[\s\S]*?<\/svg>/g, '')
+  .replace(/\s*<a\b[^>]*\bclass="[^"]*\bheading-anchor\b[^"]*"[^>]*>#<\/a>/g, '');
+```
+
+(The icon also got a hard `width="16" height="16"` on the SVG itself, so if one ever slips through, it stays icon-sized.)
+
+The hero images got the opposite treatment: instead of stripping something out, the feed now adds something in. Each item starts with the same image the post page shows, run through the same image pipeline and dropped in as a plain `img` tag with an absolute URL:
+
+```ts
+const hero = await getImage({
+  src: featureImage.src,
+  width: Math.min(1400, featureImage.src.width),
+});
+html = `<img src="${new URL(hero.src, context.site).href}" alt="...">` + html;
+```
+
+Readers even use that first image as the article thumbnail in the list view, which is a nice bonus. One warning if you try this yourself: readers cache article content aggressively, so after a fix like this you may need to remove your feed and re-add it before you believe your own eyes.
+
 ## Was it worth it?
 
-The rebuilt feed carries all 22 posts in full: text, images with working URLs, even the posts with embedded components. It weighs about 200KB, which is nothing for something fetched occasionally by feed readers.
+The rebuilt feed carries every post in full: text, hero images, body images with working URLs, even the posts with embedded components. It weighs about 200KB, which is nothing for something fetched occasionally by feed readers.
 
 If you write for the web, the people who add your site to an RSS reader are your most loyal audience by definition. They opted in. Shipping them the entire post instead of a teaser is the least a site can do, and now this one does. Subscribe away: [/rss.xml](/rss.xml). 🤙
