@@ -62,4 +62,22 @@ Testing surfaced two very on-brand bugs. The feed check originally compared slug
 
 Both fixes were one line. Both would have caused a phantom rebuild every single day, forever, and I would probably never have noticed. Test your cron jobs before you let them loose. 🤙
 
+## The post that jumped the gun
+
+There was a third bug, and this one skipped testing and went straight to production. One evening in July I had a post scheduled for the next morning, merged a completely unrelated branch after dinner, and watched tomorrow's post go live tonight.
+
+The culprit was that innocent-looking `date:` line. A bare date in frontmatter like `2026-07-23` parses as midnight UTC (the universal reference time the internet runs on). Midnight UTC is 5 PM the *previous evening* here in Pacific time. And the filter runs on every production build, not just the robot's morning visit; merging to `main` is also a build. So the moment I pushed after 5 PM, "tomorrow's" post was already in the past as far as the filter was concerned.
+
+The fix: stop publishing at midnight in Greenwich and start publishing at the robot's alarm time instead.
+
+```ts
+// src/lib/posts.ts
+// Posts go live at 15:30 UTC on their date, the workflow's cron time.
+const PUBLISH_TIME_MS = 15.5 * 60 * 60 * 1000;
+
+return !isProduction || data.date.valueOf() + PUBLISH_TIME_MS <= Date.now();
+```
+
+Now a post's date means what I always assumed it meant: the morning of that day, my time. An evening merge can't publish anything early anymore, because nothing is due until 8:30 the next morning.
+
 As for this post: it was finished, de-drafted, and merged well before the date up top. Nobody pushed anything this morning. If you're reading it, the robot rang the doorbell all by itself.
