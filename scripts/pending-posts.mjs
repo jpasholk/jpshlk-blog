@@ -11,6 +11,10 @@ import { readdir, readFile, appendFile } from 'node:fs/promises';
 const BLOG_DIR = new URL('../src/content/blog/', import.meta.url);
 const FEED_URL = 'https://jpshlk.com/rss.xml';
 
+// Posts publish at 15:30 UTC on their date, not midnight UTC. Keep in
+// sync with isPublished in src/lib/posts.ts.
+const PUBLISH_TIME_MS = 15.5 * 60 * 60 * 1000;
+
 const files = (await readdir(BLOG_DIR)).filter((f) => f.endsWith('.mdx'));
 const eligible = [];
 for (const file of files) {
@@ -21,7 +25,7 @@ for (const file of files) {
   // Old posts use non-padded dates like 2016-3-25, so 1-2 digit parts.
   const date = frontmatter.match(/^date:\s*['"]?(\d{4}-\d{1,2}-\d{1,2})/m)?.[1];
   if (!date) continue;
-  if (new Date(date).valueOf() <= Date.now()) {
+  if (new Date(date).valueOf() + PUBLISH_TIME_MS <= Date.now()) {
     eligible.push(file.replace(/\.mdx$/, ''));
   }
 }

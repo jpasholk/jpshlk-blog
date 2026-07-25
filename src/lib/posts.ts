@@ -11,11 +11,19 @@ export type Post = CollectionEntry<'blog'>;
  * 'production' | 'branch-deploy' | 'deploy-preview' on Netlify builds
  * and unset locally (same detection as assetBase in urls.ts).
  */
+// Frontmatter dates parse as midnight UTC, which is still the previous
+// evening in Pacific time, so comparing against midnight would let an
+// unrelated evening deploy publish tomorrow's post early. Instead a
+// post goes live at 15:30 UTC on its date, the scheduled workflow's
+// cron time (8:30 AM PDT, 7:30 AM PST). Keep in sync with
+// .github/workflows/scheduled-publish.yml and scripts/pending-posts.mjs.
+const PUBLISH_TIME_MS = 15.5 * 60 * 60 * 1000;
+
 export function isPublished(data: Post['data']): boolean {
   if (import.meta.env.DEV) return true;
   if (data.draft) return false;
   const isProduction = !process.env.CONTEXT || process.env.CONTEXT === 'production';
-  return !isProduction || data.date.valueOf() <= Date.now();
+  return !isProduction || data.date.valueOf() + PUBLISH_TIME_MS <= Date.now();
 }
 
 /** Published posts, newest first. */
