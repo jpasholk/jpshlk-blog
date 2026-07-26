@@ -41,8 +41,11 @@ I didn't want it blindly rebuilding the site every day, though, so first it answ
 ```js
 // scripts/pending-posts.mjs, the heart of it
 const feed = (await (await fetch('https://jpshlk.com/rss.xml')).text()).toLowerCase();
+const published = new Set(
+  [...feed.matchAll(/<link>([^<]+)<\/link>/g)].map((m) => new URL(m[1]).pathname),
+);
 const pending = eligible.filter(
-  (slug) => !feed.includes(`/blog/${slug.toLowerCase()}/`),
+  (slug) => !published.has(`/blog/${slug.toLowerCase()}/`),
 );
 ```
 
@@ -79,5 +82,33 @@ return !isProduction || data.date.valueOf() + PUBLISH_TIME_MS <= Date.now();
 ```
 
 Now a post's date means what I always assumed it meant: the morning of that day, my time. An evening merge can't publish anything early anymore, because nothing is due until 8:30 the next morning.
+
+## The post that almost never happened
+
+The best one I caught the night before it would have bitten me, while double-checking that a scheduled post was really going to show up in the morning.
+
+Remember the clever bit about using my own RSS feed as the source of truth for what's live? Here's the version of that check I had been running for weeks:
+
+```js
+feed.includes(`/blog/${slug.toLowerCase()}/`)
+```
+
+It searches the feed for the post's URL. And my feed carries the full text of every post, not just summaries. So the question it's really asking is not "is this post published?" It's "does this URL appear anywhere in the entire text of my blog?"
+
+Those are very different questions, and every series I write breaks the second one. Each part ends by linking to the next part. Part 3 signs off with "Next up: a tiny design system..." pointing straight at part 4. Which means part 4's URL was sitting in my feed, inside part 3's body, weeks before part 4 existed as a published post.
+
+So on publish morning the robot would have looked for part 4's URL, found it (in the wrong post), decided everything was already live, reported nothing pending, and gone back to sleep. No error. No failed run. A green checkmark on a workflow that quietly did nothing, and a post that just never appeared.
+
+The fix is to ask the feed a more precise question. Every published post is an `<item>` with its own `<link>`, so I compare against those links instead of the raw text:
+
+```js
+const published = new Set(
+  [...feed.matchAll(/<link>([^<]+)<\/link>/g)].map((m) => new URL(m[1]).pathname),
+);
+```
+
+Prose can mention any URL it likes now. Only a real feed entry counts as published.
+
+What gets me about this one is that it wasn't a typo or a missing edge case. The code did exactly what I wrote, and what I wrote was a *slightly* wrong question. Those are the bugs that survive testing, because there's nothing to notice until the day the answer matters. 😅
 
 As for this post: it was finished, de-drafted, and merged well before the date up top. Nobody pushed anything this morning. If you're reading it, the robot rang the doorbell all by itself.
