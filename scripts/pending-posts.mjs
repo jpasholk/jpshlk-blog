@@ -30,11 +30,23 @@ for (const file of files) {
   }
 }
 
-// Live URLs lowercase the slug (e.g. ice-macOS-menu-bar-manager), so
-// compare case-insensitively.
+// Match the feed's <item> links, not its raw text. The feed ships full
+// post bodies, and posts link forward to the next one in a series, so a
+// substring search finds an unpublished post's URL inside an already
+// published post and wrongly skips its build. Live URLs lowercase the
+// slug (e.g. ice-macOS-menu-bar-manager), so compare case-insensitively.
 const feed = (await (await fetch(FEED_URL)).text()).toLowerCase();
+const published = new Set(
+  [...feed.matchAll(/<link>([^<]+)<\/link>/g)].flatMap((match) => {
+    try {
+      return [new URL(match[1].trim()).pathname];
+    } catch {
+      return [];
+    }
+  }),
+);
 const pending = eligible.filter(
-  (slug) => !feed.includes(`/blog/${slug.toLowerCase()}/`),
+  (slug) => !published.has(`/blog/${slug.toLowerCase()}/`),
 );
 
 if (pending.length === 0) {
