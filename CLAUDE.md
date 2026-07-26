@@ -11,6 +11,17 @@ Josh Pasholk's personal site: Astro 7, Tailwind CSS v4 (CSS-first config), TypeS
 
 Check for violations before committing content: `grep -rn '—' src/content/blog/*.mdx` (posts `ice-macOS-menu-bar-manager`, `new-scam-bank-notification`, `settapp-apps-for-power-users`, and `web-development-am-i-an-imposter` contain pre-existing em dashes in Josh's original writing, and `teaching-my-ai-to-write-like-me` quotes em dashes as examples, and `turning-my-homepage-into-a-landing-page` quotes the RandomQuote attribution dash in a code snippet; leave those alone).
 
+## Hero images (`featureImage`)
+
+Post art lives in `src/assets/` named after the post slug. The rebuild series shares one look, and it has drifted before (part 3 went photoreal neon on black and dropped the warm accent, which made the whole series read as monochrome blue). When generating a prompt for a new one:
+
+- **Format:** flat vector, 1.91:1 landscape. No gradients, photoreal 3D, or painterly texture.
+- **Palette, roughly 60/30/10:** 60% dusty navy `#3A4358` (sky and ground, never pure black), 30% cream `#F5E6C8` plus amber `#E8944A` (house, warmth, lamp light), 10% sky blue `#0EA5E9` (code and UI elements) as accent only. Blue is the brand color (`--color-primary-*` is Tailwind `sky`) and warm amber is its complement; keeping both is what stops the set from going monochrome.
+- **Recurring cast:** the small hard-hatted builder in orange, the cream house with lit windows, crescent moon, low hill silhouettes.
+- **Per-post variety** comes from the topic object in frame, plus optionally one muted fourth accent (teal or sage) in small doses. Not from changing the base palette.
+- **Never:** neon glow, cyberpunk, pure black, purple, lens flare, a card border framing the whole image, or readable text baked into the art.
+- `alt` text is a full descriptive sentence, same as the existing posts.
+
 ## Workflow
 
 - Development happens on feature branches. `main` is the live site; never push or merge to it without explicit permission.
