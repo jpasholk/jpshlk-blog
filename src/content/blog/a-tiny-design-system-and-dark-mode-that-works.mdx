@@ -1,9 +1,15 @@
 ---
 title: A Tiny Design System and a Dark Mode That Works
-date: '2026-07-27'
-draft: true
-summary: 'My old theme toggle was broken in two educational ways. Building a small design system and a dark mode that survives page transitions fixed both.'
-tags: ['rebuild', 'astro', 'web-development']
+date: 2026-07-26
+tags:
+- rebuild
+- astro
+- web-development
+draft: false
+summary: My old theme toggle was broken in two educational ways. Building a small design system and a dark mode that survives page transitions fixed both.
+featureImage:
+  alt: 'Night workbench lit by a desk lamp with two proof boards clipped side by side, each showing the same set of interface pieces: cards, a pill button, tag chips, and a toggle. The left board is cream with orange elements, the right is dark navy with blue ones. A builder in orange overalls and a hard hat stands between them holding a clipboard, with a warmly lit house in the distance.'
+  src: ../../assets/a-tiny-design-system-and-dark-mode-that-works.png
 ---
 
 *This is part 4 of my [rebuild series](/tags/rebuild/). In [part 3](/blog/starting-clean-with-astro-7-and-tailwind-4/) I scaffolded the empty Astro 7 project.*
@@ -81,8 +87,6 @@ The rule of thumb I took away: **on a view-transitions site, any JavaScript that
 ## Did it actually work?
 
 We tested it with an automated browser: load the site with dark system settings (no flash), toggle to light, navigate through five pages (stays light), toggle again (still responds). All green. The styleguide got screenshotted in both themes for a visual once-over.
-
-Testing dark mode by *navigating around*, not just toggling once, is the test my old site never got. Now I know why.
 
 Next up: [turning the homepage into an actual landing page](/blog/turning-my-homepage-into-a-landing-page/).
 
