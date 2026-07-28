@@ -1,6 +1,7 @@
 ---
 import { getImage, Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import CodeCopy from '@/components/CodeCopy.astro';
 import Comments from '@/components/Comments.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
@@ -9,7 +10,7 @@ import RelatedPosts from '@/components/RelatedPosts.astro';
 import TagPill from '@/components/TagPill.astro';
 import type { MarkdownHeading } from 'astro';
 import { readingTime, type Post } from '@/lib/posts';
-import { postDateModified, postGraph } from '@/lib/schema';
+import { postCrumbs, postDateModified, postGraph } from '@/lib/schema';
 import { assetBase } from '@/lib/urls';
 
 interface Props {
@@ -59,6 +60,7 @@ const ogImage = ogSource
   graph={postGraph(post)}
 >
   <article class="pt-10" data-pagefind-body>
+    <Breadcrumbs crumbs={postCrumbs(post)} class="mb-6" />
     {
       featureImage && (
         <Image

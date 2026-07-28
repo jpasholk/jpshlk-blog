@@ -2,11 +2,12 @@
 import { getCollection } from 'astro:content';
 import type { GetStaticPaths, Page } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import Pagination from '@/components/Pagination.astro';
 import PostCard from '@/components/PostCard.astro';
 import { POSTS_PER_PAGE } from '@/config';
 import { getPublishedPosts, type Post } from '@/lib/posts';
-import { pageGraph } from '@/lib/schema';
+import { pageCrumbs, pageGraph } from '@/lib/schema';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const [tags, posts] = await Promise.all([getCollection('tags'), getPublishedPosts()]);
@@ -40,14 +41,20 @@ const pagePath =
   page.currentPage === 1
     ? `/tags/${Astro.params.tag}/`
     : `/tags/${Astro.params.tag}/${page.currentPage}/`;
+
+// Display name for the tag segment when it's an intermediate crumb
+// (paginated pages): without it, `ios` would title-case to "Ios".
+// Shared by the visible trail and the JSON-LD BreadcrumbList.
+const crumbNames = { [Astro.params.tag!]: tagName };
 ---
 
 <BaseLayout
   title={title}
   description={description}
-  graph={pageGraph(title, pagePath, description)}
+  graph={pageGraph(title, pagePath, description, crumbNames)}
 >
-  <h1 class="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">{tagName}</h1>
+  <Breadcrumbs crumbs={pageCrumbs(title, pagePath, crumbNames)} class="mt-10" />
+  <h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">{tagName}</h1>
   {
     tagDescription && (
       <p class="mt-3 text-lg text-zinc-600 dark:text-zinc-400">{tagDescription}</p>
