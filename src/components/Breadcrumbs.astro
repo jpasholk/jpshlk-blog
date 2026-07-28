@@ -1,0 +1,45 @@
+---
+/**
+ * Ancestors-only breadcrumb trail. Receives the same crumb items that
+ * feed the JSON-LD BreadcrumbList (postCrumbs/pageCrumbs in
+ * src/lib/schema.ts), drops the last item (the current page, already
+ * named by the h1 below), and links the rest. Hrefs render as
+ * pathnames so links stay on-origin in dev, preview, and Netlify
+ * branch deploys even though crumb URLs are absolute.
+ */
+import type { BreadcrumbItem } from '@jdevalk/seo-graph-core';
+
+interface Props {
+  crumbs: readonly BreadcrumbItem[];
+  class?: string;
+}
+
+const { crumbs, class: className } = Astro.props;
+const ancestors = crumbs
+  .slice(0, -1)
+  .map((crumb) => ({ name: crumb.name, href: new URL(crumb.url).pathname }));
+---
+
+{
+  ancestors.length > 0 && (
+    <nav aria-label="Breadcrumb" class={className} data-pagefind-ignore>
+      <ol class="flex flex-wrap items-center gap-1.5 text-sm font-medium">
+        {ancestors.map((crumb, index) => (
+          <li class="flex items-center gap-1.5">
+            {index > 0 && (
+              <span aria-hidden="true" class="text-zinc-400 dark:text-zinc-500">
+                &rsaquo;
+              </span>
+            )}
+            <a
+              href={crumb.href}
+              class="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+            >
+              {crumb.name}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}

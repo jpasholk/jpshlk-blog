@@ -3,9 +3,10 @@ import { getCollection, render } from 'astro:content';
 import { getImage, Image } from 'astro:assets';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import Button from '@/components/Button.astro';
 import Prose from '@/components/Prose.astro';
-import { pageGraph } from '@/lib/schema';
+import { pageCrumbs, pageGraph } from '@/lib/schema';
 import { assetBase } from '@/lib/urls';
 
 export const getStaticPaths = (async () => {
@@ -42,6 +43,7 @@ const ogImage = image
   graph={pageGraph(title, `/projects/${id}/`, description)}
 >
   <article class="pt-10" data-pagefind-body>
+    <Breadcrumbs crumbs={pageCrumbs(title, `/projects/${id}/`)} class="mb-6" />
     {
       image && (
         <Image
