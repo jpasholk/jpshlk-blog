@@ -38,4 +38,5 @@ Submitting before the key file is live gets the key rejected permanently (HTTP 4
 
 ## Credits
 
+- The previous version of this site ran on [Tailwind Astro Starter Blog](https://github.com/wanoo21/tailwind-astro-starting-blog) by Ion Prodan ([@wanoo21](https://github.com/wanoo21)). The rebuild is clean-slate code, but his theme informed plenty of design and structure decisions here. The pre-rebuild site, with his code and its original MIT license, is preserved on the `legacy-site` branch.
 - [Quotes in JSON](https://gist.github.com/nasrulhazim/54b659e43b1035215cd0ba1d4577ee80)
