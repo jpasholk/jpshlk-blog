@@ -12,6 +12,7 @@ import {
   buildWebPage,
   buildWebSite,
   makeIds,
+  type BreadcrumbItem,
 } from '@jdevalk/seo-graph-core';
 import { AUTHOR, SITE, SOCIALS } from '@/config';
 import type { Post } from '@/lib/posts';
@@ -39,6 +40,30 @@ export const website = buildWebSite(
 );
 
 export const postUrl = (post: Post) => `${SITE.url}/blog/${post.id}/`;
+
+/**
+ * Crumb trails feed two outputs from one derivation: the BreadcrumbList
+ * in the JSON-LD graph below, and the visible trail Breadcrumbs.astro
+ * renders. Pages must pass the same inputs to both so they can't drift.
+ */
+export function postCrumbs(post: Post): BreadcrumbItem[] {
+  const url = postUrl(post);
+  return breadcrumbsFromUrl({ url, siteUrl: SITE.url, pageName: post.data.title });
+}
+
+/**
+ * Crumb trail for a non-post page. `names` maps path segments to
+ * display names (e.g. { ios: 'iOS' }) for intermediate crumbs that
+ * would otherwise be title-cased from their slug.
+ */
+export function pageCrumbs(
+  name: string,
+  path: string,
+  names?: Record<string, string>,
+): BreadcrumbItem[] {
+  const url = new URL(path, SITE.url).href;
+  return breadcrumbsFromUrl({ url, siteUrl: SITE.url, pageName: name, names });
+}
 
 /**
  * Effective "updated" date: explicit lastmod wins, then the git
@@ -88,13 +113,7 @@ export function postPieces(post: Post) {
       ids,
       'BlogPosting',
     ),
-    buildBreadcrumbList(
-      {
-        url,
-        items: breadcrumbsFromUrl({ url, siteUrl: SITE.url, pageName: post.data.title }),
-      },
-      ids,
-    ),
+    buildBreadcrumbList({ url, items: postCrumbs(post) }, ids),
   ];
 }
 
@@ -106,7 +125,12 @@ export function postGraph(post: Post) {
 }
 
 /** WebPage piece for a static page (landing, blog index, tags, …). */
-export function pagePieces(name: string, path: string, description?: string) {
+export function pagePieces(
+  name: string,
+  path: string,
+  description?: string,
+  names?: Record<string, string>,
+) {
   const url = new URL(path, SITE.url).href;
   const pieces = [
     buildWebPage(
@@ -122,19 +146,19 @@ export function pagePieces(name: string, path: string, description?: string) {
     ),
   ];
   if (path !== '/') {
-    pieces.push(
-      buildBreadcrumbList(
-        { url, items: breadcrumbsFromUrl({ url, siteUrl: SITE.url, pageName: name }) },
-        ids,
-      ),
-    );
+    pieces.push(buildBreadcrumbList({ url, items: pageCrumbs(name, path, names) }, ids));
   }
   return pieces;
 }
 
 /** Full head graph for a static page. */
-export function pageGraph(name: string, path: string, description?: string) {
-  return assembleGraph([...pagePieces(name, path, description), person, website], {
+export function pageGraph(
+  name: string,
+  path: string,
+  description?: string,
+  names?: Record<string, string>,
+) {
+  return assembleGraph([...pagePieces(name, path, description, names), person, website], {
     warnOnDanglingReferences: import.meta.env.DEV,
   });
 }
@@ -157,10 +181,7 @@ export function profileGraph(name: string, path: string, description?: string) {
         ids,
         'ProfilePage',
       ),
-      buildBreadcrumbList(
-        { url, items: breadcrumbsFromUrl({ url, siteUrl: SITE.url, pageName: name }) },
-        ids,
-      ),
+      buildBreadcrumbList({ url, items: pageCrumbs(name, path) }, ids),
       person,
       website,
     ],

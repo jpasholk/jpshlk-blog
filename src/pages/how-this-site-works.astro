@@ -434,6 +434,9 @@ btn.addEventListener('click',
             <p class={`${filePath} mb-3`}>src/layouts/PostLayout.astro</p>
             <div class="flex flex-col gap-2">
               <p class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+                <span class={filePath}>breadcrumb trail: Home › Blog, same data as the page's JSON-LD (Breadcrumbs.astro)</span>
+              </p>
+              <p class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900">
                 <span class={filePath}>post header: FormattedDate, title (view-transition name), TagPills</span>
               </p>
               <div class={slotBox}>
@@ -928,7 +931,7 @@ The actual writing starts here.</pre>
           </p>
           <p class={leaf}>
             <span class={boxLabel}>JSON-LD in every head</span>
-            <span class={filePath}> schema.org data describing the page, the site, and me, all agreeing with each other</span>
+            <span class={filePath}> schema.org data describing the page, the site, and me, all agreeing with each other; the visible breadcrumb links on posts, projects, and tag pages render from the same data</span>
           </p>
           <p class={leaf}>
             <span class={boxLabel}>llms.txt</span>
