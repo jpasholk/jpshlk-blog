@@ -1,9 +1,12 @@
 ---
 title: Turning My Homepage Into a Landing Page
-date: '2026-07-31'
+date: '2026-07-30'
 draft: true
 summary: 'The homepage used to be a wall of blog posts. Now it leads with who I am and what I do, with the blog one click away. Here''s how it''s put together.'
 tags: ['rebuild', 'astro', 'web-development']
+featureImage:
+  alt: 'Two browser windows on a near-black background, with a dashed arrow pointing from the dim, faded one on the left, which shows nothing but five identical rows of a blog post list, to the larger lit one on the right, where a bright blue header band holds a circular profile photo, a name, and two buttons above a bio paragraph, a row of three project cards, a row of four post cards, and a quote bar at the bottom.'
+  src: ../../assets/turning-my-homepage-into-a-landing-page.png
 ---
 
 *This is part 5 of my [rebuild series](/tags/rebuild/). In [part 4](/blog/a-tiny-design-system-and-dark-mode-that-works/) I built the design system these pieces are made of.*
@@ -14,38 +17,41 @@ The new homepage flips it: **who I am first, blog second.**
 
 ## The anatomy
 
-The page is five sections, each its own component in `src/components/home/`:
+The page is three sections, each its own component in `src/components/home/`:
 
 ```astro
 // src/pages/index.astro (the important part)
 <BaseLayout title={AUTHOR.name} description={SITE.description}>
   <Hero />
-  <About />
   <WorkSection />
   <LatestPosts />
-  <RandomQuote />
 </BaseLayout>
 ```
 
-- **Hero**: photo, name, "Digital Duct Tape @ Plantonix," a two-line intro, and two buttons (read the blog / see my work).
-- **About**: the bio that used to hide on the `/about` page (family, coffee & beer, pool, disc golf, what I do at work, and what I'm learning: Claude Skills, Obsidian, Astro).
-- **WorkSection**: cards for Plantonix, my Jekyll UiKit theme, and my iOS Shortcuts on RoutineHub. These come from a tiny *projects* content collection (part 6), so adding a project is a new markdown file, not code.
+- **Hero**: photo, a big "👋 I'm Josh," the "Digital Duct Tape @ Plantonix" line (pulled from `src/config.ts`, not hardcoded), a short intro, and two buttons (read the blog / see my work). It also owns my favorite flourish on the whole site: the faint code snippets peeking in from the margins. Those are real snippets from this site's source, syntax-highlighted at build time into a little pool, and a script deals a random pair on every visit.
+- **WorkSection**: cards for CocoCalcs, my iOS Shortcuts on RoutineHub, and QuartFlow. These come from a tiny *projects* content collection (part 6 explains collections) where each project has a `featured` flag, so changing what's on the homepage is a one-line frontmatter edit, not code.
 - **LatestPosts**: the five newest posts, reusing the same `PostCard` component the blog page uses.
-- **RandomQuote**: the random quote widget from the old site, rebuilt (story below).
 
-Sections have anchor IDs (like `#work`), so the old `/projects` audience and the hero's "See my work" button can jump straight to a section. Fun fact: the first version of this page also had a Hobbies section with emoji cards. I cut it the next day. Getting to delete your own ideas cheaply is half the point of building from components. And if you want to see how these components nest inside the layout, the full visual map lives at [how this site works](/how-this-site-works/).
+Sections have anchor IDs (like `#work`), so the hero's "See my work" button can jump straight down the page, and WorkSection links out to the full [/projects/](/projects/) page for everything that didn't make the featured cut. Fun fact: the first version of this page had more sections, including a Hobbies grid with emoji cards. I cut it the next day. Getting to delete your own ideas cheaply is half the point of building from components. And if you want to see how these components nest inside the layout, the full visual map lives at [how this site works](/how-this-site-works/).
 
-## Killing the About page (politely)
+## The About page stays (with a smaller job)
 
-Since the landing page *is* the about page now, `/about` shouldn't 404, because old links to it exist in the wild. It redirects to the homepage instead. Astro handles this in config:
+My original plan, and an early draft of this very post, had the landing page *replacing* the About page entirely. I talked myself out of it. "Who is this person" and "tell me everything" are different questions, and cramming the long answer onto the homepage would have rebuilt the exact wall of stuff I was tearing down.
+
+So the split is: the homepage introduces me in ten seconds, and [/about/](/about/) is for people who want the long version. That page also absorbed two things that briefly lived as their own pages, a "What I'm doing now" section at `/about/#now` and a "What I use" section at `/about/#uses`. One page to keep fresh instead of three.
+
+The old URLs can't 404, because links to them exist in the wild. Astro handles that in config:
 
 ```ts
 // astro.config.ts
 redirects: {
-  '/about': '/',
-  '/aboutme': '/',
+  '/aboutme': '/about/',
+  '/uses': '/about/#uses',
+  '/now': '/about/#now',
 },
 ```
+
+(These get mirrored in `public/_redirects` with a `301!` force flag, because Astro also emits meta-refresh stub pages at those paths that would otherwise shadow the real redirect. Ask me how I know. 😅)
 
 That `/aboutme` one is fun: an SEO validation tool (part 7) scanned every link in every built page and found one of my *old posts* linking to `/aboutme`, a page that hadn't existed for years. A dead link I'd never have noticed, caught by a robot. 🤖
 
@@ -53,26 +59,31 @@ That `/aboutme` one is fun: an SEO validation tool (part 7) scanned every link i
 
 The old homepage had a widget that showed a random quote on each visit. Porting it uncovered the exact bug class from part 4: the old script ran once, as a module, on initial page load. With view transitions, navigating *back* to the homepage doesn't re-run module scripts, so the widget silently died and showed nothing.
 
-The rebuilt version does two things differently. The quotes are bundled into the page at build time (no fetch at all; they're just data in the HTML). And the picking logic runs on `astro:page-load`, which fires on every navigation, full or client-side:
+The rebuilt version does a few things differently. The quotes are bundled into the page at build time (no fetch at all; they're just JSON in the HTML). The widget got a promotion out of the homepage and into the footer, so every page shows one. And the picking logic lives in `BaseLayout.astro` instead of the component, listening for `astro:before-swap`:
 
-```astro
-<!-- src/components/home/RandomQuote.astro -->
-<script>
-  function showRandomQuote() {
-    const container = document.querySelector('[data-random-quote]');
-    const data = document.querySelector('[data-quotes]');
-    if (!container || !data?.textContent) return;
-    const quotes = JSON.parse(data.textContent);
-    const quote = quotes[Math.floor(Math.random() * quotes.length)];
-    container.querySelector('[data-quote-text]').textContent = `“${quote.text}”`;
-    container.querySelector('[data-quote-author]').textContent = `— ${quote.author}`;
-  }
+```ts
+// src/layouts/BaseLayout.astro
+function showRandomQuote(doc: Document) {
+  const container = doc.querySelector('[data-random-quote]');
+  const data = doc.querySelector('[data-quotes]');
+  if (!container || !data?.textContent) return;
+  const quotes: Array<{ text: string; author: string }> = JSON.parse(data.textContent);
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  if (!quote) return;
+  container.querySelector('[data-quote-text]')!.textContent = `“${quote.text}”`;
+  container.querySelector('[data-quote-author]')!.textContent = `— ${quote.author}`;
+}
 
-  document.addEventListener('astro:page-load', showRandomQuote);
-</script>
+showRandomQuote(document);
+document.addEventListener('astro:before-swap', (e) => {
+  const doc = (e as Event & { newDocument: Document }).newDocument;
+  showRandomQuote(doc);
+});
 ```
 
-Bonus: you now get a *new* quote every time you come back to the homepage, which is honestly how a random quote widget should have worked all along.
+Why `astro:before-swap` and not the `astro:page-load` event from part 4? Timing. `page-load` fires after the new page is already visible, so the quote would pop in a beat after the crossfade. `before-swap` hands you the *incoming* document before it's shown, so the quote is already sitting there when the page appears. (The first load has no swap, hence the direct call.)
+
+Bonus: every page you visit now deals you a fresh quote, which is honestly how a random quote widget should have worked all along.
 
 ## One small SEO note
 
