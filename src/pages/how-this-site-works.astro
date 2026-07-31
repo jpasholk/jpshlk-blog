@@ -805,7 +805,13 @@ The actual writing starts here.</pre>
           between a card and its post or project page. The morph names are
           applied just in time by a script in the layout (only when one side
           is a detail page), so list-to-list navigations stay a clean
-          crossfade instead of morphing every card at once.
+          crossfade instead of morphing every card at once. One deliberate
+          exception: the header opts out of the crossfade (its transition is
+          set to none), so the site name and nav links stay planted while the
+          little pill highlight slides underneath them to whichever link is
+          now active. The stylesheet also reserves a permanent gutter for the
+          scrollbar, so landing on a short page (where the scrollbar would
+          otherwise vanish) cannot nudge the whole layout sideways mid-swap.
         </p>
       </li>
       <li class="relative">

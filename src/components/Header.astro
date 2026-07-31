@@ -7,7 +7,14 @@ const isActive = (href: string) =>
   href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 ---
 
-<header class="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-6 sm:px-6">
+{/* Named with animate "none": the header is captured apart from the page
+    crossfade and swaps in place, so the nav feels anchored while the pill
+    slides beneath it. The group stacking rule lives in global.css. */}
+<header
+  transition:name="site-header"
+  transition:animate="none"
+  class="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-6 sm:px-6"
+>
   <a href="/" class="text-xl font-bold tracking-tight hover:text-primary-500">
     {SITE.headerTitle}<span class="text-primary-500">.</span>
   </a>
