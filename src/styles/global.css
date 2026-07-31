@@ -137,9 +137,39 @@ pagefind-results:not(:defined) {
   }
 }
 
+/* Anchored header during view transitions. Header.astro names the header
+   "site-header" with its animation set to none, so it is captured apart
+   from the root crossfade and swaps instantly: the nav labels never fade
+   or blend. Without the z-index below, the pseudo groups paint in element
+   paint order (root, then header, then pill) and the opaque pill would
+   slide OVER the nav labels; lifting the header group paints the labels
+   above it, so the pill slides underneath. The header snapshot is
+   transparent outside its content, so nothing else is covered. The pill
+   retiming matches the vt-morph pattern above: one duration and easing
+   across all three of its animations, replacing Astro's 180ms fades plus
+   the browser's default 0.25s group morph. Slightly shorter than the
+   0.4s page fade on purpose, so the nav settles first. */
+::view-transition-group(site-header) {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(active-nav-pill),
+  ::view-transition-old(active-nav-pill),
+  ::view-transition-new(active-nav-pill) {
+    animation-duration: 0.3s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Reserve space for a classic scrollbar even when the page is too
+       short to scroll, so landing on a short page (like /tags/) does not
+       shift the centered column. A no-op for overlay scrollbars, the
+       macOS default. */
+    scrollbar-gutter: stable;
   }
 
   body {
