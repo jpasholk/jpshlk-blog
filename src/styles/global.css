@@ -166,7 +166,7 @@ pagefind-results:not(:defined) {
   html {
     scroll-behavior: smooth;
     /* Reserve space for a classic scrollbar even when the page is too
-       short to scroll, so landing on a short page (like /tags/) does not
+       short to scroll, so landing on a short page (like /search/) does not
        shift the centered column. A no-op for overlay scrollbars, the
        macOS default. */
     scrollbar-gutter: stable;
