@@ -40,8 +40,8 @@ const years = [...byYear.keys()].sort((a, b) => b - a);
         </h2>
         <ul class="mt-4 flex flex-col gap-3">
           {byYear.get(year)!.map((post) => (
-            <li class="flex flex-col gap-x-4 sm:flex-row sm:items-baseline">
-              <span class="w-24 flex-none font-mono text-xs text-zinc-500 dark:text-zinc-400">
+            <li class="flex flex-col gap-x-6 sm:flex-row sm:items-baseline">
+              <span class="min-w-36 flex-none font-mono text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">
                 <FormattedDate date={post.data.date} />
               </span>
               <a
