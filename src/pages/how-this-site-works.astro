@@ -67,10 +67,11 @@ const ilink = 'text-primary-600 underline-offset-2 hover:underline dark:text-pri
       <ol class="mb-4 flex list-decimal flex-col gap-1.5 pl-5 text-sm">
         <li><a class={ilink} href="#what-is-a-website">What a website actually is</a></li>
         <li><a class={ilink} href="#visiting">What happens when you visit jpshlk.com</a></li>
+        <li><a class={ilink} href="#folders">The whole site is just folders</a></li>
         <li><a class={ilink} href="#toolbox">The toolbox on my side</a></li>
       </ol>
       <p class="mb-2 text-sm font-semibold">This site</p>
-      <ol start="4" class="list-decimal gap-x-10 pl-5 text-sm sm:columns-2">
+      <ol start="5" class="list-decimal gap-x-10 pl-5 text-sm sm:columns-2">
         <li class="mb-1.5"><a class={ilink} href="#build-time">The big picture: build time</a></li>
         <li class="mb-1.5"><a class={ilink} href="#slots">Slots in sixty seconds</a></li>
         <li class="mb-1.5"><a class={ilink} href="#homepage">The homepage, as nested boxes</a></li>
@@ -200,9 +201,9 @@ btn.addEventListener('click',
       <strong class="text-zinc-800 dark:text-zinc-200">A server is not special hardware:</strong> it
       is any computer whose job is answering requests. Many sites make theirs
       assemble each page fresh, on demand, for every visitor. This site did
-      all that work ahead of time (<a class={ilink} href="#build-time">section 4</a>),
+      all that work ahead of time (<a class={ilink} href="#build-time">section 5</a>),
       so its "server" is really a CDN, a delivery network that just hands over
-      finished files from a data center near you (<a class={ilink} href="#deploy">section 18</a>).
+      finished files from a data center near you (<a class={ilink} href="#deploy">section 19</a>).
       That is most of why it feels fast.
     </p>
     <p class={note}>
@@ -214,7 +215,107 @@ btn.addEventListener('click',
   </section>
 
   <section>
-    <h2 class={h2} id="toolbox"><span class={num}>3</span>The toolbox on my side</h2>
+    <h2 class={h2} id="folders"><span class={num}>3</span>The whole site is just folders</h2>
+    <p class={caption}>
+      Section 2 ended with "the server sends back the HTML", which raises an
+      obvious question: <em>which</em> HTML? The answer is the least magical
+      thing on this page, and it is worth saying out loud, because once you see
+      it you cannot unsee it. The address bar is a file path. A website is a
+      folder on somebody else's computer, with more folders inside it, and
+      everything after the domain name is directions for walking down that tree.
+    </p>
+    <div class="overflow-x-auto p-1">
+      <div class="grid min-w-140 grid-cols-[1fr_auto_1fr] items-center gap-y-2">
+        <p class={colLabel}>What you ask for</p>
+        <span></span>
+        <p class={colLabel}>What it opens</p>
+
+        <p class={leaf}><span class={filePath}>jpshlk.com/</span></p>
+        <div class={arrow}>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <p class={leaf}><span class={filePath}>index.html</span></p>
+
+        <p class={leaf}><span class={filePath}>jpshlk.com/about/</span></p>
+        <div class={arrow}>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <p class={leaf}><span class={filePath}>about/index.html</span></p>
+
+        <p class={leaf}><span class={filePath}>jpshlk.com/blog/learning-astro/</span></p>
+        <div class={arrow}>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <p class={leaf}><span class={filePath}>blog/learning-astro/index.html</span></p>
+
+        <p class={leaf}><span class={filePath}>jpshlk.com/rss.xml</span></p>
+        <div class={arrow}>
+          <svg width="46" height="14" viewBox="0 0 46 14" fill="none" aria-hidden="true">
+            <path d="M0 7h38m0 0-6-5m6 5-6 5" stroke="currentColor" stroke-width="2"></path>
+          </svg>
+        </div>
+        <p class={leaf}><span class={filePath}>rss.xml</span></p>
+      </div>
+    </div>
+    <p class={`${caption} mt-6`}>
+      Notice the last row breaking the pattern. Ask for a <em>file</em> and you
+      get exactly that file. Ask for a <em>folder</em> and somebody has to decide
+      what to show you. Here is the shape of this whole site, trimmed down to a
+      few branches; the rest looks the same all the way down.
+    </p>
+    <div class="p-1">
+      <pre class={pre}>jpshlk.com/
+├── index.html            ← the home page
+├── about/
+│   └── index.html
+├── blog/
+│   ├── index.html        ← page 1 of the post list
+│   ├── 2/
+│   │   └── index.html    ← page 2
+│   └── learning-astro/
+│       └── index.html    ← one post
+├── tags/
+│   ├── index.html
+│   └── astro/
+│       └── index.html
+├── rss.xml
+└── _astro/               ← one CSS file, optimized images</pre>
+    </div>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">That decision has a default:</strong> by
+      a convention older than most of the web, a server asked for a folder looks
+      inside for a file named <code class="font-mono text-xs">index.html</code> and
+      hands you that. Leave it out and plenty of servers fall back to listing the
+      folder's raw contents instead: a bare column of file names, like a file
+      manager with no styling. Which is the quiet joke of the whole thing. That
+      listing <em>is</em> a user interface, just a generic one nobody chose. Every{' '}
+      <code class="font-mono text-xs">index.html</code> on the internet is somebody
+      overriding it with a nicer one.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">This is why the links here end in a slash.</strong> Writing{' '}
+      <code class="font-mono text-xs">/blog/my-post/</code> says "the folder", which
+      is the thing that actually exists. Drop the slash and the server usually has
+      to guess and redirect you, which costs an extra round trip for no reason.
+    </p>
+    <p class={note}>
+      <strong class="text-zinc-800 dark:text-zinc-200">Two things follow from this,</strong> and
+      they explain most of the rest of the tour. First, "building" this site
+      (<a class={ilink} href="#build-time">section 5</a>) is not a metaphor: the
+      build writes that folder tree, one real file at a time. Second, the tree{' '}
+      <em>is</em> the site, so it can be picked up and dropped on any host without
+      a single address changing (<a class={ilink} href="#deploy">section 19</a>).
+    </p>
+  </section>
+
+  <section>
+    <h2 class={h2} id="toolbox"><span class={num}>4</span>The toolbox on my side</h2>
     <p class={caption}>
       Everything from here on mentions tools that run on <em>my</em> computer,
       not yours. Four of them do almost all the work, so here is the one-line
@@ -256,14 +357,14 @@ btn.addEventListener('click',
           <Link href="https://git-scm.com" class={xlink}>Git</Link> records
           named snapshots of every file in a project, forever, so nothing is
           ever lost and any change can be undone. Its full story is in{' '}
-          <a class={ilink} href="#deploy">section 18</a>.
+          <a class={ilink} href="#deploy">section 19</a>.
         </p>
       </div>
     </div>
   </section>
 
   <section>
-    <h2 class={h2} id="build-time"><span class={num}>4</span>The big picture: it all happens at build time</h2>
+    <h2 class={h2} id="build-time"><span class={num}>5</span>The big picture: it all happens at build time</h2>
     <p class={caption}>
       Two definitions first. A <em>framework</em> is a kit of pre-solved
       problems: instead of every site owner hand-writing the machinery for
@@ -310,7 +411,7 @@ btn.addEventListener('click',
             <p class={leaf}><span class={filePath}>index.html, blog/&hellip;/index.html</span></p>
             <p class={leaf}><span class={filePath}>rss.xml, sitemap, llms.txt</span></p>
             <p class={leaf}><span class={filePath}>optimized images + one CSS file</span></p>
-            <p class={leaf}><span class={filePath}>pagefind/ (the search index, <a class={ilink} href="#search">see 12</a>)</span></p>
+            <p class={leaf}><span class={filePath}>pagefind/ (the search index, <a class={ilink} href="#search">see 13</a>)</span></p>
           </div>
         </div>
       </div>
@@ -324,7 +425,7 @@ btn.addEventListener('click',
   </section>
 
   <section>
-    <h2 class={h2} id="slots"><span class={num}>5</span>Slots in sixty seconds</h2>
+    <h2 class={h2} id="slots"><span class={num}>6</span>Slots in sixty seconds</h2>
     <p class={caption}>
       This whole site is assembled from <em>components</em>: named, reusable
       chunks of page that you use like custom HTML tags
@@ -372,7 +473,7 @@ btn.addEventListener('click',
   </section>
 
   <section>
-    <h2 class={h2} id="homepage"><span class={num}>6</span>The homepage, as nested boxes</h2>
+    <h2 class={h2} id="homepage"><span class={num}>7</span>The homepage, as nested boxes</h2>
     <p class={caption}>
       Boxes inside boxes literally is the architecture. Solid boxes are
       components; the dashed region is BaseLayout's slot, filled by whatever <code class="font-mono text-sm">index.astro</code> put between its tags.
@@ -417,7 +518,7 @@ btn.addEventListener('click',
   </section>
 
   <section>
-    <h2 class={h2} id="blog-post"><span class={num}>7</span>A blog post: layouts nest, so slots nest</h2>
+    <h2 class={h2} id="blog-post"><span class={num}>8</span>A blog post: layouts nest, so slots nest</h2>
     <p class={caption}>
       A post page uses two layouts. PostLayout sits inside BaseLayout's slot,
       and declares a slot of its own, which is where the actual writing (the
@@ -468,7 +569,7 @@ btn.addEventListener('click',
   </section>
 
   <section>
-    <h2 class={h2} id="data"><span class={num}>8</span>Where the data comes from: props go down</h2>
+    <h2 class={h2} id="data"><span class={num}>9</span>Where the data comes from: props go down</h2>
     <p class={caption}>
       Components never go looking for data. Data (post titles, dates, tags)
       is loaded once, then handed down the tree as <em>props</em>: the values
@@ -529,14 +630,14 @@ btn.addEventListener('click',
   </section>
 
   <section>
-    <h2 class={h2} id="writing"><span class={num}>9</span>How a post gets written</h2>
+    <h2 class={h2} id="writing"><span class={num}>10</span>How a post gets written</h2>
     <p class={caption}>
       Every post is one file, written in <Link href="https://commonmark.org/help/" class={xlink}>Markdown</Link>:
       a way of writing formatted text with punctuation instead of buttons
       (<code class="font-mono text-sm">#</code> makes a heading, <code class="font-mono text-sm">**bold**</code> makes
       bold). Strictly speaking the files are <Link href="https://mdxjs.com" class={xlink}>MDX</Link>,
       which is Markdown that is also allowed to use the components
-      from <a class={ilink} href="#slots">section 5</a>. On top of the writing
+      from <a class={ilink} href="#slots">section 6</a>. On top of the writing
       sits a small settings block called frontmatter. That block is data,
       not prose, and it drives everything the site knows about the post.
     </p>
@@ -572,12 +673,12 @@ The actual writing starts here.</pre>
       <strong class="text-zinc-800 dark:text-zinc-200">The spell-checker:</strong> a schema in <code class="font-mono text-xs">src/content.config.ts</code> validates every settings block at build time. A misspelled tag, a bad date, a missing title: the build fails and tells me which file, before anything reaches the internet.
     </p>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">Publishing</strong> is deleting one line. Drafts render on my machine in <code class="font-mono text-xs">npm run dev</code> so I can preview them; remove <code class="font-mono text-xs">draft: true</code>, push, and the post is on its way (<a class={ilink} href="#deploy">section 18</a> covers that trip). If its date has already arrived it goes live on the next build. If the date is still in the future the post is <em>scheduled</em>: it waits, invisible on the live site, and a small robot checks every morning and rebuilds the site the day it comes due.
+      <strong class="text-zinc-800 dark:text-zinc-200">Publishing</strong> is deleting one line. Drafts render on my machine in <code class="font-mono text-xs">npm run dev</code> so I can preview them; remove <code class="font-mono text-xs">draft: true</code>, push, and the post is on its way (<a class={ilink} href="#deploy">section 19</a> covers that trip). If its date has already arrived it goes live on the next build. If the date is still in the future the post is <em>scheduled</em>: it waits, invisible on the live site, and a small robot checks every morning and rebuilds the site the day it comes due.
     </p>
   </section>
 
   <section>
-    <h2 class={h2} id="images"><span class={num}>10</span>Images: three jobs, one build</h2>
+    <h2 class={h2} id="images"><span class={num}>11</span>Images: three jobs, one build</h2>
     <p class={caption}>
       There are 36 original images in <code class="font-mono text-sm">src/assets/</code>,
       and posts reference them with plain markdown. Nobody resizes anything
@@ -626,7 +727,7 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2} id="styling"><span class={num}>11</span>How it looks: Tailwind and one CSS file</h2>
+    <h2 class={h2} id="styling"><span class={num}>12</span>How it looks: Tailwind and one CSS file</h2>
     <p class={caption}>
       <a class={ilink} href="#what-is-a-website">Section 1</a> said CSS is the
       looks. This site writes almost none of it by hand. Instead it
@@ -664,7 +765,7 @@ The actual writing starts here.</pre>
     </div>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">One small file:</strong> at
-      build time (<a class={ilink} href="#build-time">section 4</a> again)
+      build time (<a class={ilink} href="#build-time">section 5</a> again)
       Tailwind scans the whole codebase for class names it recognizes and
       writes a single CSS file containing only the ones actually used.
       Styles nobody uses never ship, and the whole site's look arrives in
@@ -681,7 +782,7 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2} id="search"><span class={num}>12</span>Search: no server, and a second kind of component</h2>
+    <h2 class={h2} id="search"><span class={num}>13</span>Search: no server, and a second kind of component</h2>
     <p class={caption}>
       The search button in the header (Cmd+K works too) and the{' '}
       <a href="/search/" class={ilink}>/search/</a> page
@@ -722,7 +823,7 @@ The actual writing starts here.</pre>
     </div>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">A second kind of component:</strong> everything
-      in <a class={ilink} href="#slots">sections 5</a> through <a class={ilink} href="#blog-post">7</a> was
+      in <a class={ilink} href="#slots">sections 6</a> through <a class={ilink} href="#blog-post">8</a> was
       Astro components, which run at build time and disappear. The search UI
       is the opposite: <em>web components</em>, custom HTML tags that a
       script brings to life in your browser. The header renders just this:
@@ -730,12 +831,12 @@ The actual writing starts here.</pre>
     <pre class={`${pre} mt-3`}>&lt;pagefind-modal-trigger instance="modal" compact&gt;&lt;/pagefind-modal-trigger&gt;
 &lt;pagefind-modal instance="modal" reset-on-close&gt;&lt;/pagefind-modal&gt;</pre>
     <p class={note}>
-      The empty <code class="font-mono text-xs">&lt;pagefind-modal&gt;</code> builds its own input, results, and keyboard hints once the loader script (that chip in <a class={ilink} href="#homepage">section 6</a>'s diagram) fetches the bundle. In dev there is no index yet, so a CSS rule hides the undefined tags and the search page shows a fallback note instead.
+      The empty <code class="font-mono text-xs">&lt;pagefind-modal&gt;</code> builds its own input, results, and keyboard hints once the loader script (that chip in <a class={ilink} href="#homepage">section 7</a>'s diagram) fetches the bundle. In dev there is no index yet, so a CSS rule hides the undefined tags and the search page shows a fallback note instead.
     </p>
   </section>
 
   <section>
-    <h2 class={h2} id="dark-mode"><span class={num}>13</span>Dark mode in three moving parts</h2>
+    <h2 class={h2} id="dark-mode"><span class={num}>14</span>Dark mode in three moving parts</h2>
     <p class={caption}>
       The theme toggle looks like one button, but making it flicker-free
       takes three pieces working together.
@@ -746,7 +847,7 @@ The actual writing starts here.</pre>
         <p class="font-semibold">One class rules everything</p>
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           Dark mode is just a <code class="font-mono text-xs">dark</code> class on the page's root element. Every dark style
-          in the CSS (those <code class="font-mono text-xs">dark:</code> variants from <a class={ilink} href="#styling">section 11</a>) keys off that single class, so adding or removing it
+          in the CSS (those <code class="font-mono text-xs">dark:</code> variants from <a class={ilink} href="#styling">section 12</a>) keys off that single class, so adding or removing it
           re-themes the whole page instantly. No reload, no per-element logic.
         </p>
       </li>
@@ -767,7 +868,7 @@ The actual writing starts here.</pre>
         <p class="max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
           Clicking the sun/moon flips the class and saves your choice in the
           browser's <Link href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage" class={xlink}><code class="font-mono text-xs">localStorage</code></Link> (a little notepad each site gets in your browser), so it sticks across visits. It also stamps a
-          <code class="font-mono text-xs">data-pf-theme</code> attribute that the search UI (<a class={ilink} href="#search">section 12</a>) reads to
+          <code class="font-mono text-xs">data-pf-theme</code> attribute that the search UI (<a class={ilink} href="#search">section 13</a>) reads to
           switch its own dark scheme.
         </p>
       </li>
@@ -775,7 +876,7 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2} id="browser"><span class={num}>14</span>The browser layer: what happens on a click</h2>
+    <h2 class={h2} id="browser"><span class={num}>15</span>The browser layer: what happens on a click</h2>
     <p class={caption}>
       Almost everything above ran at build time. Here is the small amount of
       JavaScript that actually runs for you, the visitor. One idea first:
@@ -842,7 +943,7 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2} id="analytics"><span class={num}>15</span>Analytics that do not follow you</h2>
+    <h2 class={h2} id="analytics"><span class={num}>16</span>Analytics that do not follow you</h2>
     <p class={caption}>
       Analytics means counting visits. Most sites do it
       with <Link href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies" class={xlink}>cookies</Link> (small
@@ -875,12 +976,12 @@ The actual writing starts here.</pre>
       <strong class="text-zinc-800 dark:text-zinc-200">Only in production:</strong> the script renders only on real production deploys. Local dev and preview deploys ship literally zero analytics bytes, not a disabled script, no script at all.
     </p>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">One view transitions wrinkle:</strong> page swaps are not real page loads, so automatic counting is off and each swap is counted once on <code class="font-mono text-xs">astro:page-load</code> (the same event from <a class={ilink} href="#browser">section 14</a>). Otherwise reading five posts would count as one view, or one view as ten.
+      <strong class="text-zinc-800 dark:text-zinc-200">One view transitions wrinkle:</strong> page swaps are not real page loads, so automatic counting is off and each swap is counted once on <code class="font-mono text-xs">astro:page-load</code> (the same event from <a class={ilink} href="#browser">section 15</a>). Otherwise reading five posts would count as one view, or one view as ten.
     </p>
   </section>
 
   <section>
-    <h2 class={h2} id="comments"><span class={num}>16</span>Comments via GitHub Discussions</h2>
+    <h2 class={h2} id="comments"><span class={num}>17</span>Comments via GitHub Discussions</h2>
     <p class={caption}>
       There is no comment database here either. Each post's comments live in a
       GitHub Discussion on this site's repo, and a small open source widget
@@ -909,7 +1010,7 @@ The actual writing starts here.</pre>
       </div>
     </div>
     <p class={note}>
-      <strong class="text-zinc-800 dark:text-zinc-200">The same view transitions wrinkle as analytics:</strong> a swapped-in page never runs scripts baked into its HTML, so the widget is created fresh on <code class="font-mono text-xs">astro:page-load</code> (<a class={ilink} href="#browser">section 14</a> again) for every post you visit.
+      <strong class="text-zinc-800 dark:text-zinc-200">The same view transitions wrinkle as analytics:</strong> a swapped-in page never runs scripts baked into its HTML, so the widget is created fresh on <code class="font-mono text-xs">astro:page-load</code> (<a class={ilink} href="#browser">section 15</a> again) for every post you visit.
     </p>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">Dark mode reaches into the iframe:</strong> the widget mounts with whatever theme the page has, and when you flip the toggle, a tiny observer notices the class change and messages the iframe so the comments flip with it.
@@ -917,7 +1018,7 @@ The actual writing starts here.</pre>
   </section>
 
   <section>
-    <h2 class={h2} id="robots"><span class={num}>17</span>Pages for robots</h2>
+    <h2 class={h2} id="robots"><span class={num}>18</span>Pages for robots</h2>
     <p class={caption}>
       Humans get the HTML pages. The same build also writes files meant only
       for machines, and hires a few robots to proofread my work.
@@ -962,11 +1063,11 @@ The actual writing starts here.</pre>
   </section>
 
   <section class="mb-16">
-    <h2 class={h2} id="deploy"><span class={num}>18</span>From my laptop to your screen</h2>
+    <h2 class={h2} id="deploy"><span class={num}>19</span>From my laptop to your screen</h2>
     <p class={caption}>
       Nothing here uploads files to a server by hand. The whole publish flow
       is: change something, <em>commit</em> it (ask git for one of those
-      named snapshots from <a class={ilink} href="#toolbox">section 3</a>,
+      named snapshots from <a class={ilink} href="#toolbox">section 4</a>,
       with a note saying what changed), and <em>push</em> (upload the new
       snapshots to GitHub). Everything after that is automatic.
     </p>
@@ -1019,7 +1120,7 @@ The actual writing starts here.</pre>
       labeled webhook is literally GitHub
       tapping <Link href="https://www.netlify.com" class={xlink}>Netlify</Link> on
       the shoulder to say something changed. Netlify then re-runs the build
-      from <a class={ilink} href="#build-time">section 4</a> on a fresh
+      from <a class={ilink} href="#build-time">section 5</a> on a fresh
       computer and copies the result to
       a <Link href="https://developer.mozilla.org/en-US/docs/Glossary/CDN" class={xlink}>CDN</Link>:
       data centers around the world, each holding a copy of the finished
@@ -1029,15 +1130,15 @@ The actual writing starts here.</pre>
       <strong class="text-zinc-800 dark:text-zinc-200">A push is not the only trigger:</strong> every
       morning a scheduled check (a GitHub Actions robot) looks for posts whose
       publish date has arrived and, if one is due, pokes Netlify to rebuild.
-      That is how a finished post from <a class={ilink} href="#writing">section 9</a> can
+      That is how a finished post from <a class={ilink} href="#writing">section 10</a> can
       go live on its planned date while I sleep in.
     </p>
     <p class={note}>
       <strong class="text-zinc-800 dark:text-zinc-200">Safe experiments:</strong> only the <code class="font-mono text-xs">main</code> branch publishes to jpshlk.com. Work happens on other branches, and each one gets its own private preview URL built exactly the same way, so every change is reviewed on a real deploy before it merges. This very page was checked on a preview URL before you ever saw it.
     </p>
     <p class={note}>
-      One last thing: this page is itself a box in the <a class={ilink} href="#homepage">section 6</a> diagram. You
-      are reading it inside the very slot described in <a class={ilink} href="#slots">section 5</a>. 🤙
+      One last thing: this page is itself a box in the <a class={ilink} href="#homepage">section 7</a> diagram. You
+      are reading it inside the very slot described in <a class={ilink} href="#slots">section 6</a>. 🤙
     </p>
   </section>
 </BaseLayout>
